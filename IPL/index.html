@@ -5,10 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>IPL · Índice Padrão de Limpeza | HUB COMLURB</title>
   
-  <!-- CSS do HUB -->
+  <!-- CSS Premium do HUB -->
   <link rel="stylesheet" href="../assets/css/hub-premium.css">
-  <!-- Leaflet para mapa -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 </head>
 
 <body>
@@ -21,24 +19,20 @@
   <section class="filters">
     <div class="field">
       <label>Mês</label>
-      <select id="filtroMes"><option value="">Todos</option></select>
+      <select id="filtroMes" onchange="render()"><option value="">Todos</option></select>
     </div>
-    
     <div class="field">
       <label>Superintendência</label>
-      <select id="filtroSuperintendencia"><option value="">Todas</option></select>
+      <select id="filtroSuperintendencia" onchange="render()"><option value="">Todas</option></select>
     </div>
-    
     <div class="field">
       <label>Gerência</label>
-      <select id="filtroGerencia"><option value="">Todas</option></select>
+      <select id="filtroGerencia" onchange="render()"><option value="">Todas</option></select>
     </div>
-    
     <div class="field">
       <label>Bairro</label>
-      <select id="filtroBairro"><option value="">Todos</option></select>
+      <select id="filtroBairro" onchange="render()"><option value="">Todos</option></select>
     </div>
-    
     <button class="actionBtn" onclick="clearAll()">Limpar</button>
   </section>
   
@@ -82,7 +76,7 @@
       <button class="actionBtn primary" onclick="exportarCSV()">Exportar CSV</button>
     </div>
     <div class="tblWrap">
-      <table id="tabelaAnalitica">
+      <table>
         <thead>
           <tr>
             <th>Data</th>
@@ -92,9 +86,9 @@
             <th>Bairro</th>
             <th>Logradouro</th>
             <th>Trecho</th>
-            <th>Total OK</th>
-            <th>Total NOK</th>
-            <th>Lixo Branco</th>
+            <th class="num">Total OK</th>
+            <th class="num">Total NOK</th>
+            <th class="num">Lixo Branco</th>
           </tr>
         </thead>
         <tbody id="tabelaBody">
@@ -112,70 +106,64 @@
 <!-- DEPENDÊNCIAS -->
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-<!-- COMPONENTES HUB -->
 <script src="../assets/components/hub-utils.js"></script>
 <script src="../assets/components/hub-cards.js"></script>
-<script src="../assets/components/hub-charts.js"></script>
-<script src="../assets/components/hub-filters.js"></script>
 <script src="../assets/components/hub-layout.js"></script>
 
 <script>
+// ============================================
+// CONFIGURAÇÃO - SUAS PLANILHAS
+// ============================================
+
 const CONFIG = {
-  dataUrl: "COLE_SUA_URL_AVALIACAO_TRECHOS_AQUI",
-  panelName: "IPL · Índice Padrão de Limpeza",
-  systemLabel: "Monitoramento Operacional",
-  subtitle: "Avaliação territorial, conformidade operacional e reincidências",
+  // URLs das planilhas do Google Sheets
+  urls: [
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vQfx6ZKKoHDmuOOWq9SmNF0SuwZjxM0TCgMBQkpaX-711pjPaKslHUwzWF2bb21o0h4FQIZn4sZN6qP/pub?output=csv",
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vQiBCZr7VWVWqT-OgURqYgnSM7P_wDfFSdmYtjFMfQm7EZJZdbCjkN4v7Q2nJVh8uurzOwxtChPJQrs/pub?output=csv",
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vROo6VzcQvjvIvx3F2ZuCtrf3K369bpxhIXTBcnUcjEQ06rV0BAY5XJF6cQrnxWZBtnR_VwsGsUKwer/pub?output=csv",
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vTcMXJxBYWRaLS_gTdPkAhjIXRHRs-MBNUbfwxmeoZaXMBE53gd1xXttAkQ_lb-HJZcboKMWhRHq8G_/pub?output=csv",
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vTGBqTRVpbulLshnBLc29YhCWsyNTjC6UBbkhWS2bmjArOJfWwQJP_-PusqqZhKOdwT23k23r2niFDa/pub?output=csv",
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vRfraRH94bYNzL6feRpzhhLkja1HsSxTmOi7NopK8PpDPJuY-qgYFhuKrsFvvio0V1YVu38mEZef4PA/pub?output=csv",
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vQlHcfabvwtvbihLOJCfV280rfF9Te2xCSvzKaEtqoJRHcfrCGSnQnIS-hWshyscjtKsnR351wD6-Wo/pub?output=csv"
+  ],
   metaIPL: 77.0
 };
 
+// ============================================
+// ESTADO
+// ============================================
+
 let DATA = [];
 let FILTERED = [];
+let LOADING = true;
+
+// ============================================
+// INICIALIZAÇÃO
+// ============================================
 
 async function init() {
   try {
-    HUB.loading.showMultiple(["alertas", "kpis", "chartEvolucao", "rankingSuperintendencias", "chartNOKItens", "tabelaBody"]);
-    
+    // Renderizar header
     HUB.header.render("header", {
-      systemLabel: CONFIG.systemLabel,
-      title: CONFIG.panelName,
-      subtitle: CONFIG.subtitle
+      systemLabel: "MONITORAMENTO OPERACIONAL",
+      title: "IPL · Índice Padrão de Limpeza",
+      subtitle: "Avaliação territorial, conformidade operacional e reincidências"
     });
     
-    DATA = await HUB.data.loadCSV(CONFIG.dataUrl, { name: "Avaliações IPL", required: true });
+    // Carregar todas as planilhas
+    console.log("Carregando " + CONFIG.urls.length + " planilhas do Google Sheets...");
     
-    DATA = DATA.map(row => {
-      let totalOK = 0, totalNOK = 0, itensNOK = [];
-      const itensAvaliar = ['Coleta domiciliar', 'Lixo Crítico', 'Ralo', 'Entulho', 'Bens inservíveis', 'Material de Obra', 'Pneus', 'Propaganda', 'Galhada', 'Animal morto', 'Resíduo morador de rua', 'Lama/Areia', 'Resíduo pós servico', 'Ponto crítico', 'Capina'];
-      
-      itensAvaliar.forEach(item => {
-        const valor = row[item];
-        if (valor === 'Sim' || valor === 'OK') totalOK++;
-        else if (valor === 'Não' || valor === 'NOK') { totalNOK++; itensNOK.push(item); }
-      });
-      
-      let lixoBrancoTotal = 0;
-      for (let tc = 1; tc <= 4; tc++) {
-        for (let t of ['P', 'G']) {
-          const col = `Lixo Branco TC${tc} - ${t}`;
-          if (row[col]) lixoBrancoTotal += parseInt(row[col]) || 0;
-        }
-      }
-      
-      return { ...row, totalOK, totalNOK, itensNOK, lixoBrancoTotal, taxaConformidade: totalOK + totalNOK > 0 ? (totalOK / (totalOK + totalNOK) * 100) : 0 };
-    });
+    for (let i = 0; i < CONFIG.urls.length; i++) {
+      await carregarPlanilha(CONFIG.urls[i], i + 1);
+    }
     
-    HUB.filters.populateAll(DATA, [
-      { id: "filtroMes", field: "Mês" },
-      { id: "filtroSuperintendencia", field: "Superintendência" },
-      { id: "filtroGerencia", field: "Gerência" },
-      { id: "filtroBairro", field: "Bairro" }
-    ]);
+    console.log("Total de registros carregados: " + DATA.length);
+    LOADING = false;
     
-    HUB.filters.onChange(() => render());
+    populateFilters();
     render();
     
+    // Footer
     HUB.footer.render("footer", {
       customText: `<strong>Gabinete da Presidência</strong><br>HUB COMLURB • Núcleo de Inteligência e Gestão Estratégica Operacional`,
       version: "1.0",
@@ -184,23 +172,107 @@ async function init() {
     
   } catch (e) {
     console.error("Erro:", e);
-    alert(`Erro ao carregar dados: ${e.message}`);
+    alert("Erro ao carregar dados: " + e.message);
   }
 }
 
+// ============================================
+// CARREGAR PLANILHAS
+// ============================================
+
+function carregarPlanilha(url, numero) {
+  return new Promise((resolve, reject) => {
+    Papa.parse(url, {
+      download: true,
+      header: true,
+      complete: (results) => {
+        const registros = results.data.filter(row => Object.values(row).some(v => v && v.toString().trim()));
+        
+        // Enriquecer dados
+        const enriquecidos = registros.map(row => {
+          let totalOK = 0, totalNOK = 0, itensNOK = [];
+          const itens = ['Coleta domiciliar', 'Lixo Crítico', 'Ralo', 'Entulho', 'Bens inservíveis', 'Material de Obra', 'Pneus', 'Propaganda', 'Galhada', 'Animal morto', 'Resíduo morador de rua', 'Lama/Areia', 'Resíduo pós servico', 'Ponto crítico', 'Capina'];
+          
+          itens.forEach(item => {
+            const valor = row[item];
+            if (valor === 'Sim' || valor === 'OK') totalOK++;
+            else if (valor === 'Não' || valor === 'NOK') { totalNOK++; itensNOK.push(item); }
+          });
+          
+          let lixoBranco = 0;
+          for (let tc = 1; tc <= 4; tc++) {
+            for (let t of ['P', 'G']) {
+              const col = `Lixo Branco TC${tc} - ${t}`;
+              if (row[col]) lixoBranco += parseInt(row[col]) || 0;
+            }
+          }
+          
+          return { ...row, totalOK, totalNOK, itensNOK, lixoBranco, taxa: totalOK + totalNOK > 0 ? (totalOK / (totalOK + totalNOK) * 100) : 0 };
+        });
+        
+        DATA = DATA.concat(enriquecidos);
+        console.log(`Planilha ${numero}: ${registros.length} registros carregados`);
+        resolve();
+      },
+      error: (error) => {
+        console.warn(`Erro ao carregar planilha ${numero}:`, error.message);
+        resolve(); // Continua mesmo se uma planilha falhar
+      }
+    });
+  });
+}
+
+// ============================================
+// FILTROS
+// ============================================
+
+function populateFilters() {
+  const meses = [...new Set(DATA.map(r => r['Mês'] || '').filter(Boolean))].sort();
+  const sups = [...new Set(DATA.map(r => r['Superintendência'] || '').filter(Boolean))].sort();
+  const gers = [...new Set(DATA.map(r => r['Gerência'] || '').filter(Boolean))].sort();
+  const bairros = [...new Set(DATA.map(r => r['Bairro'] || '').filter(Boolean))].sort();
+  
+  const populate = (id, items) => {
+    const sel = document.getElementById(id);
+    items.forEach(item => {
+      const opt = document.createElement('option');
+      opt.value = item;
+      opt.textContent = item;
+      sel.appendChild(opt);
+    });
+  };
+  
+  populate('filtroMes', meses);
+  populate('filtroSuperintendencia', sups);
+  populate('filtroGerencia', gers);
+  populate('filtroBairro', bairros);
+}
+
 function clearAll() {
-  HUB.filters.clear();
+  document.getElementById('filtroMes').value = '';
+  document.getElementById('filtroSuperintendencia').value = '';
+  document.getElementById('filtroGerencia').value = '';
+  document.getElementById('filtroBairro').value = '';
   render();
 }
 
 function applyFilters() {
-  FILTERED = HUB.filters.apply(DATA, [
-    { id: "filtroMes", field: "Mês" },
-    { id: "filtroSuperintendencia", field: "Superintendência" },
-    { id: "filtroGerencia", field: "Gerência" },
-    { id: "filtroBairro", field: "Bairro" }
-  ]);
+  const mes = document.getElementById('filtroMes').value;
+  const sup = document.getElementById('filtroSuperintendencia').value;
+  const ger = document.getElementById('filtroGerencia').value;
+  const bai = document.getElementById('filtroBairro').value;
+  
+  FILTERED = DATA.filter(r => {
+    return (mes === '' || r['Mês'] === mes) &&
+           (sup === '' || r['Superintendência'] === sup) &&
+           (ger === '' || r['Gerência'] === ger) &&
+           (bai === '' || r['Bairro'] === bai);
+  });
 }
+
+// ============================================
+// RENDERIZAÇÃO
+// ============================================
 
 function render() {
   applyFilters();
@@ -212,73 +284,142 @@ function render() {
 
 function renderAlertas() {
   const container = document.getElementById('alertas');
-  const alertas = [];
-  const porSuperintendencia = {};
+  const porSup = {};
   
   FILTERED.forEach(row => {
-    const sup = row['Superintendência'];
-    if (!sup) return;
-    if (!porSuperintendencia[sup]) porSuperintendencia[sup] = { ok: 0, nok: 0 };
-    porSuperintendencia[sup].ok += row.totalOK || 0;
-    porSuperintendencia[sup].nok += row.totalNOK || 0;
+    const s = row['Superintendência'];
+    if (!s) return;
+    if (!porSup[s]) porSup[s] = { ok: 0, nok: 0 };
+    porSup[s].ok += row.totalOK || 0;
+    porSup[s].nok += row.totalNOK || 0;
   });
   
-  Object.entries(porSuperintendencia).forEach(([sup, data]) => {
-    const total = data.ok + data.nok;
-    const conformidade = total > 0 ? (data.ok / total * 100) : 0;
-    if (conformidade < CONFIG.metaIPL) {
-      alertas.push(`<div class="card highlight warn"><small>Atenção Operacional</small><b>A Superintendência ${sup} apresenta taxa de conformidade de ${conformidade.toFixed(1)}%, abaixo da meta de ${CONFIG.metaIPL}%.</b></div>`);
+  const alertas = [];
+  Object.entries(porSup).forEach(([s, d]) => {
+    const tot = d.ok + d.nok;
+    const conf = tot > 0 ? (d.ok / tot * 100) : 0;
+    if (conf < CONFIG.metaIPL) {
+      alertas.push(`
+        <div class="highlight warn">
+          <small>Atenção Operacional</small>
+          <b>A Superintendência ${s} apresenta taxa de conformidade de ${conf.toFixed(1)}%, abaixo da meta de ${CONFIG.metaIPL}%.</b>
+        </div>
+      `);
     }
   });
   
-  container.innerHTML = alertas.length > 0 ? alertas.join('') : `<div class="card highlight good"><small>Sistema Operacional</small><b>Nenhum alerta crítico identificado.</b></div>`;
+  if (alertas.length === 0) {
+    container.innerHTML = `
+      <div class="highlight good">
+        <small>Sistema Operacional</small>
+        <b>Nenhum alerta crítico identificado.</b>
+      </div>
+    `;
+  } else {
+    container.innerHTML = alertas.join('');
+  }
 }
 
 function renderKPIs() {
-  const totalAvaliações = FILTERED.length;
-  const totalOK = FILTERED.reduce((sum, r) => sum + (r.totalOK || 0), 0);
-  const totalNOK = FILTERED.reduce((sum, r) => sum + (r.totalNOK || 0), 0);
+  const totalAval = FILTERED.length;
+  const totalOK = FILTERED.reduce((s, r) => s + (r.totalOK || 0), 0);
+  const totalNOK = FILTERED.reduce((s, r) => s + (r.totalNOK || 0), 0);
   const totalItens = totalOK + totalNOK;
-  const taxaConformidade = totalItens > 0 ? (totalOK / totalItens * 100) : 0;
-  const totalLixoBranco = FILTERED.reduce((sum, r) => sum + (r.lixoBrancoTotal || 0), 0);
+  const taxa = totalItens > 0 ? (totalOK / totalItens * 100) : 0;
+  const lixo = FILTERED.reduce((s, r) => s + (r.lixoBranco || 0), 0);
   
   HUB.cards.render("kpis", [
-    { label: "Taxa de Conformidade", value: taxaConformidade.toFixed(1) + '%', note: "itens OK / total", feature: true, color: taxaConformidade >= CONFIG.metaIPL ? "green" : "orange" },
+    { label: "Taxa de Conformidade", value: taxa.toFixed(1) + '%', note: "itens OK / total", feature: true, color: taxa >= CONFIG.metaIPL ? "green" : "orange" },
     { label: "Meta IPL", value: CONFIG.metaIPL.toFixed(1) + '%', note: "objetivo", color: "blue" },
-    { label: "Total Avaliações", value: HUB.format.num(totalAvaliações), note: "vistorias" },
+    { label: "Total Avaliações", value: HUB.format.num(totalAval), note: "vistorias" },
     { label: "Itens OK", value: HUB.format.num(totalOK), note: "conformes", color: "green" },
     { label: "Itens NOK", value: HUB.format.num(totalNOK), note: "não conformes", color: "orange" },
-    { label: "Lixo Branco", value: HUB.format.num(totalLixoBranco), note: "unidades" }
+    { label: "Lixo Branco", value: HUB.format.num(lixo), note: "unidades" }
   ]);
 }
 
 function renderCharts() {
-  const porSup = HUB.array.groupBy(FILTERED, 'Superintendência');
-  const supData = Object.entries(porSup).map(([sup, rows]) => {
-    const total = rows.reduce((s, r) => s + (r.totalOK || 0) + (r.totalNOK || 0), 0);
-    const ok = rows.reduce((s, r) => s + (r.totalOK || 0), 0);
-    const conformidade = total > 0 ? (ok / total * 100) : 0;
-    return [sup, conformidade];
-  }).sort((a, b) => b[1] - a[1]);
+  // Ranking
+  const porSup = {};
+  FILTERED.forEach(row => {
+    const s = row['Superintendência'];
+    if (!s) return;
+    if (!porSup[s]) porSup[s] = { ok: 0, nok: 0 };
+    porSup[s].ok += row.totalOK || 0;
+    porSup[s].nok += row.totalNOK || 0;
+  });
   
-  HUB.simpleBar.render("rankingSuperintendencias", supData.slice(0, 10), { total: 100, color: "blue" });
+  const supData = Object.entries(porSup)
+    .map(([s, d]) => {
+      const tot = d.ok + d.nok;
+      const conf = tot > 0 ? (d.ok / tot * 100) : 0;
+      return { label: s, value: conf };
+    })
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 10);
   
+  HUB.simpleBar.render("rankingSuperintendencias", supData, { total: 100, color: "blue" });
+  
+  // NOK por Item
   const nokPorItem = {};
   FILTERED.forEach(row => row.itensNOK.forEach(item => nokPorItem[item] = (nokPorItem[item] || 0) + 1));
-  const nokData = Object.entries(nokPorItem).sort((a, b) => b[1] - a[1]).slice(0, 10);
-  HUB.simpleBar.render("chartNOKItens", nokData, { total: Object.values(nokPorItem).reduce((a, b) => a + b, 0), color: "orange" });
+  
+  const nokData = Object.entries(nokPorItem)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10);
+  
+  HUB.simpleBar.render("chartNOKItens", nokData, { total: Math.max(...nokData.map(d => d[1]), 1), color: "orange" });
 }
 
 function renderTabela() {
   const tbody = document.getElementById('tabelaBody');
-  tbody.innerHTML = FILTERED.slice(0, 100).map(row => `<tr><td>${row['Data'] || '-'}</td><td>${row['Mês'] || '-'}</td><td>${row['Superintendência'] || '-'}</td><td>${row['Gerência'] || '-'}</td><td>${row['Bairro'] || '-'}</td><td>${row['Logradouro'] || '-'}</td><td>${row['Trecho'] || '-'}</td><td class="num">${row.totalOK || 0}</td><td class="num">${row.totalNOK || 0}</td><td class="num">${row.lixoBrancoTotal || 0}</td></tr>`).join('');
+  const rows = FILTERED.slice(0, 100).map(r => `
+    <tr>
+      <td>${r['Data'] || '-'}</td>
+      <td>${r['Mês'] || '-'}</td>
+      <td>${r['Superintendência'] || '-'}</td>
+      <td>${r['Gerência'] || '-'}</td>
+      <td>${r['Bairro'] || '-'}</td>
+      <td>${r['Logradouro'] || '-'}</td>
+      <td>${r['Trecho'] || '-'}</td>
+      <td class="num">${r.totalOK || 0}</td>
+      <td class="num">${r.totalNOK || 0}</td>
+      <td class="num">${r.lixoBranco || 0}</td>
+    </tr>
+  `).join('');
+  
+  tbody.innerHTML = rows || '<tr><td colspan="10" class="loading">Nenhum dado</td></tr>';
 }
 
 function exportarCSV() {
-  HUB.export.csv(FILTERED, 'ipl-dados.csv');
+  if (FILTERED.length === 0) { alert('Nenhum dado para exportar'); return; }
+  
+  const headers = ['Data', 'Mês', 'Superintendência', 'Gerência', 'Bairro', 'Logradouro', 'Trecho', 'Total OK', 'Total NOK', 'Lixo Branco'];
+  const rows = FILTERED.map(r => [
+    r['Data'] || '',
+    r['Mês'] || '',
+    r['Superintendência'] || '',
+    r['Gerência'] || '',
+    r['Bairro'] || '',
+    r['Logradouro'] || '',
+    r['Trecho'] || '',
+    r.totalOK || 0,
+    r.totalNOK || 0,
+    r.lixoBranco || 0
+  ]);
+  
+  let csv = headers.join(',') + '\n';
+  rows.forEach(row => csv += row.map(v => `"${v}"`).join(',') + '\n');
+  
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'ipl-dados.csv';
+  a.click();
 }
 
-document.addEventListener("DOMContentLoaded", init);
+document.addEventListener('DOMContentLoaded', init);
 </script>
 
 </body>
