@@ -1,48 +1,55 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>IPL · Índice Padrão de Limpeza · HUB COMLURB</title>
-
-<!-- CSS HUB -->
-<link rel="stylesheet" href="../assets/css/hub-premium.css">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IPL · Índice Padrão de Limpeza | HUB COMLURB</title>
+  
+  <!-- CSS do HUB -->
+  <link rel="stylesheet" href="../assets/css/hub-premium.css">
+  <!-- Leaflet para mapa -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 </head>
+
 <body>
 <div class="app">
-
-<!-- ============================================
-     HEADER
-     ============================================ -->
-<div id="header"></div>
-
-<!-- ============================================
-     STATUS
-     ============================================ -->
-<div id="status" class="statusBar loading" style="display:none">
-  Carregando bases de dados...
-</div>
-
-<!-- ============================================
-     NAVEGAÇÃO
-     ============================================ -->
-<div id="navTabs"></div>
-
-<!-- ============================================
-     TELA 1: INTELIGÊNCIA OPERACIONAL
-     ============================================ -->
-<div id="screenOperacional" class="screen active">
   
-  <!-- Alertas operacionais -->
-  <div id="alertasContainer" style="margin-bottom:20px"></div>
+  <!-- HEADER -->
+  <div id="header"></div>
   
-  <!-- KPIs -->
-  <div id="kpis"></div>
+  <!-- FILTROS -->
+  <section class="filters">
+    <div class="field">
+      <label>Mês</label>
+      <select id="filtroMes"><option value="">Todos</option></select>
+    </div>
+    
+    <div class="field">
+      <label>Superintendência</label>
+      <select id="filtroSuperintendencia"><option value="">Todas</option></select>
+    </div>
+    
+    <div class="field">
+      <label>Gerência</label>
+      <select id="filtroGerencia"><option value="">Todas</option></select>
+    </div>
+    
+    <div class="field">
+      <label>Bairro</label>
+      <select id="filtroBairro"><option value="">Todos</option></select>
+    </div>
+    
+    <button class="actionBtn" onclick="clearAll()">Limpar</button>
+  </section>
   
-  <!-- Gráficos -->
-  <div class="grid2">
+  <!-- ALERTAS -->
+  <div id="alertas"></div>
+  
+  <!-- KPIS -->
+  <div class="kpis" id="kpis"></div>
+  
+  <!-- GRÁFICOS -->
+  <div class="grid">
     <div class="panel">
       <div class="panelHead">
         <h2>Evolução Mensal do IPL</h2>
@@ -58,177 +65,221 @@
       </div>
       <div class="body" id="rankingSuperintendencias"></div>
     </div>
-  </div>
-  
-  <div class="panel">
-    <div class="panelHead">
-      <h2>Distribuição de NOK por Item</h2>
-      <div class="hint">Itens com maior concentração de não conformidades</div>
-    </div>
-    <div class="body" id="chartNOKItens"></div>
-  </div>
-
-</div>
-
-<!-- ============================================
-     TELA 2: EXECUTIVO
-     ============================================ -->
-<div id="screenExecutivo" class="screen">
-  
-  <!-- Filtros -->
-  <section class="filters">
-    <div class="field">
-      <label for="filtroMes">Mês</label>
-      <select id="filtroMes"><option value="">Todos</option></select>
-    </div>
-    <div class="field">
-      <label for="filtroSuperintendencia">Superintendência</label>
-      <select id="filtroSuperintendencia"><option value="">Todas</option></select>
-    </div>
-    <div class="field">
-      <label for="filtroGerencia">Gerência</label>
-      <select id="filtroGerencia"><option value="">Todas</option></select>
-    </div>
-    <div class="field">
-      <label for="filtroBairro">Bairro</label>
-      <select id="filtroBairro"><option value="">Todos</option></select>
-    </div>
-    <button id="btnLimpar" class="actionBtn primary">Limpar Filtros</button>
-  </section>
-
-  <!-- KPIs filtrados -->
-  <div id="kpisExecutivos"></div>
-  
-  <!-- Gráficos -->
-  <div class="grid2">
-    <div class="panel">
-      <div class="panelHead">
-        <h2>Meta x Realizado</h2>
-      </div>
-      <div class="body" id="chartMetaRealizado"></div>
-    </div>
     
     <div class="panel">
       <div class="panelHead">
-        <h2>IPL por Gerência</h2>
+        <h2>Distribuição de NOK por Item</h2>
+        <div class="hint">Itens com maior concentração de não conformidades</div>
       </div>
-      <div class="body" id="rankingGerencias"></div>
-    </div>
-  </div>
-
-</div>
-
-<!-- ============================================
-     TELA 3: TERRITORIAL
-     ============================================ -->
-<div id="screenTerritorial" class="screen">
-  
-  <div class="panel">
-    <div class="panelHead">
-      <h2>Mapa Territorial de NOK</h2>
-      <div class="hint">Hotspots e concentração por bairro</div>
-    </div>
-    <div class="body" style="padding:0">
-      <div id="map" style="height:600px"></div>
+      <div class="body" id="chartNOKItens"></div>
     </div>
   </div>
   
-  <div class="panel">
-    <div class="panelHead">
-      <h2>Top 20 Bairros com Maior Concentração de NOK</h2>
-    </div>
-    <div class="body" id="rankingBairrosNOK"></div>
-  </div>
-
-</div>
-
-<!-- ============================================
-     TELA 4: REINCIDÊNCIA
-     ============================================ -->
-<div id="screenReincidencia" class="screen">
-  
-  <div id="kpisReincidencia"></div>
-  
-  <div class="grid2">
-    <div class="panel">
-      <div class="panelHead">
-        <h2>Reincidência por Item</h2>
-      </div>
-      <div class="body" id="chartReincidenciaItem"></div>
-    </div>
-    
-    <div class="panel">
-      <div class="panelHead">
-        <h2>Top Trechos Reincidentes</h2>
-      </div>
-      <div class="body" id="rankingTrechosReincidentes"></div>
-    </div>
-  </div>
-
-</div>
-
-<!-- ============================================
-     TELA 5: ANALÍTICO
-     ============================================ -->
-<div id="screenAnalitico" class="screen">
-  
+  <!-- TABELA -->
   <div class="panel">
     <div class="panelHead">
       <h2>Dados Detalhados</h2>
-      <button id="btnExportar" class="actionBtn primary">Exportar CSV</button>
+      <button class="actionBtn primary" onclick="exportarCSV()">Exportar CSV</button>
     </div>
     <div class="tblWrap">
       <table id="tabelaAnalitica">
         <thead>
           <tr>
-            <th data-sort="data">Data</th>
-            <th data-sort="mes">Mês</th>
-            <th data-sort="superintendencia">Superintendência</th>
-            <th data-sort="gerencia">Gerência</th>
-            <th data-sort="bairro">Bairro</th>
-            <th data-sort="logradouro">Logradouro</th>
-            <th data-sort="trecho">Trecho</th>
-            <th data-sort="totalOK">Total OK</th>
-            <th data-sort="totalNOK">Total NOK</th>
-            <th data-sort="lixoBranco">Lixo Branco</th>
+            <th>Data</th>
+            <th>Mês</th>
+            <th>Superintendência</th>
+            <th>Gerência</th>
+            <th>Bairro</th>
+            <th>Logradouro</th>
+            <th>Trecho</th>
+            <th>Total OK</th>
+            <th>Total NOK</th>
+            <th>Lixo Branco</th>
           </tr>
         </thead>
         <tbody id="tabelaBody">
-          <tr><td colspan="10" class="loading">Carregando...</td></tr>
+          <tr><td colspan="10" class="loading">Carregando dados...</td></tr>
         </tbody>
       </table>
     </div>
   </div>
-
+  
+  <!-- FOOTER -->
+  <div id="footer"></div>
+  
 </div>
 
-<!-- ============================================
-     FOOTER
-     ============================================ -->
-<div id="footer"></div>
-
-</div>
-
-<!-- ============================================
-     DEPENDÊNCIAS
-     ============================================ -->
+<!-- DEPENDÊNCIAS -->
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<!-- ============================================
-     COMPONENTES HUB
-     ============================================ -->
+<!-- COMPONENTES HUB -->
 <script src="../assets/components/hub-utils.js"></script>
 <script src="../assets/components/hub-cards.js"></script>
 <script src="../assets/components/hub-charts.js"></script>
 <script src="../assets/components/hub-filters.js"></script>
 <script src="../assets/components/hub-layout.js"></script>
 
-<!-- ============================================
-     APP IPL
-     ============================================ -->
-<script src="app.js"></script>
+<script>
+const CONFIG = {
+  dataUrl: "COLE_SUA_URL_AVALIACAO_TRECHOS_AQUI",
+  panelName: "IPL · Índice Padrão de Limpeza",
+  systemLabel: "Monitoramento Operacional",
+  subtitle: "Avaliação territorial, conformidade operacional e reincidências",
+  metaIPL: 77.0
+};
+
+let DATA = [];
+let FILTERED = [];
+
+async function init() {
+  try {
+    HUB.loading.showMultiple(["alertas", "kpis", "chartEvolucao", "rankingSuperintendencias", "chartNOKItens", "tabelaBody"]);
+    
+    HUB.header.render("header", {
+      systemLabel: CONFIG.systemLabel,
+      title: CONFIG.panelName,
+      subtitle: CONFIG.subtitle
+    });
+    
+    DATA = await HUB.data.loadCSV(CONFIG.dataUrl, { name: "Avaliações IPL", required: true });
+    
+    DATA = DATA.map(row => {
+      let totalOK = 0, totalNOK = 0, itensNOK = [];
+      const itensAvaliar = ['Coleta domiciliar', 'Lixo Crítico', 'Ralo', 'Entulho', 'Bens inservíveis', 'Material de Obra', 'Pneus', 'Propaganda', 'Galhada', 'Animal morto', 'Resíduo morador de rua', 'Lama/Areia', 'Resíduo pós servico', 'Ponto crítico', 'Capina'];
+      
+      itensAvaliar.forEach(item => {
+        const valor = row[item];
+        if (valor === 'Sim' || valor === 'OK') totalOK++;
+        else if (valor === 'Não' || valor === 'NOK') { totalNOK++; itensNOK.push(item); }
+      });
+      
+      let lixoBrancoTotal = 0;
+      for (let tc = 1; tc <= 4; tc++) {
+        for (let t of ['P', 'G']) {
+          const col = `Lixo Branco TC${tc} - ${t}`;
+          if (row[col]) lixoBrancoTotal += parseInt(row[col]) || 0;
+        }
+      }
+      
+      return { ...row, totalOK, totalNOK, itensNOK, lixoBrancoTotal, taxaConformidade: totalOK + totalNOK > 0 ? (totalOK / (totalOK + totalNOK) * 100) : 0 };
+    });
+    
+    HUB.filters.populateAll(DATA, [
+      { id: "filtroMes", field: "Mês" },
+      { id: "filtroSuperintendencia", field: "Superintendência" },
+      { id: "filtroGerencia", field: "Gerência" },
+      { id: "filtroBairro", field: "Bairro" }
+    ]);
+    
+    HUB.filters.onChange(() => render());
+    render();
+    
+    HUB.footer.render("footer", {
+      customText: `<strong>Gabinete da Presidência</strong><br>HUB COMLURB • Núcleo de Inteligência e Gestão Estratégica Operacional`,
+      version: "1.0",
+      showTimestamp: false
+    });
+    
+  } catch (e) {
+    console.error("Erro:", e);
+    alert(`Erro ao carregar dados: ${e.message}`);
+  }
+}
+
+function clearAll() {
+  HUB.filters.clear();
+  render();
+}
+
+function applyFilters() {
+  FILTERED = HUB.filters.apply(DATA, [
+    { id: "filtroMes", field: "Mês" },
+    { id: "filtroSuperintendencia", field: "Superintendência" },
+    { id: "filtroGerencia", field: "Gerência" },
+    { id: "filtroBairro", field: "Bairro" }
+  ]);
+}
+
+function render() {
+  applyFilters();
+  renderAlertas();
+  renderKPIs();
+  renderCharts();
+  renderTabela();
+}
+
+function renderAlertas() {
+  const container = document.getElementById('alertas');
+  const alertas = [];
+  const porSuperintendencia = {};
+  
+  FILTERED.forEach(row => {
+    const sup = row['Superintendência'];
+    if (!sup) return;
+    if (!porSuperintendencia[sup]) porSuperintendencia[sup] = { ok: 0, nok: 0 };
+    porSuperintendencia[sup].ok += row.totalOK || 0;
+    porSuperintendencia[sup].nok += row.totalNOK || 0;
+  });
+  
+  Object.entries(porSuperintendencia).forEach(([sup, data]) => {
+    const total = data.ok + data.nok;
+    const conformidade = total > 0 ? (data.ok / total * 100) : 0;
+    if (conformidade < CONFIG.metaIPL) {
+      alertas.push(`<div class="card highlight warn"><small>Atenção Operacional</small><b>A Superintendência ${sup} apresenta taxa de conformidade de ${conformidade.toFixed(1)}%, abaixo da meta de ${CONFIG.metaIPL}%.</b></div>`);
+    }
+  });
+  
+  container.innerHTML = alertas.length > 0 ? alertas.join('') : `<div class="card highlight good"><small>Sistema Operacional</small><b>Nenhum alerta crítico identificado.</b></div>`;
+}
+
+function renderKPIs() {
+  const totalAvaliações = FILTERED.length;
+  const totalOK = FILTERED.reduce((sum, r) => sum + (r.totalOK || 0), 0);
+  const totalNOK = FILTERED.reduce((sum, r) => sum + (r.totalNOK || 0), 0);
+  const totalItens = totalOK + totalNOK;
+  const taxaConformidade = totalItens > 0 ? (totalOK / totalItens * 100) : 0;
+  const totalLixoBranco = FILTERED.reduce((sum, r) => sum + (r.lixoBrancoTotal || 0), 0);
+  
+  HUB.cards.render("kpis", [
+    { label: "Taxa de Conformidade", value: taxaConformidade.toFixed(1) + '%', note: "itens OK / total", feature: true, color: taxaConformidade >= CONFIG.metaIPL ? "green" : "orange" },
+    { label: "Meta IPL", value: CONFIG.metaIPL.toFixed(1) + '%', note: "objetivo", color: "blue" },
+    { label: "Total Avaliações", value: HUB.format.num(totalAvaliações), note: "vistorias" },
+    { label: "Itens OK", value: HUB.format.num(totalOK), note: "conformes", color: "green" },
+    { label: "Itens NOK", value: HUB.format.num(totalNOK), note: "não conformes", color: "orange" },
+    { label: "Lixo Branco", value: HUB.format.num(totalLixoBranco), note: "unidades" }
+  ]);
+}
+
+function renderCharts() {
+  const porSup = HUB.array.groupBy(FILTERED, 'Superintendência');
+  const supData = Object.entries(porSup).map(([sup, rows]) => {
+    const total = rows.reduce((s, r) => s + (r.totalOK || 0) + (r.totalNOK || 0), 0);
+    const ok = rows.reduce((s, r) => s + (r.totalOK || 0), 0);
+    const conformidade = total > 0 ? (ok / total * 100) : 0;
+    return [sup, conformidade];
+  }).sort((a, b) => b[1] - a[1]);
+  
+  HUB.simpleBar.render("rankingSuperintendencias", supData.slice(0, 10), { total: 100, color: "blue" });
+  
+  const nokPorItem = {};
+  FILTERED.forEach(row => row.itensNOK.forEach(item => nokPorItem[item] = (nokPorItem[item] || 0) + 1));
+  const nokData = Object.entries(nokPorItem).sort((a, b) => b[1] - a[1]).slice(0, 10);
+  HUB.simpleBar.render("chartNOKItens", nokData, { total: Object.values(nokPorItem).reduce((a, b) => a + b, 0), color: "orange" });
+}
+
+function renderTabela() {
+  const tbody = document.getElementById('tabelaBody');
+  tbody.innerHTML = FILTERED.slice(0, 100).map(row => `<tr><td>${row['Data'] || '-'}</td><td>${row['Mês'] || '-'}</td><td>${row['Superintendência'] || '-'}</td><td>${row['Gerência'] || '-'}</td><td>${row['Bairro'] || '-'}</td><td>${row['Logradouro'] || '-'}</td><td>${row['Trecho'] || '-'}</td><td class="num">${row.totalOK || 0}</td><td class="num">${row.totalNOK || 0}</td><td class="num">${row.lixoBrancoTotal || 0}</td></tr>`).join('');
+}
+
+function exportarCSV() {
+  HUB.export.csv(FILTERED, 'ipl-dados.csv');
+}
+
+document.addEventListener("DOMContentLoaded", init);
+</script>
 
 </body>
 </html>
