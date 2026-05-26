@@ -1,1 +1,234 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>IPL · Índice Padrão de Limpeza · HUB COMLURB</title>
 
+<!-- CSS HUB -->
+<link rel="stylesheet" href="../assets/css/hub-premium.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+</head>
+<body>
+<div class="app">
+
+<!-- ============================================
+     HEADER
+     ============================================ -->
+<div id="header"></div>
+
+<!-- ============================================
+     STATUS
+     ============================================ -->
+<div id="status" class="statusBar loading" style="display:none">
+  Carregando bases de dados...
+</div>
+
+<!-- ============================================
+     NAVEGAÇÃO
+     ============================================ -->
+<div id="navTabs"></div>
+
+<!-- ============================================
+     TELA 1: INTELIGÊNCIA OPERACIONAL
+     ============================================ -->
+<div id="screenOperacional" class="screen active">
+  
+  <!-- Alertas operacionais -->
+  <div id="alertasContainer" style="margin-bottom:20px"></div>
+  
+  <!-- KPIs -->
+  <div id="kpis"></div>
+  
+  <!-- Gráficos -->
+  <div class="grid2">
+    <div class="panel">
+      <div class="panelHead">
+        <h2>Evolução Mensal do IPL</h2>
+        <div class="hint">Comparativo mensal de conformidade</div>
+      </div>
+      <div class="body" id="chartEvolucao"></div>
+    </div>
+    
+    <div class="panel">
+      <div class="panelHead">
+        <h2>Ranking Superintendências</h2>
+        <div class="hint">Taxa de conformidade por região</div>
+      </div>
+      <div class="body" id="rankingSuperintendencias"></div>
+    </div>
+  </div>
+  
+  <div class="panel">
+    <div class="panelHead">
+      <h2>Distribuição de NOK por Item</h2>
+      <div class="hint">Itens com maior concentração de não conformidades</div>
+    </div>
+    <div class="body" id="chartNOKItens"></div>
+  </div>
+
+</div>
+
+<!-- ============================================
+     TELA 2: EXECUTIVO
+     ============================================ -->
+<div id="screenExecutivo" class="screen">
+  
+  <!-- Filtros -->
+  <section class="filters">
+    <div class="field">
+      <label for="filtroMes">Mês</label>
+      <select id="filtroMes"><option value="">Todos</option></select>
+    </div>
+    <div class="field">
+      <label for="filtroSuperintendencia">Superintendência</label>
+      <select id="filtroSuperintendencia"><option value="">Todas</option></select>
+    </div>
+    <div class="field">
+      <label for="filtroGerencia">Gerência</label>
+      <select id="filtroGerencia"><option value="">Todas</option></select>
+    </div>
+    <div class="field">
+      <label for="filtroBairro">Bairro</label>
+      <select id="filtroBairro"><option value="">Todos</option></select>
+    </div>
+    <button id="btnLimpar" class="actionBtn primary">Limpar Filtros</button>
+  </section>
+
+  <!-- KPIs filtrados -->
+  <div id="kpisExecutivos"></div>
+  
+  <!-- Gráficos -->
+  <div class="grid2">
+    <div class="panel">
+      <div class="panelHead">
+        <h2>Meta x Realizado</h2>
+      </div>
+      <div class="body" id="chartMetaRealizado"></div>
+    </div>
+    
+    <div class="panel">
+      <div class="panelHead">
+        <h2>IPL por Gerência</h2>
+      </div>
+      <div class="body" id="rankingGerencias"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ============================================
+     TELA 3: TERRITORIAL
+     ============================================ -->
+<div id="screenTerritorial" class="screen">
+  
+  <div class="panel">
+    <div class="panelHead">
+      <h2>Mapa Territorial de NOK</h2>
+      <div class="hint">Hotspots e concentração por bairro</div>
+    </div>
+    <div class="body" style="padding:0">
+      <div id="map" style="height:600px"></div>
+    </div>
+  </div>
+  
+  <div class="panel">
+    <div class="panelHead">
+      <h2>Top 20 Bairros com Maior Concentração de NOK</h2>
+    </div>
+    <div class="body" id="rankingBairrosNOK"></div>
+  </div>
+
+</div>
+
+<!-- ============================================
+     TELA 4: REINCIDÊNCIA
+     ============================================ -->
+<div id="screenReincidencia" class="screen">
+  
+  <div id="kpisReincidencia"></div>
+  
+  <div class="grid2">
+    <div class="panel">
+      <div class="panelHead">
+        <h2>Reincidência por Item</h2>
+      </div>
+      <div class="body" id="chartReincidenciaItem"></div>
+    </div>
+    
+    <div class="panel">
+      <div class="panelHead">
+        <h2>Top Trechos Reincidentes</h2>
+      </div>
+      <div class="body" id="rankingTrechosReincidentes"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ============================================
+     TELA 5: ANALÍTICO
+     ============================================ -->
+<div id="screenAnalitico" class="screen">
+  
+  <div class="panel">
+    <div class="panelHead">
+      <h2>Dados Detalhados</h2>
+      <button id="btnExportar" class="actionBtn primary">Exportar CSV</button>
+    </div>
+    <div class="tblWrap">
+      <table id="tabelaAnalitica">
+        <thead>
+          <tr>
+            <th data-sort="data">Data</th>
+            <th data-sort="mes">Mês</th>
+            <th data-sort="superintendencia">Superintendência</th>
+            <th data-sort="gerencia">Gerência</th>
+            <th data-sort="bairro">Bairro</th>
+            <th data-sort="logradouro">Logradouro</th>
+            <th data-sort="trecho">Trecho</th>
+            <th data-sort="totalOK">Total OK</th>
+            <th data-sort="totalNOK">Total NOK</th>
+            <th data-sort="lixoBranco">Lixo Branco</th>
+          </tr>
+        </thead>
+        <tbody id="tabelaBody">
+          <tr><td colspan="10" class="loading">Carregando...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- ============================================
+     FOOTER
+     ============================================ -->
+<div id="footer"></div>
+
+</div>
+
+<!-- ============================================
+     DEPENDÊNCIAS
+     ============================================ -->
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- ============================================
+     COMPONENTES HUB
+     ============================================ -->
+<script src="../assets/components/hub-utils.js"></script>
+<script src="../assets/components/hub-cards.js"></script>
+<script src="../assets/components/hub-charts.js"></script>
+<script src="../assets/components/hub-filters.js"></script>
+<script src="../assets/components/hub-layout.js"></script>
+
+<!-- ============================================
+     APP IPL
+     ============================================ -->
+<script src="app.js"></script>
+
+</body>
+</html>
