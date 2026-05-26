@@ -5,15 +5,101 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>IPL · Índice Padrão de Limpeza | HUB COMLURB</title>
   
-  <!-- CSS Premium do HUB -->
-  <link rel="stylesheet" href="../assets/css/hub-premium.css">
+  <style>
+    :root {
+      --bg: #06111f;
+      --panel: #0d1f36;
+      --panel2: #0a1b31;
+      --line: #294866;
+      --text: #f7f9ff;
+      --muted: #b8c9de;
+      --blue: #4b86bd;
+      --blue2: #5b9bd5;
+      --orange: #e87535;
+      --green: #78aaa3;
+      --red: #ef6a5d;
+      --yellow: #ffa02b;
+      --purple: #a78bfa;
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: "Segoe UI", Arial, sans-serif; line-height: 1.5; }
+    input, select, button, textarea { font-family: inherit; }
+
+    .app { max-width: 1800px; margin: 0 auto; padding: 28px; }
+
+    .header {
+      display: flex; align-items: center; gap: 28px; padding: 26px; border: 1px solid var(--line); border-radius: 22px;
+      background: var(--panel2); margin-bottom: 20px;
+    }
+
+    .logoWrap { display: flex; align-items: center; min-width: 0; }
+    .logoImg { width: 310px; max-height: 82px; object-fit: contain; padding-right: 26px; border-right: 1px solid rgba(255, 255, 255, 0.28); }
+    .headerContent { flex: 1; min-width: 0; }
+
+    .systemLabel { font-size: 12px; font-weight: 900; letter-spacing: 0.25em; color: #b8d4f2; text-transform: uppercase; }
+    .mainTitle { margin: 8px 0 4px; font-size: 32px; font-weight: 950; }
+    .subtitle { font-size: 14px; color: #c5d5e8; }
+
+    .filters {
+      display: grid; grid-template-columns: repeat(4, 1fr) 140px; gap: 12px; margin: 14px 0; padding: 0;
+    }
+
+    .field { display: flex; flex-direction: column; }
+    label { font-size: 10px; font-weight: 900; letter-spacing: 0.13em; text-transform: uppercase; color: #aebbd0; margin-bottom: 6px; }
+    select, input { width: 100%; background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 11px 12px; color: #f2f6ff; font-weight: 800; }
+    select option { background: var(--panel); color: #fff; }
+
+    .actionBtn { border: 1px solid var(--line); background: var(--panel); border-radius: 16px; padding: 11px 12px; color: #eef5ff; font-weight: 950; cursor: pointer; }
+    .actionBtn.primary { border-color: rgba(232, 117, 53, .75); background: #14243b; color: #fff; }
+
+    .highlight { padding: 16px; border-radius: 16px; margin-bottom: 12px; border-left: 4px solid var(--blue); background: rgba(109, 165, 216, 0.08); }
+    .highlight.warn { border-left-color: var(--orange); background: rgba(232, 117, 53, 0.08); }
+    .highlight.good { border-left-color: var(--green); background: rgba(120, 170, 163, 0.08); }
+    .highlight small { display: block; color: #9fb0c7; font-weight: 900; text-transform: uppercase; letter-spacing: .10em; font-size: 9px; margin-bottom: 6px; }
+    .highlight b { display: block; color: #fff; font-size: 14px; line-height: 1.5; }
+
+    .kpis { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-bottom: 14px; }
+    .kpi { position: relative; overflow: hidden; min-height: 104px; background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: 16px; }
+    .kpi:before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: #4b7eac; }
+    .kpi.orange:before { background: var(--orange); }
+    .kpi.green:before { background: var(--green); }
+    .kpi span { display: block; color: #aebbd0; font-size: 11px; letter-spacing: .13em; text-transform: uppercase; font-weight: 950; }
+    .kpi strong { display: block; font-size: 24px; margin: 9px 0 4px; font-weight: 950; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
+    .kpi small { color: #a8b8cf; font-size: 12px; }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); gap: 14px; margin-bottom: 14px; }
+
+    .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 22px; overflow: hidden; }
+    .panelHead { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 16px 18px; border-bottom: 1px solid var(--line); background: #0b1a2e; }
+    .panel h2, .panel h3 { margin: 0; font-size: 16px; color: #fff; }
+    .hint { font-size: 12px; color: #a8b8cf; margin-top: 4px; }
+    .body { padding: 18px; }
+
+    .tblWrap { overflow: auto; max-height: 600px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { background: #0a1b31; border-bottom: 1px solid var(--line); padding: 13px 12px; text-align: left; color: #aebbd0; font-weight: 950; letter-spacing: .10em; text-transform: uppercase; font-size: 10px; position: sticky; top: 0; z-index: 10; }
+    td { padding: 13px 12px; border-bottom: 1px solid rgba(255, 255, 255, .05); color: #d7e4f7; }
+    tr:hover { background: rgba(109, 165, 216, .05); }
+    .num { text-align: right; font-weight: 700; color: #fff; }
+    .loading { padding: 40px; text-align: center; color: var(--muted); }
+
+    .footer { margin-top: 40px; padding: 20px; color: #aebbd5; font-size: 12px; text-align: left; border-top: 1px solid var(--line); opacity: 0.7; }
+    .footerContent { max-width: 800px; margin: 0; }
+  </style>
 </head>
 
 <body>
 <div class="app">
   
   <!-- HEADER -->
-  <div id="header"></div>
+  <header class="header">
+    <div style="flex: 1;">
+      <div class="systemLabel">Monitoramento Operacional • Índice Padrão de Limpeza</div>
+      <h1 class="mainTitle">IPL · Índice Padrão de Limpeza</h1>
+      <div class="subtitle">Avaliação territorial, conformidade operacional e reincidências</div>
+    </div>
+  </header>
   
   <!-- FILTROS -->
   <section class="filters">
@@ -44,14 +130,6 @@
   
   <!-- GRÁFICOS -->
   <div class="grid">
-    <div class="panel">
-      <div class="panelHead">
-        <h2>Evolução Mensal do IPL</h2>
-        <div class="hint">Comparativo mensal de conformidade</div>
-      </div>
-      <div class="body" id="chartEvolucao"></div>
-    </div>
-    
     <div class="panel">
       <div class="panelHead">
         <h2>Ranking Superintendências</h2>
@@ -99,24 +177,20 @@
   </div>
   
   <!-- FOOTER -->
-  <div id="footer"></div>
+  <footer class="footer">
+    <div class="footerContent">
+      <strong>Gabinete da Presidência</strong><br>
+      HUB COMLURB • Núcleo de Inteligência e Gestão Estratégica Operacional
+    </div>
+  </footer>
   
 </div>
 
 <!-- DEPENDÊNCIAS -->
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script src="../assets/components/hub-utils.js"></script>
-<script src="../assets/components/hub-cards.js"></script>
-<script src="../assets/components/hub-layout.js"></script>
 
 <script>
-// ============================================
-// CONFIGURAÇÃO - SUAS PLANILHAS
-// ============================================
-
 const CONFIG = {
-  // URLs das planilhas do Google Sheets
   urls: [
     "https://docs.google.com/spreadsheets/d/e/2PACX-1vQfx6ZKKoHDmuOOWq9SmNF0SuwZjxM0TCgMBQkpaX-711pjPaKslHUwzWF2bb21o0h4FQIZn4sZN6qP/pub?output=csv",
     "https://docs.google.com/spreadsheets/d/e/2PACX-1vQiBCZr7VWVWqT-OgURqYgnSM7P_wDfFSdmYtjFMfQm7EZJZdbCjkN4v7Q2nJVh8uurzOwxtChPJQrs/pub?output=csv",
@@ -129,66 +203,35 @@ const CONFIG = {
   metaIPL: 77.0
 };
 
-// ============================================
-// ESTADO
-// ============================================
-
 let DATA = [];
 let FILTERED = [];
-let LOADING = true;
-
-// ============================================
-// INICIALIZAÇÃO
-// ============================================
 
 async function init() {
   try {
-    // Renderizar header
-    HUB.header.render("header", {
-      systemLabel: "MONITORAMENTO OPERACIONAL",
-      title: "IPL · Índice Padrão de Limpeza",
-      subtitle: "Avaliação territorial, conformidade operacional e reincidências"
-    });
-    
-    // Carregar todas as planilhas
-    console.log("Carregando " + CONFIG.urls.length + " planilhas do Google Sheets...");
+    console.log("Carregando " + CONFIG.urls.length + " planilhas...");
     
     for (let i = 0; i < CONFIG.urls.length; i++) {
       await carregarPlanilha(CONFIG.urls[i], i + 1);
     }
     
-    console.log("Total de registros carregados: " + DATA.length);
-    LOADING = false;
-    
+    console.log("Total: " + DATA.length + " registros");
     populateFilters();
     render();
     
-    // Footer
-    HUB.footer.render("footer", {
-      customText: `<strong>Gabinete da Presidência</strong><br>HUB COMLURB • Núcleo de Inteligência e Gestão Estratégica Operacional`,
-      version: "1.0",
-      showTimestamp: false
-    });
-    
   } catch (e) {
     console.error("Erro:", e);
-    alert("Erro ao carregar dados: " + e.message);
+    alert("Erro: " + e.message);
   }
 }
 
-// ============================================
-// CARREGAR PLANILHAS
-// ============================================
-
 function carregarPlanilha(url, numero) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     Papa.parse(url, {
       download: true,
       header: true,
       complete: (results) => {
-        const registros = results.data.filter(row => Object.values(row).some(v => v && v.toString().trim()));
+        const registros = results.data.filter(r => Object.values(r).some(v => v && v.toString().trim()));
         
-        // Enriquecer dados
         const enriquecidos = registros.map(row => {
           let totalOK = 0, totalNOK = 0, itensNOK = [];
           const itens = ['Coleta domiciliar', 'Lixo Crítico', 'Ralo', 'Entulho', 'Bens inservíveis', 'Material de Obra', 'Pneus', 'Propaganda', 'Galhada', 'Animal morto', 'Resíduo morador de rua', 'Lama/Areia', 'Resíduo pós servico', 'Ponto crítico', 'Capina'];
@@ -211,26 +254,19 @@ function carregarPlanilha(url, numero) {
         });
         
         DATA = DATA.concat(enriquecidos);
-        console.log(`Planilha ${numero}: ${registros.length} registros carregados`);
+        console.log(`Planilha ${numero}: ${registros.length} registros`);
         resolve();
       },
       error: (error) => {
-        console.warn(`Erro ao carregar planilha ${numero}:`, error.message);
-        resolve(); // Continua mesmo se uma planilha falhar
+        console.warn(`Erro planilha ${numero}:`, error.message);
+        resolve();
       }
     });
   });
 }
 
-// ============================================
-// FILTROS
-// ============================================
-
 function populateFilters() {
-  const meses = [...new Set(DATA.map(r => r['Mês'] || '').filter(Boolean))].sort();
-  const sups = [...new Set(DATA.map(r => r['Superintendência'] || '').filter(Boolean))].sort();
-  const gers = [...new Set(DATA.map(r => r['Gerência'] || '').filter(Boolean))].sort();
-  const bairros = [...new Set(DATA.map(r => r['Bairro'] || '').filter(Boolean))].sort();
+  const vals = (field) => [...new Set(DATA.map(r => r[field] || '').filter(Boolean))].sort();
   
   const populate = (id, items) => {
     const sel = document.getElementById(id);
@@ -242,10 +278,10 @@ function populateFilters() {
     });
   };
   
-  populate('filtroMes', meses);
-  populate('filtroSuperintendencia', sups);
-  populate('filtroGerencia', gers);
-  populate('filtroBairro', bairros);
+  populate('filtroMes', vals('Mês'));
+  populate('filtroSuperintendencia', vals('Superintendência'));
+  populate('filtroGerencia', vals('Gerência'));
+  populate('filtroBairro', vals('Bairro'));
 }
 
 function clearAll() {
@@ -269,10 +305,6 @@ function applyFilters() {
            (bai === '' || r['Bairro'] === bai);
   });
 }
-
-// ============================================
-// RENDERIZAÇÃO
-// ============================================
 
 function render() {
   applyFilters();
@@ -299,25 +331,11 @@ function renderAlertas() {
     const tot = d.ok + d.nok;
     const conf = tot > 0 ? (d.ok / tot * 100) : 0;
     if (conf < CONFIG.metaIPL) {
-      alertas.push(`
-        <div class="highlight warn">
-          <small>Atenção Operacional</small>
-          <b>A Superintendência ${s} apresenta taxa de conformidade de ${conf.toFixed(1)}%, abaixo da meta de ${CONFIG.metaIPL}%.</b>
-        </div>
-      `);
+      alertas.push(`<div class="highlight warn"><small>Atenção Operacional</small><b>A Superintendência ${s} apresenta taxa de conformidade de ${conf.toFixed(1)}%, abaixo da meta de ${CONFIG.metaIPL}%.</b></div>`);
     }
   });
   
-  if (alertas.length === 0) {
-    container.innerHTML = `
-      <div class="highlight good">
-        <small>Sistema Operacional</small>
-        <b>Nenhum alerta crítico identificado.</b>
-      </div>
-    `;
-  } else {
-    container.innerHTML = alertas.join('');
-  }
+  container.innerHTML = alertas.length > 0 ? alertas.join('') : `<div class="highlight good"><small>Sistema Operacional</small><b>Nenhum alerta crítico identificado.</b></div>`;
 }
 
 function renderKPIs() {
@@ -328,18 +346,25 @@ function renderKPIs() {
   const taxa = totalItens > 0 ? (totalOK / totalItens * 100) : 0;
   const lixo = FILTERED.reduce((s, r) => s + (r.lixoBranco || 0), 0);
   
-  HUB.cards.render("kpis", [
+  const fmt = (n) => n.toLocaleString('pt-BR');
+  const kpis = [
     { label: "Taxa de Conformidade", value: taxa.toFixed(1) + '%', note: "itens OK / total", feature: true, color: taxa >= CONFIG.metaIPL ? "green" : "orange" },
     { label: "Meta IPL", value: CONFIG.metaIPL.toFixed(1) + '%', note: "objetivo", color: "blue" },
-    { label: "Total Avaliações", value: HUB.format.num(totalAval), note: "vistorias" },
-    { label: "Itens OK", value: HUB.format.num(totalOK), note: "conformes", color: "green" },
-    { label: "Itens NOK", value: HUB.format.num(totalNOK), note: "não conformes", color: "orange" },
-    { label: "Lixo Branco", value: HUB.format.num(lixo), note: "unidades" }
-  ]);
+    { label: "Total Avaliações", value: fmt(totalAval), note: "vistorias" },
+    { label: "Itens OK", value: fmt(totalOK), note: "conformes", color: "green" },
+    { label: "Itens NOK", value: fmt(totalNOK), note: "não conformes", color: "orange" },
+    { label: "Lixo Branco", value: fmt(lixo), note: "unidades" }
+  ];
+  
+  const html = kpis.map(kpi => {
+    const colorClass = kpi.color === 'green' ? 'green' : kpi.color === 'orange' ? 'orange' : '';
+    return `<div class="kpi ${colorClass}"><span>${kpi.label}</span><strong>${kpi.value}</strong><small>${kpi.note}</small></div>`;
+  }).join('');
+  
+  document.getElementById('kpis').innerHTML = html;
 }
 
 function renderCharts() {
-  // Ranking
   const porSup = {};
   FILTERED.forEach(row => {
     const s = row['Superintendência'];
@@ -353,22 +378,29 @@ function renderCharts() {
     .map(([s, d]) => {
       const tot = d.ok + d.nok;
       const conf = tot > 0 ? (d.ok / tot * 100) : 0;
-      return { label: s, value: conf };
+      return [s, conf];
     })
-    .sort((a, b) => b.value - a.value)
-    .slice(0, 10);
-  
-  HUB.simpleBar.render("rankingSuperintendencias", supData, { total: 100, color: "blue" });
-  
-  // NOK por Item
-  const nokPorItem = {};
-  FILTERED.forEach(row => row.itensNOK.forEach(item => nokPorItem[item] = (nokPorItem[item] || 0) + 1));
-  
-  const nokData = Object.entries(nokPorItem)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 10);
   
-  HUB.simpleBar.render("chartNOKItens", nokData, { total: Math.max(...nokData.map(d => d[1]), 1), color: "orange" });
+  const html1 = supData.map(item => {
+    const pct = (item[1] / 100 * 100);
+    const cor = item[1] >= CONFIG.metaIPL ? '#78aaa3' : '#e87535';
+    return `<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:#fff;font-weight:800;font-size:13px">${item[0]}</span><span style="color:${cor};font-weight:950">${item[1].toFixed(1)}%</span></div><div style="height:6px;background:rgba(255,255,255,0.08);border-radius:999px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${cor}"></div></div></div>`;
+  }).join('');
+  document.getElementById('rankingSuperintendencias').innerHTML = html1;
+  
+  const nokPorItem = {};
+  FILTERED.forEach(row => row.itensNOK.forEach(item => nokPorItem[item] = (nokPorItem[item] || 0) + 1));
+  
+  const nokData = Object.entries(nokPorItem).sort((a, b) => b[1] - a[1]).slice(0, 10);
+  const maxNOK = Math.max(...nokData.map(d => d[1]), 1);
+  
+  const html2 = nokData.map(item => {
+    const pct = (item[1] / maxNOK * 100);
+    return `<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:#fff;font-weight:800;font-size:13px">${item[0]}</span><span style="color:#e87535;font-weight:950">${item[1]}</span></div><div style="height:6px;background:rgba(255,255,255,0.08);border-radius:999px;overflow:hidden"><div style="height:100%;width:${pct}%;background:#e87535"></div></div></div>`;
+  }).join('');
+  document.getElementById('chartNOKItens').innerHTML = html2;
 }
 
 function renderTabela() {
@@ -395,28 +427,20 @@ function exportarCSV() {
   if (FILTERED.length === 0) { alert('Nenhum dado para exportar'); return; }
   
   const headers = ['Data', 'Mês', 'Superintendência', 'Gerência', 'Bairro', 'Logradouro', 'Trecho', 'Total OK', 'Total NOK', 'Lixo Branco'];
-  const rows = FILTERED.map(r => [
-    r['Data'] || '',
-    r['Mês'] || '',
-    r['Superintendência'] || '',
-    r['Gerência'] || '',
-    r['Bairro'] || '',
-    r['Logradouro'] || '',
-    r['Trecho'] || '',
-    r.totalOK || 0,
-    r.totalNOK || 0,
-    r.lixoBranco || 0
-  ]);
+  const rows = FILTERED.map(r => [r['Data'] || '', r['Mês'] || '', r['Superintendência'] || '', r['Gerência'] || '', r['Bairro'] || '', r['Logradouro'] || '', r['Trecho'] || '', r.totalOK || 0, r.totalNOK || 0, r.lixoBranco || 0]);
   
   let csv = headers.join(',') + '\n';
   rows.forEach(row => csv += row.map(v => `"${v}"`).join(',') + '\n');
   
-  const blob = new Blob([csv], { type: 'text/csv' });
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'ipl-dados.csv';
-  a.click();
+  link.setAttribute('href', url);
+  link.setAttribute('download', 'ipl-dados.csv');
+  link.style.visibility = 'hidden';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 }
 
 document.addEventListener('DOMContentLoaded', init);
