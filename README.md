@@ -1,98 +1,195 @@
-# 🏢 HUB COMLURB
+# IPL · Sistema de Inteligência Operacional
 
-**Centro de Inteligência Operacional**  
-Portal executivo dos painéis operacionais, funcionais, territoriais e contratuais da COMLURB.
-
-![Status](https://img.shields.io/badge/status-ativo-green)
-![GitHub Pages](https://img.shields.io/badge/deploy-GitHub%20Pages-blue)
+**HUB COMLURB** — Índice Padrão de Limpeza
 
 ---
 
-## 🌐 Acesso
+## Sistema Real Baseado em Dados
 
-**URL Principal:** https://urbanflowrio.github.io/HUB_COMLURB/
+**ZERO dados simulados. ZERO métricas inventadas.**
 
-### Painéis Disponíveis
-
-- **DTE** — Diretoria Técnica e de Engenharia  
-  https://urbanflowrio.github.io/HUB_COMLURB/dte/
-
-- **Pessoas** — Perfil funcional e territorial  
-  https://urbanflowrio.github.io/HUB_COMLURB/pessoas/
-
-- **SME** — Limpeza e higienização escolar  
-  https://urbanflowrio.github.io/HUB_COMLURB/sme/
-
-- **SMS** — Monitoramento operacional hospitalar  
-  https://urbanflowrio.github.io/HUB_COMLURB/sms/
-
-- **Contratos** — Acompanhamento executivo contratual  
-  https://urbanflowrio.github.io/HUB_COMLURB/contratos/
-
-- **Territorial** — Leitura geográfica e territorial  
-  https://urbanflowrio.github.io/HUB_COMLURB/territorial/
+Tudo é calculado dinamicamente a partir das planilhas Google Sheets.
 
 ---
 
-## 🚀 Deploy no GitHub Pages
+## Configuração (5 minutos)
 
-### Passo 1: Criar repositório no GitHub
+### Passo 1: Publicar Planilhas como CSV
 
-1. Vá para https://github.com/urbanflowrio
-2. Clique em **New repository**
-3. Nome: `HUB_COMLURB`
-4. Visibilidade: **Public**
-5. ✅ NÃO inicializar com README
-6. Clique em **Create repository**
+Para cada planilha no Google Sheets:
 
-### Passo 2: Fazer upload dos arquivos
+1. **Arquivo** → **Compartilhar** → **Publicar na web**
+2. Selecione a aba correta
+3. Formato: **CSV**
+4. Clique em **Publicar**
+5. Copie a URL gerada
 
-**Opção A — Via interface web do GitHub:**
-
-1. No repositório recém-criado, clique em **uploading an existing file**
-2. Arraste TODOS os arquivos desta pasta
-3. Commit message: `feat: deploy inicial HUB COMLURB`
-4. Clique em **Commit changes**
-
-**Opção B — Via linha de comando:**
-
-```bash
-cd HUB_COMLURB
-git init
-git add .
-git commit -m "feat: deploy inicial HUB COMLURB"
-git branch -M main
-git remote add origin https://github.com/urbanflowrio/HUB_COMLURB.git
-git push -u origin main
+Exemplo:
+```
+https://docs.google.com/spreadsheets/d/e/2PACX-.../pub?output=csv
 ```
 
-### Passo 3: Ativar GitHub Pages
+### Passo 2: Configurar URLs
 
-1. Vá em **Settings** (⚙️) do repositório
-2. Menu lateral: **Pages**
-3. Em **Source**, selecione:
-   - Branch: `main`
-   - Folder: `/ (root)`
-4. Clique em **Save**
+Abra `app.js` e localize CONFIG (linha ~11):
 
-### Passo 4: Aguardar deploy
+```javascript
+const CONFIG = {
+  avaliacoes: 'COLE_AQUI_URL_AVALIACAO_TRECHOS_CSV',
+  notas: 'COLE_AQUI_URL_NOTAS_IPL_CSV',
+  pesos: 'COLE_AQUI_URL_PESOS_ITENS_CSV',
+  
+  metaIPL: 77.0
+};
+```
 
-- O GitHub vai buildar automaticamente (2-5 minutos)
-- Você verá uma mensagem: "Your site is ready to be published at..."
-- Quando ficar verde ✅, o site está no ar!
+Cole as URLs:
+
+```javascript
+const CONFIG = {
+  avaliacoes: 'https://docs.google.com/spreadsheets/d/e/2PACX-.../pub?output=csv',
+  notas: 'https://docs.google.com/spreadsheets/d/e/2PACX-.../pub?output=csv',
+  pesos: 'https://docs.google.com/spreadsheets/d/e/2PACX-.../pub?output=csv',
+  
+  metaIPL: 77.0
+};
+```
 
 ---
 
-## ✅ Checklist de Deploy
+## Padrão HUB COMLURB
 
-- [ ] Repositório criado no GitHub
-- [ ] Todos os arquivos enviados (incluindo `.nojekyll`)
-- [ ] GitHub Pages ativado em Settings → Pages
-- [ ] Branch `main` selecionado
-- [ ] Deploy concluído (ícone verde ✅)
-- [ ] URL testada: https://urbanflowrio.github.io/HUB_COMLURB/
-- [ ] Todos os painéis testados
+### Visual
+
+- CSS: `hub-premium.css`
+- Sem emojis nos botões/textos
+- Paleta: navy + blue + orange
+- Estilo executivo premium
+
+### Footer Institucional
+
+```
+Gabinete da Presidência
+HUB COMLURB • Núcleo de Inteligência e Gestão Estratégica Operacional
+```
+
+Renderizado via:
+
+```javascript
+HUB.footer.render("footer", {
+  customText: `
+    <strong>Gabinete da Presidência</strong><br>
+    HUB COMLURB • Núcleo de Inteligência e Gestão Estratégica Operacional
+  `,
+  version: "1.0",
+  showTimestamp: false
+});
+```
+
+### Componentes HUB
+
+- `HUB.header.render()` — header e navegação
+- `HUB.data.loadCSV()` — carregamento com cache
+- `HUB.cards.render()` — KPIs
+- `HUB.charts.*` — gráficos Chart.js
+- `HUB.filters.*` — filtros dinâmicos
+- `HUB.footer.render()` — footer institucional
 
 ---
 
-**© 2025 COMLURB — Todos os direitos reservados.**
+## 5 Telas
+
+### 1. Inteligência Operacional
+
+**Alertas automáticos REAIS:**
+- Superintendências abaixo da meta
+- Itens críticos (top NOK)
+- Sistema operacional (se tudo OK)
+
+**KPIs:**
+- Taxa conformidade geral
+- Meta IPL
+- Total avaliações
+- Trechos avaliados
+- Itens conformes
+- Não conformidades
+- Lixo branco total
+- Média lixo branco/trecho
+
+### 2. Executivo
+
+- Filtros dinâmicos (mês, sup, gerência, bairro)
+- KPIs filtrados
+- Meta x Realizado
+- Ranking gerências
+
+### 3. Territorial
+
+- Mapa Leaflet
+- Hotspots de NOK
+- Top 20 bairros críticos
+
+### 4. Reincidência
+
+- KPIs de reincidência
+- Reincidência por item
+- Top trechos reincidentes
+
+### 5. Analítico
+
+- Tabela completa
+- Exportação CSV
+- Ordenação por coluna
+
+---
+
+## Rastreabilidade
+
+Cada número tem origem rastreável:
+
+| Indicador | Cálculo |
+|-----------|---------|
+| Taxa Conformidade | `(totalOK / (totalOK + totalNOK)) * 100` |
+| Total Avaliações | `avaliacoes.length` |
+| Trechos Únicos | `Set(codigo + trecho).size` |
+| Lixo Branco | `Soma TC1-4 P/G` |
+| NOK por Item | `Count onde valor = 'Não'` |
+
+---
+
+## O Que NÃO Tem
+
+❌ Dados simulados/mockados  
+❌ Arrays hardcoded  
+❌ Métricas inventadas  
+❌ ML/IA fictícios  
+❌ Previsões sem modelo  
+❌ ROI inventado  
+❌ Emojis nos botões  
+❌ Buzzwords de consultoria  
+
+---
+
+## Atualização
+
+As planilhas são lidas em tempo real.
+
+Para atualizar:
+1. Edite a planilha no Google Sheets
+2. Salve (automático)
+3. Recarregue o dashboard (F5)
+4. Dados atualizados
+
+---
+
+## Desenvolvido por
+
+**Gabinete da Presidência**  
+HUB COMLURB • Núcleo de Inteligência e Gestão Estratégica Operacional  
+Versão 1.0
+
+---
+
+## Licença
+
+© 2026 COMLURB — Todos os direitos reservados

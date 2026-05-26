@@ -1,23 +1,42 @@
-// ============================================
-// APP.JS - PAINEL DTE
-// Lógica principal do painel
-// ============================================
+/**
+ * APP IPL - COMLURB
+ * Sistema de Monitoramento do Índice Padrão de Limpeza
+ */
 
 // ============================================
 // CONFIGURAÇÃO
 // ============================================
 
 const CONFIG = {
-  panelName: "Painel Estratégico DTE",
-  systemLabel: "DIRETORIA TÉCNICA E DE ENGENHARIA",
-  subtitle: "Monitoramento Operacional e Análise de Performance"
+  // URLs dos CSVs publicados no Google Sheets
+  avaliacoes: 'COLE_AQUI_URL_AVALIACAO_TRECHOS_CSV',
+  notas: 'COLE_AQUI_URL_NOTAS_IPL_CSV',
+  pesos: 'COLE_AQUI_URL_PESOS_ITENS_CSV',
+  
+  // Meta IPL oficial
+  metaIPL: 77.0,
+  
+  // Configuração do painel
+  panelName: "IPL · Índice Padrão de Limpeza",
+  systemLabel: "Monitoramento Operacional",
+  subtitle: "Avaliação territorial, conformidade operacional e reincidências"
 };
 
 // ============================================
 // ESTADO GLOBAL
 // ============================================
 
-let DRILL = null;
+const App = {
+  data: {
+    avaliacoes: [],
+    notas: [],
+    pesos: []
+  },
+  filtered: [],
+  filters: {},
+  charts: {},
+  currentScreen: 'operacional'
+};
 
 // ============================================
 // INICIALIZAÇÃO
@@ -26,16 +45,7 @@ let DRILL = null;
 async function init() {
   try {
     // Mostra loading
-    HUB.loading.showMultiple([
-      "kpis", 
-      "chartEvolucao", 
-      "chartETRs", 
-      "chartTipoColeta",
-      "chartSazonalidade",
-      "chartUtilizacao",
-      "chartBiogas",
-      "chartFrota"
-    ]);
+    HUB.loading.showMultiple(["kpis", "chartEvolucao", "rankingSuperintendencias"]);
     
     // Renderiza header
     HUB.header.render("header", {
@@ -44,46 +54,89 @@ async function init() {
       subtitle: CONFIG.subtitle
     });
     
-    // Carrega dados do Google Sheets (SEM CACHE - sempre atualizado)
-    const response = await fetch(DATA_URL, { 
-      cache: "no-store",
-      headers: {
-        'Cache-Control': 'no-cache',
-        'Pragma': 'no-cache'
-      }
-    });
-    const text = await response.text();
-    
-    const parsed = Papa.parse(text, {
-      header: false,
-      skipEmptyLines: true
+    // Renderiza navegação
+    HUB.header.render("navTabs", {
+      navigation: [
+        { id: "screenOperacional", label: "Inteligência Operacional", onActivate: () => renderOperacional() },
+        { id: "screenExecutivo", label: "Executivo", onActivate: () => renderExecutivo() },
+        { id: "screenTerritorial", label: "Territorial", onActivate: () => renderTerritorial() },
+        { id: "screenReincidencia", label: "Reincidência", onActivate: () => renderReincidencia() },
+        { id: "screenAnalitico", label: "Analítico", onActivate: () => renderAnalitico() }
+      ]
     });
     
-    DATA_RAW = parsed.data;
-    processData();
+    // Carrega dados
+    await carregarDados();
     
-    // Popula filtros
-    populateFilters();
+    // Processa dados
+    processarDados();
     
-    // Callback de mudança
-    HUB.filters.onChange(() => render());
+    // Inicializa filtros
+    initFilters();
     
-    // Renderiza inicial
-    render();
+    // Renderiza tela inicial
+    renderOperacional();
     
-    // Footer - Padrão institucional HUB COMLURB
+    // Footer institucional
     HUB.footer.render("footer", {
       customText: `
         <strong>Gabinete da Presidência</strong><br>
         HUB COMLURB • Núcleo de Inteligência e Gestão Estratégica Operacional
       `,
       version: "1.0",
-      showTimestamp: true
+      showTimestamp: false
     });
     
-  } catch (e) {
-    console.error("Erro ao inicializar:", e);
-    alert(`Erro ao carregar dados: ${e.message}`);
+  } catch (error) {
+    console.error("Erro na inicialização:", error);
+    alert(`Erro ao carregar dados: ${error.message}`);
+  }
+}
+
+// ============================================
+// CARREGAMENTO DE DADOS
+// ============================================
+
+async function carregarDados() {
+  const status = document.getElementById('status');
+  if (status) {
+    status.style.display = 'block';
+    status.textContent = 'Carregando bases de dados do Google Sheets...';
+  }
+  
+  try {
+    // Carrega avaliações
+    App.data.avaliacoes = await HUB.data.loadCSV(CONFIG.avaliacoes, {
+      name: 'Avaliações IPL',
+      required: true
+    });
+    
+    console.log(`✓ Avaliações: ${App.data.avaliacoes.length} registros`);
+    
+    // Carrega notas (opcional)
+    if (CONFIG.notas && !CONFIG.notas.includes('COLE_AQUI')) {
+      App.data.notas = await HUB.data.loadCSV(CONFIG.notas, {
+        name: 'Notas IPL',
+        required: false
+      });
+    }
+    
+    // Carrega pesos (opcional)
+    if (CONFIG.pesos && !CONFIG.pesos.includes('COLE_AQUI')) {
+      App.data.pesos = await HUB.data.loadCSV(CONFIG.pesos, {
+        name: 'Pesos IPL',
+        required: false
+      });
+    }
+    
+    if (status) status.style.display = 'none';
+    
+  } catch (error) {
+    if (status) {
+      status.textContent = `Erro ao carregar dados: ${error.message}`;
+      status.classList.add('error');
+    }
+    throw error;
   }
 }
 
@@ -91,415 +144,339 @@ async function init() {
 // PROCESSAMENTO DE DADOS
 // ============================================
 
-function processData() {
-  // Processa Recebimento ETRs
-  const recIdx = findSection("I - Recebimento Resíduos Totais");
-  if (recIdx !== -1) {
-    const meses = DATA_RAW[recIdx].slice(1);
-    const bangu = DATA_RAW[recIdx + 1];
-    const caju = DATA_RAW[recIdx + 2];
-    const jac = DATA_RAW[recIdx + 3];
-    const hermes = DATA_RAW[recIdx + 4];
-    const santa = DATA_RAW[recIdx + 5];
-    const total = DATA_RAW[recIdx + 6];
-    
-    for (let i = 0; i < meses.length; i++) {
-      DATA.recebimento.push({
-        mes: meses[i],
-        bangu: parseNum(bangu[i + 1]),
-        caju: parseNum(caju[i + 1]),
-        jacarepagua: parseNum(jac[i + 1]),
-        hermes: parseNum(hermes[i + 1]),
-        santa_cruz: parseNum(santa[i + 1]),
-        total: parseNum(total[i + 1])
-      });
-    }
-  }
+function processarDados() {
+  const { avaliacoes } = App.data;
   
-  // Processa Tipo de Coleta
-  const tipoIdx = findSection("II - Recebimento Residos Recebidos nas ETR");
-  if (tipoIdx !== -1) {
-    const meses = DATA_RAW[tipoIdx].slice(1);
-    const domiciliar = DATA_RAW[tipoIdx + 1];
-    const comunidades = DATA_RAW[tipoIdx + 2];
-    const publico = DATA_RAW[tipoIdx + 3];
-    const geradores = DATA_RAW[tipoIdx + 4];
+  // Enriquecer dados com cálculos
+  App.data.avaliacoes = avaliacoes.map(aval => {
+    // Calcular totais OK/NOK
+    let totalOK = 0;
+    let totalNOK = 0;
+    let itensNOK = [];
     
-    for (let i = 0; i < meses.length; i++) {
-      DATA.tipoColeta.push({
-        mes: meses[i],
-        domiciliar: parseNum(domiciliar[i + 1]),
-        comunidades: parseNum(comunidades[i + 1]),
-        publico: parseNum(publico[i + 1]),
-        geradores: parseNum(geradores[i + 1])
-      });
-    }
-  }
-  
-  // Processa Biogás
-  const bioIdx = findSection("V - Geração Biogás");
-  if (bioIdx !== -1) {
-    const meses = DATA_RAW[bioIdx].slice(1);
-    const seropedica = DATA_RAW[bioIdx + 1];
-    const gramacho = DATA_RAW[bioIdx + 2];
+    // Itens para avaliar (ajuste conforme suas colunas)
+    const itensAvaliar = [
+      'Coleta domiciliar', 'Lixo Crítico', 'Ralo', 'Entulho',
+      'Bens inservíveis', 'Material de Obra', 'Pneus', 'Propaganda',
+      'Galhada', 'Animal morto', 'Resíduo morador de rua', 'Lama/Areia',
+      'Resíduo pós servico', 'Ponto crítico', 'Capina'
+    ];
     
-    for (let i = 0; i < meses.length; i++) {
-      DATA.biogas.push({
-        mes: meses[i],
-        seropedica: parseNum(seropedica[i + 1]),
-        gramacho: parseNum(gramacho[i + 1])
-      });
-    }
-  }
-  
-  // Processa Utilização de Frota
-  const utilIdx = findSection("Coleta Domiociliar e Comunidade");
-  if (utilIdx !== -1) {
-    const meses = DATA_RAW[utilIdx].slice(1);
-    const taxa = DATA_RAW[utilIdx + 1];
+    itensAvaliar.forEach(item => {
+      const valor = aval[item];
+      if (valor) {
+        if (valor === 'Sim' || valor === 'OK') {
+          totalOK++;
+        } else if (valor === 'Não' || valor === 'NOK') {
+          totalNOK++;
+          itensNOK.push(item);
+        }
+      }
+    });
     
-    for (let i = 0; i < meses.length; i++) {
-      const valor = taxa[i + 1];
-      const pct = parseFloat(String(valor).replace("%", "").replace(",", "."));
-      
-      DATA.utilizacao.push({
-        mes: meses[i],
-        taxa: pct || 0
-      });
+    // Calcular lixo branco total (ajuste conforme suas colunas)
+    let lixoBrancoTotal = 0;
+    for (let tc = 1; tc <= 4; tc++) {
+      for (let tamanho of ['P', 'G']) {
+        const col = `Lixo Branco TC${tc} - ${tamanho}`;
+        if (aval[col]) {
+          lixoBrancoTotal += parseInt(aval[col]) || 0;
+        }
+      }
     }
-  }
-  
-  // Processa Frota Própria
-  const frotaIdx = findSection("C - MANUTENÇÃO FROTA PRÓPRIA");
-  if (frotaIdx !== -1) {
-    const meses = DATA_RAW[frotaIdx].slice(1);
-    const total = DATA_RAW[frotaIdx + 1];
-    const operacao = DATA_RAW[frotaIdx + 7];
-    const diesel = DATA_RAW[frotaIdx + 11];
     
-    for (let i = 0; i < meses.length; i++) {
-      DATA.frotaPropria.push({
-        mes: meses[i],
-        total: parseNum(total[i + 1]),
-        operacao: parseNum(operacao[i + 1]),
-        diesel: parseNum(diesel[i + 1])
-      });
-    }
-  }
+    return {
+      ...aval,
+      totalOK,
+      totalNOK,
+      itensNOK,
+      lixoBrancoTotal,
+      taxaConformidade: totalOK + totalNOK > 0 ? (totalOK / (totalOK + totalNOK) * 100) : 0
+    };
+  });
   
-  console.log("✅ Dados processados:", DATA);
+  console.log('✓ Dados processados e enriquecidos');
 }
 
 // ============================================
 // FILTROS
 // ============================================
 
-function populateFilters() {
-  // Popula ETRs
-  const etrs = ["Bangu", "Caju", "Jacarepaguá", "Mal Hermes", "Santa Cruz"];
-  HUB.filters.populate("fETR", etrs);
+function initFilters() {
+  const { avaliacoes } = App.data;
   
-  // Popula Tipos
-  const tipos = ["Coleta Domiciliar", "Coleta em Comunidades", "Lixo Público", "Grandes Geradores"];
-  HUB.filters.populate("fTipo", tipos);
-}
-
-function clearAll() {
-  HUB.filters.clear();
-  DRILL = null;
-  HUB.drillBanner.hide("drillBanner");
-  render();
-}
-
-// ============================================
-// DRILL DOWN
-// ============================================
-
-function setDrill(field, value, label) {
-  DRILL = { field, value, label };
+  // Popular filtros
+  HUB.filters.populateAll(avaliacoes, [
+    { id: "filtroMes", field: "Mês" },
+    { id: "filtroSuperintendencia", field: "Superintendência" },
+    { id: "filtroGerencia", field: "Gerência" },
+    { id: "filtroBairro", field: "Bairro" }
+  ]);
   
-  HUB.drillBanner.show("drillBanner", {
-    title: `Filtro ativo: ${label}`,
-    description: "Clique para remover",
-    onClear: "clearDrill()"
+  // Callback de mudança
+  HUB.filters.onChange(() => {
+    applyFilters();
+    renderExecutivo();
   });
   
-  render();
+  // Botão limpar
+  const btnLimpar = document.getElementById('btnLimpar');
+  if (btnLimpar) {
+    btnLimpar.addEventListener('click', () => {
+      HUB.filters.clear();
+      renderExecutivo();
+    });
+  }
 }
 
-function clearDrill() {
-  DRILL = null;
-  HUB.drillBanner.hide("drillBanner");
-  render();
+function applyFilters() {
+  App.filtered = HUB.filters.apply(App.data.avaliacoes, [
+    { id: "filtroMes", field: "Mês" },
+    { id: "filtroSuperintendencia", field: "Superintendência" },
+    { id: "filtroGerencia", field: "Gerência" },
+    { id: "filtroBairro", field: "Bairro" }
+  ]);
 }
 
 // ============================================
-// RENDERIZAÇÃO
+// RENDERIZAÇÃO: INTELIGÊNCIA OPERACIONAL
 // ============================================
 
-function render() {
-  renderKPIs();
-  renderCharts();
+function renderOperacional() {
+  const avaliacoes = App.data.avaliacoes;
+  if (!avaliacoes || avaliacoes.length === 0) return;
+  
+  // Gerar alertas automáticos
+  renderAlertasOperacionais(avaliacoes);
+  
+  // KPIs
+  renderKPIsOperacionais(avaliacoes);
+  
+  // Gráficos
+  renderEvolucaoIPL(avaliacoes);
+  renderRankingSuperintendencias(avaliacoes);
+  renderNOKPorItem(avaliacoes);
 }
 
-function renderKPIs() {
-  if (!DATA.recebimento.length) return;
+function renderAlertasOperacionais(avaliacoes) {
+  const container = document.getElementById('alertasContainer');
+  if (!container) return;
   
-  const ultimo = DATA.recebimento[DATA.recebimento.length - 1];
-  const penultimo = DATA.recebimento[DATA.recebimento.length - 2];
-  const variacao = ((ultimo.total - penultimo.total) / penultimo.total * 100);
+  const alertas = [];
   
-  const media = DATA.recebimento.reduce((acc, r) => acc + r.total, 0) / DATA.recebimento.length;
-  const pico = Math.max(...DATA.recebimento.map(r => r.total));
+  // Detectar superintendências abaixo da meta
+  const porSuperintendencia = {};
+  avaliacoes.forEach(a => {
+    const sup = a['Superintendência'];
+    if (!sup) return;
+    
+    if (!porSuperintendencia[sup]) {
+      porSuperintendencia[sup] = { ok: 0, nok: 0 };
+    }
+    
+    porSuperintendencia[sup].ok += a.totalOK || 0;
+    porSuperintendencia[sup].nok += a.totalNOK || 0;
+  });
   
-  // Últimas médias de frota
-  const ultimaUtil = DATA.utilizacao.length ? DATA.utilizacao[DATA.utilizacao.length - 1].taxa : 0;
+  Object.entries(porSuperintendencia).forEach(([sup, data]) => {
+    const total = data.ok + data.nok;
+    const conformidade = total > 0 ? (data.ok / total * 100) : 0;
+    
+    if (conformidade < CONFIG.metaIPL) {
+      alertas.push(`
+        <div class="panel" style="border-left:4px solid var(--orange);background:rgba(232,117,53,0.05)">
+          <div class="panelHead" style="background:transparent">
+            <h3>Atenção Operacional</h3>
+          </div>
+          <div class="body">
+            <p>A Superintendência <strong>${sup}</strong> apresenta taxa de conformidade de <strong>${conformidade.toFixed(1)}%</strong>, abaixo da meta de <strong>${CONFIG.metaIPL}%</strong>.</p>
+          </div>
+        </div>
+      `);
+    }
+  });
   
-  // Última frota própria
-  const ultimaFrota = DATA.frotaPropria.length ? DATA.frotaPropria[DATA.frotaPropria.length - 1] : { total: 0, operacao: 0 };
+  // Detectar itens com alta taxa de NOK
+  const nokPorItem = {};
+  avaliacoes.forEach(a => {
+    a.itensNOK.forEach(item => {
+      nokPorItem[item] = (nokPorItem[item] || 0) + 1;
+    });
+  });
+  
+  const topNOK = Object.entries(nokPorItem)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3);
+  
+  if (topNOK.length > 0) {
+    alertas.push(`
+      <div class="panel" style="border-left:4px solid var(--blue);background:rgba(109,165,216,0.05)">
+        <div class="panelHead" style="background:transparent">
+          <h3>Itens Críticos Identificados</h3>
+        </div>
+        <div class="body">
+          <p>Os itens com maior concentração de não conformidades são:</p>
+          <ul>
+            ${topNOK.map(([item, count]) => `<li><strong>${item}</strong>: ${count} ocorrências</li>`).join('')}
+          </ul>
+        </div>
+      </div>
+    `);
+  }
+  
+  // Renderizar
+  if (alertas.length === 0) {
+    container.innerHTML = `
+      <div class="panel" style="border-left:4px solid var(--green);background:rgba(120,170,163,0.05)">
+        <div class="panelHead" style="background:transparent">
+          <h3>Sistema Operacional</h3>
+        </div>
+        <div class="body">
+          <p>Nenhum alerta crítico identificado no momento.</p>
+        </div>
+      </div>
+    `;
+  } else {
+    container.innerHTML = alertas.join('');
+  }
+}
+
+function renderKPIsOperacionais(avaliacoes) {
+  const totalAvaliacoes = avaliacoes.length;
+  const totalOK = avaliacoes.reduce((sum, a) => sum + (a.totalOK || 0), 0);
+  const totalNOK = avaliacoes.reduce((sum, a) => sum + (a.totalNOK || 0), 0);
+  const totalItens = totalOK + totalNOK;
+  const taxaConformidade = totalItens > 0 ? (totalOK / totalItens * 100) : 0;
+  const totalLixoBranco = avaliacoes.reduce((sum, a) => sum + (a.lixoBrancoTotal || 0), 0);
+  const trechosUnicos = new Set(avaliacoes.map(a => (a['Código logradouro'] || '') + (a['Trecho'] || ''))).size;
   
   HUB.cards.render("kpis", [
     {
-      label: "Recebimento Total",
-      value: ultimo.total,
-      note: `${ultimo.mes} • ${variacao > 0 ? '+' : ''}${HUB.format.pct(variacao, 1)} vs mês anterior`,
+      label: "Taxa de Conformidade Geral",
+      value: taxaConformidade.toFixed(1) + '%',
+      note: "itens OK / total avaliado",
       feature: true,
-      format: "int",
-      color: variacao > 0 ? "orange" : "green"
+      color: taxaConformidade >= CONFIG.metaIPL ? "green" : "orange"
     },
     {
-      label: "ETR Caju (Líder)",
-      value: ultimo.caju,
-      note: `${HUB.format.pct((ultimo.caju / ultimo.total) * 100)} do total`,
-      format: "int",
-      color: "blue",
-      onclick: "setDrill('etr', 'Caju', 'ETR Caju')"
+      label: "Meta IPL",
+      value: CONFIG.metaIPL.toFixed(1) + '%',
+      note: "objetivo institucional",
+      color: "blue"
     },
     {
-      label: "Média Mensal",
-      value: media,
-      note: "Últimos 13 meses",
-      format: "int",
+      label: "Total de Avaliações",
+      value: HUB.format.num(totalAvaliacoes),
+      note: "vistorias realizadas"
+    },
+    {
+      label: "Trechos Avaliados",
+      value: HUB.format.num(trechosUnicos),
+      note: "logradouros fiscalizados"
+    },
+    {
+      label: "Itens Conformes",
+      value: HUB.format.num(totalOK),
+      note: "itens OK",
       color: "green"
     },
     {
-      label: "Utilização Frota CDC",
-      value: ultimaUtil,
-      note: "Peso / capacidade estimada",
-      format: "pct",
-      color: ultimaUtil > 75 ? "green" : "orange"
+      label: "Não Conformidades",
+      value: HUB.format.num(totalNOK),
+      note: "itens NOK",
+      color: "red"
     },
     {
-      label: "Frota Própria Ativa",
-      value: ultimaFrota.operacao,
-      note: `${ultimaFrota.total} total • ${HUB.format.pct((ultimaFrota.operacao / ultimaFrota.total) * 100, 0)} operacional`,
-      format: "int",
-      color: "purple"
+      label: "Lixo Branco Total",
+      value: HUB.format.num(totalLixoBranco),
+      note: "unidades registradas"
+    },
+    {
+      label: "Média Lixo Branco/Trecho",
+      value: (totalLixoBranco / totalAvaliacoes).toFixed(1),
+      note: "unidades por avaliação"
     }
   ]);
 }
 
-function renderCharts() {
-  if (!DATA.recebimento.length) return;
+function renderEvolucaoIPL(avaliacoes) {
+  // TODO: Implementar gráfico Chart.js
+  console.log('renderEvolucaoIPL: implementar');
+}
+
+function renderRankingSuperintendencias(avaliacoes) {
+  const container = document.getElementById('rankingSuperintendencias');
+  if (!container) return;
   
-  // Gráfico: Evolução do Recebimento
-  HUB.charts.line("chartEvolucao", {
-    labels: DATA.recebimento.map(r => r.mes),
-    values: DATA.recebimento.map(r => r.total)
-  }, {
-    label: "Recebimento Total (t)",
-    color: HUB.charts.colors.blueGradient
+  // Agrupar por superintendência
+  const porSup = {};
+  avaliacoes.forEach(a => {
+    const sup = a['Superintendência'];
+    if (!sup) return;
+    
+    if (!porSup[sup]) {
+      porSup[sup] = { ok: 0, nok: 0 };
+    }
+    
+    porSup[sup].ok += a.totalOK || 0;
+    porSup[sup].nok += a.totalNOK || 0;
   });
   
-  // Ranking ETRs
-  const ultimo = DATA.recebimento[DATA.recebimento.length - 1];
-  const etrsData = [
-    ["ETR Caju", ultimo.caju],
-    ["ETR Mal Hermes", ultimo.hermes],
-    ["ETR Bangu", ultimo.bangu],
-    ["ETR Jacarepaguá", ultimo.jacarepagua],
-    ["ETR Santa Cruz", ultimo.santa_cruz]
-  ].sort((a, b) => b[1] - a[1]);
+  // Calcular conformidade e ordenar
+  const ranking = Object.entries(porSup)
+    .map(([sup, data]) => {
+      const total = data.ok + data.nok;
+      const conformidade = total > 0 ? (data.ok / total * 100) : 0;
+      return { superintendencia: sup, conformidade };
+    })
+    .sort((a, b) => b.conformidade - a.conformidade);
   
-  HUB.simpleBar.render("chartETRs", etrsData, {
-    total: ultimo.total,
-    color: "blue",
-    onclick: name => `setDrill('etr', '${name}', '${name}')`
-  });
+  // Renderizar
+  const rows = ranking.map((item, idx) => {
+    const cor = item.conformidade >= CONFIG.metaIPL ? 'var(--green)' : 'var(--orange)';
+    return `
+      <div class="rank">
+        <div>
+          <b>${idx + 1}º · ${item.superintendencia}</b>
+        </div>
+        <div style="color:${cor};font-weight:950;font-size:16px">
+          ${item.conformidade.toFixed(1)}%
+        </div>
+      </div>
+    `;
+  }).join('');
   
-  // Tipo de Coleta
-  if (DATA.tipoColeta.length) {
-    const ultimoTipo = DATA.tipoColeta[DATA.tipoColeta.length - 1];
-    HUB.charts.donut("chartTipoColeta", {
-      labels: ["Domiciliar", "Comunidades", "Lixo Público", "Grandes Geradores"],
-      values: [
-        ultimoTipo.domiciliar,
-        ultimoTipo.comunidades,
-        ultimoTipo.publico,
-        ultimoTipo.geradores
-      ]
-    });
-  }
-  
-  // Sazonalidade
-  const mesesAgrupados = {};
-  DATA.recebimento.forEach(r => {
-    const mes = r.mes.split("-")[0];
-    if (!mesesAgrupados[mes]) mesesAgrupados[mes] = [];
-    mesesAgrupados[mes].push(r.total);
-  });
-  
-  const sazonalidade = Object.entries(mesesAgrupados).map(([mes, valores]) => {
-    const media = valores.reduce((a, b) => a + b, 0) / valores.length;
-    return [mes, media];
-  });
-  
-  const mediaSaz = sazonalidade.reduce((a, b) => a + b[1], 0) / sazonalidade.length;
-  HUB.simpleBar.render("chartSazonalidade", sazonalidade, {
-    total: mediaSaz,
-    color: "green"
-  });
-  
-  // Utilização Frota
-  if (DATA.utilizacao.length) {
-    HUB.charts.line("chartUtilizacao", {
-      labels: DATA.utilizacao.map(r => r.mes),
-      values: DATA.utilizacao.map(r => r.taxa)
-    }, {
-      label: "Taxa de Utilização (%)",
-      color: HUB.charts.colors.orangeGradient
-    });
-  }
-  
-  // Biogás
-  if (DATA.biogas.length) {
-    const ctx = document.getElementById("chartBiogas").getContext("2d");
-    new Chart(ctx, {
-      type: "line",
-      data: {
-        labels: DATA.biogas.map(r => r.mes),
-        datasets: [
-          {
-            label: "CTR Seropédica",
-            data: DATA.biogas.map(r => r.seropedica / 1000),
-            borderColor: "#78aaa3",
-            backgroundColor: "rgba(120, 170, 163, 0.1)",
-            borderWidth: 3,
-            tension: 0.4,
-            fill: true
-          },
-          {
-            label: "Aterro Gramacho",
-            data: DATA.biogas.map(r => r.gramacho / 1000),
-            borderColor: "#5b9bd5",
-            backgroundColor: "rgba(91, 155, 213, 0.1)",
-            borderWidth: 3,
-            tension: 0.4,
-            fill: true
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: "bottom",
-            labels: {
-              color: "#b8c9de",
-              font: { size: 12 },
-              padding: 15,
-              usePointStyle: true
-            }
-          },
-          tooltip: {
-            backgroundColor: "rgba(13,31,54,0.95)",
-            callbacks: {
-              label: ctx => `${ctx.dataset.label}: ${HUB.format.int(ctx.parsed.y)} mil Nm³`
-            }
-          }
-        },
-        scales: {
-          y: {
-            grid: { color: "rgba(41,72,102,0.3)" },
-            ticks: {
-              color: "#b8c9de",
-              callback: value => `${value}k`
-            }
-          },
-          x: {
-            grid: { color: "rgba(41,72,102,0.3)" },
-            ticks: { color: "#b8c9de" }
-          }
-        }
-      }
-    });
-  }
-  
-  // Frota Própria
-  if (DATA.frotaPropria.length) {
-    const ctx = document.getElementById("chartFrota").getContext("2d");
-    new Chart(ctx, {
-      type: "line",
-      data: {
-        labels: DATA.frotaPropria.map(r => r.mes),
-        datasets: [
-          {
-            label: "Frota Total",
-            data: DATA.frotaPropria.map(r => r.total),
-            borderColor: "#ef6a5d",
-            backgroundColor: "rgba(239, 106, 93, 0.1)",
-            borderWidth: 3,
-            tension: 0.4,
-            fill: true
-          },
-          {
-            label: "Em Operação",
-            data: DATA.frotaPropria.map(r => r.operacao),
-            borderColor: "#78aaa3",
-            backgroundColor: "rgba(120, 170, 163, 0.1)",
-            borderWidth: 3,
-            tension: 0.4,
-            fill: true
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: "bottom",
-            labels: {
-              color: "#b8c9de",
-              font: { size: 12 },
-              padding: 15,
-              usePointStyle: true
-            }
-          },
-          tooltip: {
-            backgroundColor: "rgba(13,31,54,0.95)",
-            callbacks: {
-              label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y} veículos`
-            }
-          }
-        },
-        scales: {
-          y: {
-            grid: { color: "rgba(41,72,102,0.3)" },
-            ticks: {
-              color: "#b8c9de",
-              callback: value => value
-            }
-          },
-          x: {
-            grid: { color: "rgba(41,72,102,0.3)" },
-            ticks: { color: "#b8c9de" }
-          }
-        }
-      }
-    });
-  }
+  container.innerHTML = rows;
+}
+
+function renderNOKPorItem(avaliacoes) {
+  // TODO: Implementar gráfico Chart.js
+  console.log('renderNOKPorItem: implementar');
+}
+
+// ============================================
+// RENDERIZAÇÃO: OUTRAS TELAS
+// ============================================
+
+function renderExecutivo() {
+  console.log('renderExecutivo');
+  applyFilters();
+  // TODO: Implementar
+}
+
+function renderTerritorial() {
+  console.log('renderTerritorial');
+  // TODO: Implementar mapa Leaflet
+}
+
+function renderReincidencia() {
+  console.log('renderReincidencia');
+  // TODO: Implementar análise de reincidência
+}
+
+function renderAnalitico() {
+  console.log('renderAnalitico');
+  // TODO: Implementar tabela analítica
 }
 
 // ============================================
