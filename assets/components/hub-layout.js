@@ -25,7 +25,7 @@ HUB.header = {
       logoHTML = `
         <div class="logoWrap">
           <img id="logoComlurb" class="logoImg" 
-               src="/HUB_COMLURB/assets/logos/RIOPREFEITURA%20Comlurb%20horizontal%20monocromatica%20branco.png" 
+               src="/HUB-COMLURB/assets/logos/RIOPREFEITURA%20Comlurb%20horizontal%20monocromatica%20branco.png" 
                alt="Prefeitura do Rio + Comlurb"
                style="display:block">
           <div id="logoFallback" class="logoTextFallback" style="display:none">
@@ -89,11 +89,11 @@ HUB.header = {
     if (!img) return;
 
     const candidates = [
-      "/HUB_COMLURB/assets/logos/RIOPREFEITURA%20Comlurb%20horizontal%20monocromatica%20branco.png",
+      "/HUB-COMLURB/assets/logos/RIOPREFEITURA%20Comlurb%20horizontal%20monocromatica%20branco.png",
       "./assets/logos/RIOPREFEITURA%20Comlurb%20horizontal%20monocromatica%20branco.png",
       "../assets/logos/RIOPREFEITURA%20Comlurb%20horizontal%20monocromatica%20branco.png",
       "../../assets/logos/RIOPREFEITURA%20Comlurb%20horizontal%20monocromatica%20branco.png",
-      "/HUB_COMLURB/assets/logos/RIOPREFEITURA%20Comlurb%20horizontal%20monocromatica%20azul.png",
+      "/HUB-COMLURB/assets/logos/RIOPREFEITURA%20Comlurb%20horizontal%20monocromatica%20azul.png",
       "./assets/logos/RIOPREFEITURA%20Comlurb%20horizontal%20monocromatica%20azul.png"
     ];
 
