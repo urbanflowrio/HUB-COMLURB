@@ -3,410 +3,86 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>IPL · Índice Padrão de Limpeza · HUB COMLURB</title>
+<title>IPL Territorial · HUB COMLURB</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
-:root{
-  --bg:#07111f;--ink:#f2f6ff;--muted:#9fb0c7;--panel:#0d1b2f;--panel2:#10243d;
-  --line:#274260;--navy:#071426;--navy2:#10233d;--blue:#6da5d8;--orange:#e87535;
-  --green:#78aaa3;--shadow:0 18px 45px rgba(0,0,0,.28);
-}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,Segoe UI,Arial,sans-serif}
-.app{max-width:1880px;margin:0 auto;padding:18px}
-
-/* ── HEADER ── */
-.header{display:flex;align-items:center;gap:22px;padding:20px 22px;border:1px solid rgba(111,164,216,.25);border-radius:22px;background:#0b1a2e;box-shadow:var(--shadow);color:white;margin-bottom:14px}
-.logo{width:230px;max-height:58px;object-fit:contain;border-right:1px solid rgba(255,255,255,.35);padding-right:20px}
-.eyebrow{font-size:11px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:#b9c9dc}
-h1{margin:4px 0;font-size:clamp(25px,2vw,38px);line-height:1.05;color:white}
-.sub{color:#c5d5e8;font-size:14px}
-
-/* ── FILTROS ── */
-.controls{display:grid;grid-template-columns:repeat(3,minmax(220px,1fr)) 160px;gap:12px;margin:14px 0}
-.field,.btn,.search{border:1px solid var(--line);background:var(--panel);border-radius:16px;padding:11px 12px;box-shadow:0 8px 20px rgba(16,32,51,.05)}
-label{display:block;color:#aebbd0;font-size:10px;letter-spacing:.13em;text-transform:uppercase;font-weight:900;margin-bottom:6px}
-select,input{width:100%;background:transparent;border:0;color:#f2f6ff;font-weight:800;outline:0}
-select option{background:#0d1b2f;color:#fff}
-.btn{cursor:pointer;color:#eef5ff;font-weight:950}
-.btn.orange{border-color:rgba(232,117,53,.75);background:#14243b;color:#fff}
-
-/* ── STATUS ── */
-.status{margin:12px 0;padding:10px 12px;border:1px solid rgba(75,126,172,.55);background:#1b2130;border-radius:14px;color:#b8d4f2;font-size:13px}
-
-/* ── ALERTAS ── */
-.hl{border:1px solid rgba(255,255,255,.10);background:#0b1a2e;border-radius:16px;padding:12px;min-height:86px;position:relative;overflow:hidden;margin-bottom:14px;transition:transform .16s ease,border-color .16s ease}
-.hl:hover{transform:translateY(-1px);border-color:rgba(109,165,216,.42);box-shadow:0 14px 34px rgba(0,0,0,.28)}
-.hl:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--blue)}
-.hl.warn:before{background:var(--orange)}.hl.good:before{background:var(--green)}
-.hl small{display:block;color:#9fb0c7;font-weight:900;text-transform:uppercase;letter-spacing:.10em;font-size:9px;margin-bottom:6px}
-.hl b{display:block;color:#fff;font-size:16px;line-height:1.4;overflow-wrap:anywhere}
-
-/* ── KPIs ── */
-.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:14px}
-.kpi{position:relative;overflow:hidden;min-height:104px;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:16px;box-shadow:var(--shadow)}
-.kpi:before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:#4b7eac}
-.kpi.orange:before{background:var(--orange)}.kpi.green:before{background:var(--green)}
-.kpi span{display:block;color:#aebbd0;font-size:11px;letter-spacing:.13em;text-transform:uppercase;font-weight:950}
-.kpi strong{display:block;font-size:clamp(22px,1.9vw,34px);margin:9px 0 4px;font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff}
-.kpi small{color:#a8b8cf}
-
-/* ── PAINÉIS ── */
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:14px}
-.panel{background:var(--panel);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);overflow:hidden}
-.panelHead{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 18px;border-bottom:1px solid var(--line);background:#0b1a2e}
-.panel h2{margin:0;font-size:16px;color:#fff}
-.hint{font-size:12px;color:#a8b8cf;margin-top:4px}
-.body{padding:18px}
-
-/* ── RANKING ── */
-.rank{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.08);cursor:pointer;border-radius:10px;padding-left:8px;padding-right:8px;min-width:0}
-.rank:last-child{border-bottom:0}
-.rank:hover{background:rgba(109,165,216,.08)}
-.rank b{font-size:13px;overflow:hidden;text-overflow:ellipsis;color:#fff;min-width:0;white-space:nowrap}
-.rank small{color:#a8b8cf}
-
-/* ── TABELA ── */
-.tblWrap{overflow:auto;max-height:600px}
-table{width:100%;border-collapse:collapse;font-size:13px}
-th{background:var(--navy2);border-bottom:1px solid var(--line);padding:13px 12px;text-align:left;color:#aebbd0;font-weight:950;letter-spacing:.10em;text-transform:uppercase;font-size:10px;position:sticky;top:0;z-index:10;cursor:pointer}
-th:hover{background:#0f2540}
-td{padding:13px 12px;border-bottom:1px solid rgba(255,255,255,.05);color:#d7e4f7}
-tr:hover{background:rgba(109,165,216,.05)}
-.num{text-align:right;font-weight:700;color:#fff}
-
-/* ── FOOTER ── */
-.footer{background:var(--panel);border-top:1px solid var(--line);padding:14px 18px;display:flex;gap:18px;flex-wrap:wrap;align-items:center;font-size:13px;color:#c2d1e6;margin-top:14px}
-.footer b{color:#fff;font-weight:950}
-
-.loading{padding:40px;text-align:center;color:var(--muted)}
+:root{--bg:#07111f;--panel:#0d1b2f;--panel2:#10243d;--line:#274260;--ink:#f2f6ff;--muted:#9fb0c7;--blue:#6da5d8;--orange:#e87535;--green:#78aaa3;--red:#e84855;--yellow:#f4a261;--shadow:0 18px 45px rgba(0,0,0,.28)}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,Segoe UI,Arial,sans-serif}.app{max-width:1880px;margin:0 auto;padding:18px}.header{display:flex;align-items:center;gap:22px;padding:20px 22px;border:1px solid rgba(111,164,216,.25);border-radius:22px;background:#0b1a2e;box-shadow:var(--shadow);margin-bottom:14px}.logo{width:220px;max-height:58px;object-fit:contain;border-right:1px solid rgba(255,255,255,.22);padding-right:20px}.eyebrow{font-size:11px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:#b9c9dc}h1{margin:4px 0;font-size:clamp(25px,2vw,38px);line-height:1.05}.sub{color:#c5d5e8;font-size:14px}.controls{display:grid;grid-template-columns:repeat(5,minmax(170px,1fr));gap:12px;margin:14px 0}.field,.btn{border:1px solid var(--line);background:var(--panel);border-radius:16px;padding:11px 12px}label{display:block;color:#aebbd0;font-size:10px;letter-spacing:.13em;text-transform:uppercase;font-weight:900;margin-bottom:6px}select{width:100%;background:transparent;border:0;color:#f2f6ff;font-weight:800;outline:0}select option{background:#0d1b2f;color:#fff}.btn{cursor:pointer;color:#fff;font-weight:950}.btn.orange{border-color:rgba(232,117,53,.75);background:#14243b}.status{margin:12px 0;padding:10px 12px;border:1px solid rgba(75,126,172,.55);background:#1b2130;border-radius:14px;color:#b8d4f2;font-size:13px}.insight{border:1px solid rgba(255,255,255,.10);background:#0b1a2e;border-radius:16px;padding:13px 14px;margin-bottom:14px;border-left:4px solid var(--orange);line-height:1.45}.insight b{color:#fff}.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:14px}.kpi{min-height:104px;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:16px;box-shadow:var(--shadow);position:relative;overflow:hidden}.kpi:before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:#4b7eac}.kpi.orange:before{background:var(--orange)}.kpi.green:before{background:var(--green)}.kpi.red:before{background:var(--red)}.kpi span{display:block;color:#aebbd0;font-size:11px;letter-spacing:.13em;text-transform:uppercase;font-weight:950}.kpi strong{display:block;font-size:clamp(22px,1.9vw,34px);margin:9px 0 4px;font-weight:950;color:#fff}.kpi small{color:#a8b8cf}.grid{display:grid;grid-template-columns:1.2fr .8fr;gap:14px;margin-bottom:14px}.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:14px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);overflow:hidden}.panelHead{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 18px;border-bottom:1px solid var(--line);background:#0b1a2e}.panel h2{margin:0;font-size:16px}.hint{font-size:12px;color:#a8b8cf;margin-top:4px}.body{padding:16px}.rank{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:10px 8px;border-bottom:1px solid rgba(255,255,255,.08);border-radius:10px;min-width:0}.rank:hover{background:rgba(109,165,216,.08)}.rank b{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.rank small{color:#a8b8cf;font-weight:900}.bar{height:8px;border-radius:999px;background:#1b3657;margin-top:6px;overflow:hidden}.bar i{display:block;height:100%;background:var(--orange)}#map{height:560px;background:#07111f}.tblWrap{overflow:auto;max-height:520px}table{width:100%;border-collapse:collapse;font-size:13px}th{background:#10243d;border-bottom:1px solid var(--line);padding:12px;text-align:left;color:#aebbd0;font-weight:950;letter-spacing:.09em;text-transform:uppercase;font-size:10px;position:sticky;top:0;z-index:10}td{padding:12px;border-bottom:1px solid rgba(255,255,255,.05);color:#d7e4f7}.num{text-align:right;font-weight:800;color:#fff}.footer{background:var(--panel);border-top:1px solid var(--line);padding:14px 18px;display:flex;gap:18px;flex-wrap:wrap;align-items:center;font-size:13px;color:#c2d1e6;margin-top:14px}@media(max-width:1100px){.kpis,.controls,.grid,.grid2{grid-template-columns:1fr}.logo{width:160px}.header{align-items:flex-start;flex-direction:column}}
 </style>
 </head>
-
 <body>
 <div class="app">
-
-<!-- HEADER -->
 <header class="header">
-  <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 80'%3E%3Crect fill='%23FFFFFF' width='300' height='80'/%3E%3Ctext x='50' y='50' font-family='Arial,sans-serif' font-size='24' font-weight='bold' fill='%23003366'%3ECOMLURB%3C/text%3E%3C/svg%3E" alt="COMLURB" class="logo">
-  <div>
-    <div class="eyebrow">Monitoramento Operacional</div>
-    <h1>IPL · Índice Padrão de Limpeza</h1>
-    <div class="sub">Avaliação territorial, conformidade operacional e reincidências</div>
-  </div>
+  <img src="./assets/logo-comlurb.png" onerror="this.style.display='none'" alt="COMLURB" class="logo">
+  <div><div class="eyebrow">HUB COMLURB · Inteligência Operacional</div><h1>IPL · Análise Territorial</h1><div class="sub">NotaFinal, meta, bairros críticos, itens de maior perda e reincidência territorial</div></div>
 </header>
-
-<!-- FILTROS -->
 <section class="controls">
-  <div class="field">
-    <label>Mês</label>
-    <select id="filtroMes" onchange="render()"><option value="">Todos</option></select>
-  </div>
-  <div class="field">
-    <label>Superintendência</label>
-    <select id="filtroSuperintendencia" onchange="render()"><option value="">Todas</option></select>
-  </div>
-  <div class="field">
-    <label>Gerência</label>
-    <select id="filtroGerencia" onchange="render()"><option value="">Todas</option></select>
-  </div>
+  <div class="field"><label>Mês</label><select id="fMes" onchange="render()"><option value="">Todos</option></select></div>
+  <div class="field"><label>Superintendência</label><select id="fSup" onchange="render()"><option value="">Todas</option></select></div>
+  <div class="field"><label>Gerência</label><select id="fGer" onchange="render()"><option value="">Todas</option></select></div>
+  <div class="field"><label>Bairro</label><select id="fBairro" onchange="render()"><option value="">Todos</option></select></div>
   <button class="btn orange" onclick="clearAll()">Limpar</button>
 </section>
-
-<!-- STATUS -->
-<div id="status" class="status" style="display:none">
-  Carregando dados... <span id="statusText"></span>
-</div>
-
-<!-- ALERTAS -->
-<div id="alertas"></div>
-
-<!-- KPIS -->
+<div id="status" class="status">Carregando bases...</div>
+<div id="insight" class="insight"></div>
 <div class="kpis" id="kpis"></div>
-
-<!-- GRÁFICOS -->
 <div class="grid">
-  <div class="panel">
-    <div class="panelHead">
-      <h2>Ranking Superintendências</h2>
-      <div class="hint">Taxa de conformidade por região</div>
-    </div>
-    <div class="body" id="rankingSuperintendencias"></div>
-  </div>
-  
-  <div class="panel">
-    <div class="panelHead">
-      <h2>Distribuição de NOK por Item</h2>
-      <div class="hint">Itens com maior concentração de não conformidades</div>
-    </div>
-    <div class="body" id="chartNOKItens"></div>
-  </div>
+  <div class="panel"><div class="panelHead"><div><h2>Mapa por bairro</h2><div class="hint">Cor por NotaFinal média. Laranja/vermelho = abaixo da meta 77.</div></div></div><div id="map"></div></div>
+  <div class="panel"><div class="panelHead"><div><h2>Bairros críticos</h2><div class="hint">Menor média IPL com volume mínimo</div></div></div><div class="body" id="rankBairros"></div></div>
 </div>
-
-<!-- TABELA -->
-<div class="panel">
-  <div class="panelHead">
-    <h2>Dados Detalhados</h2>
-    <button class="btn orange" onclick="exportarCSV()">Exportar CSV</button>
-  </div>
-  <div class="tblWrap">
-    <table>
-      <thead>
-        <tr>
-          <th>Data</th>
-          <th>Mês</th>
-          <th>Superintendência</th>
-          <th>Gerência</th>
-          <th>Bairro</th>
-          <th>Logradouro</th>
-          <th>Trecho</th>
-          <th class="num">Total OK</th>
-          <th class="num">Total NOK</th>
-          <th class="num">Lixo Branco</th>
-        </tr>
-      </thead>
-      <tbody id="tabelaBody">
-        <tr><td colspan="10" class="loading">Carregando dados...</td></tr>
-      </tbody>
-    </table>
-  </div>
+<div class="grid2">
+  <div class="panel"><div class="panelHead"><div><h2>Ranking por Superintendência</h2><div class="hint">NotaFinal média e volume avaliado</div></div></div><div class="body" id="rankSup"></div></div>
+  <div class="panel"><div class="panelHead"><div><h2>Itens com maior perda</h2><div class="hint">Média mais baixa por item de avaliação</div></div></div><div class="body" id="rankItens"></div></div>
 </div>
-
-<!-- FOOTER -->
-<footer class="footer">
-  <span><b>Gabinete da Presidência</b></span>
-  <span>HUB COMLURB • Núcleo de Inteligência e Gestão Estratégica Operacional</span>
-  <span>v1.0</span>
-</footer>
-
+<div class="panel"><div class="panelHead"><h2>Detalhamento</h2><button class="btn orange" onclick="exportCSV()">Exportar CSV</button></div><div class="tblWrap"><table><thead><tr><th>Mês</th><th>Data</th><th>Sup.</th><th>Gerência</th><th>Bairro</th><th>Logradouro</th><th>Trecho</th><th class="num">NotaFinal</th></tr></thead><tbody id="tbody"></tbody></table></div></div>
+<footer class="footer"><b>Gabinete da Presidência</b><span>Fonte: bases IPL e arquivos territoriais publicados no GitHub</span><span>v2 territorial</span></footer>
 </div>
-
-<!-- DEPENDÊNCIAS -->
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-const CONFIG = {
-  metaIPL: 77.0
-};
-
-let DATA = [];
-let FILTERED = [];
-
-// Dados em formato CSV embutido (você vai substituir por URLs depois)
-const CSV_DATA = `Data,Mês,Superintendência,Gerência,Bairro,Logradouro,Trecho,Coleta domiciliar,Lixo Crítico,Ralo,Entulho,Bens inservíveis,Material de Obra,Pneus,Propaganda,Galhada,Animal morto,Resíduo morador de rua,Lama/Areia,Resíduo pós servico,Ponto crítico,Capina,Lixo Branco TC1 - P,Lixo Branco TC1 - G,Lixo Branco TC2 - P,Lixo Branco TC2 - G,Lixo Branco TC3 - P,Lixo Branco TC3 - G,Lixo Branco TC4 - P,Lixo Branco TC4 - G
-2026-05-15,2026-05,LRN,GER-01,Centro,Rua A,T-001,Sim,Sim,Sim,Não,Sim,Sim,Sim,Sim,Sim,Não,Sim,Sim,Sim,Sim,Sim,2,1,1,2,0,1,1,0
-2026-05-15,2026-05,LRN,GER-02,Botafogo,Rua B,T-002,Sim,Não,Sim,Sim,Sim,Sim,Sim,Sim,Sim,Sim,Sim,Sim,Sim,Sim,Sim,3,2,2,1,1,2,0,1
-2026-05-16,2026-05,LRC,GER-03,Copacabana,Rua C,T-003,Sim,Sim,Não,Sim,Sim,Sim,Não,Sim,Sim,Sim,Sim,Sim,Sim,Sim,Sim,1,1,2,2,1,1,2,1
-2026-05-16,2026-05,LRS,GER-04,Leme,Rua D,T-004,Não,Sim,Sim,Sim,Sim,Sim,Sim,Sim,Sim,Não,Sim,Sim,Sim,Sim,Sim,4,3,2,2,1,2,1,0
-2026-05-17,2026-05,LRO,GER-05,Leblon,Rua E,T-005,Sim,Sim,Sim,Sim,Sim,Sim,Sim,Sim,Sim,Sim,Sim,Não,Sim,Sim,Sim,2,2,1,1,2,1,1,1
-2026-05-17,2026-05,LRB,GER-06,Ipanema,Rua F,T-006,Sim,Sim,Sim,Sim,Não,Sim,Sim,Sim,Sim,Sim,Sim,Sim,Sim,Não,Sim,1,2,2,3,1,1,0,1`;
-
-function parseCSV(csv) {
-  const lines = csv.trim().split('\n');
-  const headers = lines[0].split(',').map(h => h.trim());
-  
-  const data = lines.slice(1).map(line => {
-    const values = line.split(',').map(v => v.trim());
-    const obj = {};
-    headers.forEach((h, i) => obj[h] = values[i]);
-    return obj;
-  });
-  
-  return data;
+const META = 77;
+const URL_IPL = './data/avaliacoes_ipl_2026.csv';
+const URL_COORD_BAIRROS = './data/coordenadas_bairros_rio.csv';
+const URL_BAIRROS_GEOJSON = './data/DLU_Novos_Bairros_estrutura2025.geojson';
+const URL_GERENCIAS_GEOJSON = './data/GERENCIAS_DSU.geojson';
+let DATA=[], FILTERED=[], COORD=[], GEOBAIRROS=null, GEOGER=null, map, bairroLayer, gerLayer, markerLayer;
+const $=id=>document.getElementById(id), norm=s=>(s??'').toString().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toUpperCase();
+const num=v=>{ if(v==null||v==='N/A'||v==='') return null; let n=parseFloat(String(v).replace(',','.')); return isNaN(n)?null:n; };
+async function csv(url){ return new Promise((res,rej)=>Papa.parse(url,{download:true,header:true,skipEmptyLines:true,complete:r=>res(r.data),error:rej})); }
+async function json(url){ const r=await fetch(url); if(!r.ok) throw new Error(url+' não carregou'); return r.json(); }
+function pick(row,names){ for(const n of names){ if(row[n]!==undefined) return row[n]; } return ''; }
+async function init(){
+ try{
+  $('status').textContent='Carregando avaliação IPL, coordenadas e geometrias...';
+  const [ipl,coord,geoB,geoG] = await Promise.allSettled([csv(URL_IPL),csv(URL_COORD_BAIRROS),json(URL_BAIRROS_GEOJSON),json(URL_GERENCIAS_GEOJSON)]);
+  if(ipl.status!=='fulfilled') throw new Error('Não encontrei ./data/avaliacoes_ipl_2026.csv. Exporte a aba Consolidado 2026 como CSV e coloque nessa pasta.');
+  DATA = ipl.value.map(r=>({raw:r, mes:pick(r,['Mês','Mes','MES']), data:pick(r,['Data','DATA']), sup:pick(r,['Superintendência','Superintendencia','SUPERINTENDÊNCIA']), ger:pick(r,['Gerência','Gerencia','GERÊNCIA','GERENCIA']), bairro:pick(r,['Bairro','BAIRRO']), nome:pick(r,['Nome','Denominação','Logradouro','NOME']), trecho:pick(r,['Trecho','TRECHO']), nota:num(pick(r,['NotaFinal','Nota Final','NOTAFINAL','Nota'])) })).filter(r=>r.nota!==null && r.bairro);
+  COORD = coord.status==='fulfilled'?coord.value:[]; GEOBAIRROS = geoB.status==='fulfilled'?geoB.value:null; GEOGER = geoG.status==='fulfilled'?geoG.value:null;
+  $('status').style.display='none'; initMap(); populateFilters(); render();
+ }catch(e){ $('status').textContent='Erro: '+e.message; console.error(e); }
 }
-
-async function init() {
-  try {
-    document.getElementById('status').style.display = 'block';
-    document.getElementById('statusText').textContent = 'Processando dados...';
-    
-    // Parse CSV embutido
-    DATA = parseCSV(CSV_DATA);
-    
-    // Enriquecer dados
-    DATA = DATA.map(row => {
-      let totalOK = 0, totalNOK = 0, itensNOK = [];
-      const itens = ['Coleta domiciliar', 'Lixo Crítico', 'Ralo', 'Entulho', 'Bens inservíveis', 'Material de Obra', 'Pneus', 'Propaganda', 'Galhada', 'Animal morto', 'Resíduo morador de rua', 'Lama/Areia', 'Resíduo pós servico', 'Ponto crítico', 'Capina'];
-      
-      itens.forEach(item => {
-        const valor = row[item];
-        if (valor === 'Sim' || valor === 'OK') totalOK++;
-        else if (valor === 'Não' || valor === 'NOK') { totalNOK++; itensNOK.push(item); }
-      });
-      
-      let lixoBranco = 0;
-      for (let tc = 1; tc <= 4; tc++) {
-        for (let t of ['P', 'G']) {
-          const col = `Lixo Branco TC${tc} - ${t}`;
-          if (row[col]) lixoBranco += parseInt(row[col]) || 0;
-        }
-      }
-      
-      return { ...row, totalOK, totalNOK, itensNOK, lixoBranco, taxa: totalOK + totalNOK > 0 ? (totalOK / (totalOK + totalNOK) * 100) : 0 };
-    });
-    
-    document.getElementById('status').style.display = 'none';
-    populateFilters();
-    render();
-    
-  } catch (e) {
-    console.error("Erro:", e);
-    alert("Erro: " + e.message);
-  }
+function populateFilters(){
+ const fill=(id,arr)=>{ const sel=$(id); arr.filter(Boolean).sort((a,b)=>a.localeCompare(b,'pt-BR')).forEach(v=>{let o=document.createElement('option');o.value=v;o.textContent=v;sel.appendChild(o)}); };
+ fill('fMes',[...new Set(DATA.map(r=>r.mes))]); fill('fSup',[...new Set(DATA.map(r=>r.sup))]); fill('fGer',[...new Set(DATA.map(r=>r.ger))]); fill('fBairro',[...new Set(DATA.map(r=>r.bairro))]);
 }
-
-function populateFilters() {
-  const vals = (field) => [...new Set(DATA.map(r => r[field] || '').filter(Boolean))].sort();
-  
-  const populate = (id, items) => {
-    const sel = document.getElementById(id);
-    items.forEach(item => {
-      const opt = document.createElement('option');
-      opt.value = item;
-      opt.textContent = item;
-      sel.appendChild(opt);
-    });
-  };
-  
-  populate('filtroMes', vals('Mês'));
-  populate('filtroSuperintendencia', vals('Superintendência'));
-  populate('filtroGerencia', vals('Gerência'));
-}
-
-function clearAll() {
-  document.getElementById('filtroMes').value = '';
-  document.getElementById('filtroSuperintendencia').value = '';
-  document.getElementById('filtroGerencia').value = '';
-  render();
-}
-
-function applyFilters() {
-  const mes = document.getElementById('filtroMes').value;
-  const sup = document.getElementById('filtroSuperintendencia').value;
-  const ger = document.getElementById('filtroGerencia').value;
-  
-  FILTERED = DATA.filter(r => {
-    return (mes === '' || r['Mês'] === mes) &&
-           (sup === '' || r['Superintendência'] === sup) &&
-           (ger === '' || r['Gerência'] === ger);
-  });
-}
-
-function render() {
-  applyFilters();
-  renderAlertas();
-  renderKPIs();
-  renderCharts();
-  renderTabela();
-}
-
-function renderAlertas() {
-  const container = document.getElementById('alertas');
-  const porSup = {};
-  
-  FILTERED.forEach(row => {
-    const s = row['Superintendência'];
-    if (!s) return;
-    if (!porSup[s]) porSup[s] = { ok: 0, nok: 0 };
-    porSup[s].ok += row.totalOK || 0;
-    porSup[s].nok += row.totalNOK || 0;
-  });
-  
-  const alertas = [];
-  Object.entries(porSup).forEach(([s, d]) => {
-    const tot = d.ok + d.nok;
-    const conf = tot > 0 ? (d.ok / tot * 100) : 0;
-    if (conf < CONFIG.metaIPL) {
-      alertas.push(`<div class="hl warn"><small>Atenção Operacional</small><b>A Superintendência ${s} apresenta taxa de conformidade de ${conf.toFixed(1)}%, abaixo da meta de ${CONFIG.metaIPL}%.</b></div>`);
-    }
-  });
-  
-  container.innerHTML = alertas.length > 0 ? alertas.join('') : `<div class="hl good"><small>Sistema Operacional</small><b>Nenhum alerta crítico identificado.</b></div>`;
-}
-
-function renderKPIs() {
-  const totalAval = FILTERED.length;
-  const totalOK = FILTERED.reduce((s, r) => s + (r.totalOK || 0), 0);
-  const totalNOK = FILTERED.reduce((s, r) => s + (r.totalNOK || 0), 0);
-  const totalItens = totalOK + totalNOK;
-  const taxa = totalItens > 0 ? (totalOK / totalItens * 100) : 0;
-  const lixo = FILTERED.reduce((s, r) => s + (r.lixoBranco || 0), 0);
-  
-  const fmt = (n) => n.toLocaleString('pt-BR');
-  const kpis = [
-    { label: "Taxa de Conformidade", value: taxa.toFixed(1) + '%', note: "itens OK / total", color: taxa >= CONFIG.metaIPL ? "green" : "orange" },
-    { label: "Meta IPL", value: CONFIG.metaIPL.toFixed(1) + '%', note: "objetivo", color: "" },
-    { label: "Total Avaliações", value: fmt(totalAval), note: "vistorias", color: "" },
-    { label: "Itens OK", value: fmt(totalOK), note: "conformes", color: "green" },
-    { label: "Itens NOK", value: fmt(totalNOK), note: "não conformes", color: "orange" },
-    { label: "Lixo Branco", value: fmt(lixo), note: "unidades", color: "" }
-  ];
-  
-  document.getElementById('kpis').innerHTML = kpis.map(k => `<div class="kpi ${k.color}"><span>${k.label}</span><strong>${k.value}</strong><small>${k.note}</small></div>`).join('');
-}
-
-function renderCharts() {
-  const porSup = {};
-  FILTERED.forEach(row => {
-    const s = row['Superintendência'];
-    if (!s) return;
-    if (!porSup[s]) porSup[s] = { ok: 0, nok: 0 };
-    porSup[s].ok += row.totalOK || 0;
-    porSup[s].nok += row.totalNOK || 0;
-  });
-  
-  const supData = Object.entries(porSup).map(([s, d]) => {
-    const tot = d.ok + d.nok;
-    const conf = tot > 0 ? (d.ok / tot * 100) : 0;
-    return [s, conf];
-  }).sort((a, b) => b[1] - a[1]);
-  
-  document.getElementById('rankingSuperintendencias').innerHTML = supData.map(item => {
-    const cor = item[1] >= CONFIG.metaIPL ? '#78aaa3' : '#e87535';
-    return `<div class="rank"><b>${item[0]}</b><small style="color:${cor};font-weight:950">${item[1].toFixed(1)}%</small></div>`;
-  }).join('') || '<div class="loading">Nenhum dado</div>';
-  
-  const nokPorItem = {};
-  FILTERED.forEach(row => row.itensNOK.forEach(item => nokPorItem[item] = (nokPorItem[item] || 0) + 1));
-  
-  const nokData = Object.entries(nokPorItem).sort((a, b) => b[1] - a[1]).slice(0, 10);
-  
-  document.getElementById('chartNOKItens').innerHTML = nokData.map(item => `<div class="rank"><b>${item[0]}</b><small style="color:#e87535;font-weight:950">${item[1]}</small></div>`).join('') || '<div class="loading">Nenhum dado</div>';
-}
-
-function renderTabela() {
-  const tbody = document.getElementById('tabelaBody');
-  tbody.innerHTML = FILTERED.slice(0, 100).map(r => `
-    <tr>
-      <td>${r['Data']}</td>
-      <td>${r['Mês']}</td>
-      <td>${r['Superintendência']}</td>
-      <td>${r['Gerência']}</td>
-      <td>${r['Bairro']}</td>
-      <td>${r['Logradouro']}</td>
-      <td>${r['Trecho']}</td>
-      <td class="num">${r.totalOK || 0}</td>
-      <td class="num">${r.totalNOK || 0}</td>
-      <td class="num">${r.lixoBranco || 0}</td>
-    </tr>
-  `).join('') || '<tr><td colspan="10" class="loading">Nenhum dado</td></tr>';
-}
-
-function exportarCSV() {
-  if (FILTERED.length === 0) { alert('Nenhum dado para exportar'); return; }
-  
-  const headers = ['Data', 'Mês', 'Superintendência', 'Gerência', 'Bairro', 'Logradouro', 'Trecho', 'Total OK', 'Total NOK', 'Lixo Branco'];
-  let csv = headers.join(',') + '\n';
-  FILTERED.forEach(r => csv += `${r['Data']},${r['Mês']},${r['Superintendência']},${r['Gerência']},${r['Bairro']},${r['Logradouro']},${r['Trecho']},${r.totalOK},${r.totalNOK},${r.lixoBranco}\n`);
-  
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'ipl-' + new Date().toISOString().slice(0,10) + '.csv';
-  a.click();
-}
-
-document.addEventListener('DOMContentLoaded', init);
+function clearAll(){['fMes','fSup','fGer','fBairro'].forEach(id=>$(id).value='');render();}
+function apply(){ const m=$('fMes').value,s=$('fSup').value,g=$('fGer').value,b=$('fBairro').value; FILTERED=DATA.filter(r=>(!m||r.mes===m)&&(!s||r.sup===s)&&(!g||r.ger===g)&&(!b||r.bairro===b)); }
+function avg(a){return a.length?a.reduce((s,x)=>s+x,0)/a.length:0} function fmt(n,d=1){return n.toLocaleString('pt-BR',{maximumFractionDigits:d,minimumFractionDigits:d})}
+function group(key){ const o={}; FILTERED.forEach(r=>{const k=r[key]||'Não informado';(o[k]??=[]).push(r)}); return Object.entries(o).map(([k,rows])=>({k,rows,n:rows.length,media:avg(rows.map(r=>r.nota)),abaixo:rows.filter(r=>r.nota<META).length})); }
+function render(){ apply(); renderKpis(); renderRanks(); renderTable(); renderInsight(); renderMap(); }
+function renderKpis(){ const notas=FILTERED.map(r=>r.nota), media=avg(notas), abaixo=FILTERED.filter(r=>r.nota<META).length, bairros=new Set(FILTERED.map(r=>norm(r.bairro))).size; $('kpis').innerHTML=[['Nota IPL média',fmt(media),'Meta 77',media>=META?'green':'orange'],['Avaliações',FILTERED.length.toLocaleString('pt-BR'),'registros filtrados',''],['Abaixo da meta',abaixo.toLocaleString('pt-BR'),FILTERED.length?fmt(abaixo/FILTERED.length*100)+'%':'0%','red'],['Bairros avaliados',bairros.toLocaleString('pt-BR'),'territórios',''],['Pior bairro',worstBairro()?.k||'-',worstBairro()?fmt(worstBairro().media):'-','orange'],['Melhor Sup.',bestSup()?.k||'-',bestSup()?fmt(bestSup().media):'-','green']].map(k=>`<div class="kpi ${k[3]}"><span>${k[0]}</span><strong>${k[1]}</strong><small>${k[2]}</small></div>`).join(''); }
+function worstBairro(){return group('bairro').filter(x=>x.n>=5).sort((a,b)=>a.media-b.media)[0]} function bestSup(){return group('sup').sort((a,b)=>b.media-a.media)[0]}
+function renderInsight(){ const w=worstBairro(), sup=group('sup').sort((a,b)=>a.media-b.media)[0]; $('insight').innerHTML = FILTERED.length?`<b>Leitura executiva:</b> a média filtrada está em <b>${fmt(avg(FILTERED.map(r=>r.nota)))}</b>. ${FILTERED.filter(r=>r.nota<META).length.toLocaleString('pt-BR')} avaliações estão abaixo da meta. O bairro mais crítico no filtro é <b>${w?.k||'-'}</b> e a superintendência com menor média é <b>${sup?.k||'-'}</b>.`: 'Sem dados no filtro atual.'; }
+function rankHTML(arr,mode='media'){ return arr.map(x=>{const pct=mode==='abaixo'?x.abaixo/x.n*100:x.media; const color=x.media>=META?'var(--green)':(x.media<65?'var(--red)':'var(--orange)'); return `<div class="rank"><div><b>${x.k}</b><div class="bar"><i style="width:${Math.min(100,Math.max(0,pct))}%;background:${color}"></i></div></div><small>${fmt(x.media)} · ${x.n}</small></div>`}).join('') || '<div class="status">Sem dados</div>'; }
+function renderRanks(){ $('rankBairros').innerHTML=rankHTML(group('bairro').filter(x=>x.n>=5).sort((a,b)=>a.media-b.media).slice(0,15)); $('rankSup').innerHTML=rankHTML(group('sup').sort((a,b)=>a.media-b.media)); const itemCols=['LixoBranco','ColetaDomiciliar','CaixaRalo','BensInserviveis','PapeleirasConteinerCheia','PapeleiraConteinerSuja','PapeleiraConteinerQuebrada','LixoCriticoFezes','LixoCriticoPerfuroCortante','Galhada','Propaganda','Capina','RocadaareaverdeAvaliacao','animalmorto','ResiduoMoradorRua','ResiduosLimpeza','LamaAreia','DescarteIrregularPontoCritico','CaixaMetalicaDempster']; const itens=itemCols.map(c=>{const vals=FILTERED.map(r=>num(r.raw[c])).filter(v=>v!==null); return {k:c,n:vals.length,media:avg(vals),rows:[]}}).filter(x=>x.n>0).sort((a,b)=>a.media-b.media).slice(0,12); $('rankItens').innerHTML=rankHTML(itens); }
+function renderTable(){ $('tbody').innerHTML=FILTERED.slice(0,300).map(r=>`<tr><td>${r.mes}</td><td>${String(r.data).slice(0,10)}</td><td>${r.sup}</td><td>${r.ger}</td><td>${r.bairro}</td><td>${r.nome}</td><td>${r.trecho||''}</td><td class="num">${fmt(r.nota)}</td></tr>`).join('') || '<tr><td colspan="8">Sem dados</td></tr>'; }
+function initMap(){ map=L.map('map',{zoomControl:true}).setView([-22.91,-43.35],10); L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'&copy; OpenStreetMap & CARTO'}).addTo(map); markerLayer=L.layerGroup().addTo(map); }
+function color(v){return v>=85?'#78aaa3':v>=77?'#6da5d8':v>=65?'#e87535':'#e84855'}
+function propName(p){ const keys=Object.keys(p||{}); return p.BAIRRO||p.Bairro||p.NOME||p.nome||p.NM_BAIRRO||p.bairro||p.name||''; }
+function renderMap(){ if(!map)return; const byB={}; group('bairro').forEach(x=>byB[norm(x.k)]=x); if(bairroLayer){map.removeLayer(bairroLayer)} if(GEOBAIRROS){ bairroLayer=L.geoJSON(GEOBAIRROS,{style:f=>{let d=byB[norm(propName(f.properties))]; return {color:'#274260',weight:.7,fillColor:d?color(d.media):'#16263d',fillOpacity:d?.n?0.62:0.18}},onEachFeature:(f,l)=>{let name=propName(f.properties),d=byB[norm(name)]; l.bindPopup(`<b>${name}</b><br>${d?`Nota média: ${fmt(d.media)}<br>Avaliações: ${d.n}<br>Abaixo da meta: ${d.abaixo}`:'Sem avaliação no filtro'}`)}}).addTo(map); }
+ markerLayer.clearLayers(); const coords={}; COORD.forEach(r=>{let b=norm(pick(r,['Bairro','BAIRRO','bairro','nome','NOME'])); let lat=num(pick(r,['lat','latitude','Latitude','LAT'])), lon=num(pick(r,['lon','lng','longitude','Longitude','LON','LONG'])); if(b&&lat&&lon) coords[b]=[lat,lon];}); Object.values(byB).forEach(d=>{let c=coords[norm(d.k)]; if(c){L.circleMarker(c,{radius:Math.max(5,Math.min(18,d.n/15)),color:color(d.media),fillColor:color(d.media),fillOpacity:.72,weight:1}).bindPopup(`<b>${d.k}</b><br>Nota média: ${fmt(d.media)}<br>Avaliações: ${d.n}`).addTo(markerLayer)}}); }
+function exportCSV(){ const rows=[['Mês','Data','Superintendência','Gerência','Bairro','Logradouro','Trecho','NotaFinal'],...FILTERED.map(r=>[r.mes,r.data,r.sup,r.ger,r.bairro,r.nome,r.trecho,r.nota])]; const csv=rows.map(r=>r.map(v=>'"'+String(v??'').replaceAll('"','""')+'"').join(',')).join('\n'); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'})); a.download='ipl_filtrado_'+new Date().toISOString().slice(0,10)+'.csv'; a.click(); }
+document.addEventListener('DOMContentLoaded',init);
 </script>
-
 </body>
 </html>
