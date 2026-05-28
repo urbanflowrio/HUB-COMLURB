@@ -3,8 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-
-<title>IPL Territorial · HUB COMLURB</title>
+<title>IPL · Análise Territorial · HUB COMLURB</title>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
@@ -41,8 +40,8 @@ body{
 .header{
   display:flex;
   align-items:center;
-  gap:22px;
-  padding:20px 22px;
+  gap:24px;
+  padding:22px;
   border:1px solid rgba(111,164,216,.25);
   border-radius:22px;
   background:#0b1a2e;
@@ -51,11 +50,11 @@ body{
 }
 
 .logo{
-  width:220px;
-  max-height:58px;
+  width:210px;
+  max-height:70px;
   object-fit:contain;
-  border-right:1px solid rgba(255,255,255,.22);
-  padding-right:20px;
+  border-right:1px solid rgba(255,255,255,.24);
+  padding-right:22px;
 }
 
 .eyebrow{
@@ -67,8 +66,8 @@ body{
 }
 
 h1{
-  margin:4px 0;
-  font-size:clamp(25px,2vw,38px);
+  margin:5px 0;
+  font-size:clamp(28px,2.2vw,42px);
   line-height:1.05;
 }
 
@@ -221,10 +220,6 @@ select option{
 }
 
 .panelHead{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:14px;
   padding:16px 18px;
   border-bottom:1px solid var(--line);
   background:#0b1a2e;
@@ -238,6 +233,7 @@ select option{
 .hint{
   font-size:12px;
   color:#a8b8cf;
+  margin-top:4px;
 }
 
 .body{
@@ -299,6 +295,8 @@ th{
   font-weight:950;
   font-size:10px;
   text-transform:uppercase;
+  position:sticky;
+  top:0;
 }
 
 td{
@@ -322,6 +320,23 @@ td{
   color:#c2d1e6;
   margin-top:14px;
 }
+
+@media(max-width:1100px){
+  .controls,.kpis,.grid,.grid2{
+    grid-template-columns:1fr;
+  }
+
+  .header{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+  .logo{
+    width:180px;
+    border-right:0;
+    padding-right:0;
+  }
+}
 </style>
 </head>
 
@@ -330,11 +345,17 @@ td{
 <div class="app">
 
 <header class="header">
-  <img src="./assets/logo-comlurb.png" class="logo">
+  <img
+    id="logoComlurb"
+    class="logo"
+    alt="COMLURB"
+    src="../assets/logos/comlurb_logo_transparent.png"
+  >
+
   <div>
     <div class="eyebrow">HUB COMLURB · Inteligência Operacional</div>
     <h1>IPL · Análise Territorial</h1>
-    <div class="sub">NotaFinal, meta, bairros críticos e análise territorial</div>
+    <div class="sub">Avaliação dos trechos, bairros críticos, reincidência territorial e itens NOK</div>
   </div>
 </header>
 
@@ -377,50 +398,45 @@ td{
 <div class="kpis" id="kpis"></div>
 
 <div class="grid">
-
   <div class="panel">
     <div class="panelHead">
-      <div>
-        <h2>Mapa por bairro</h2>
-        <div class="hint">Cor por NotaFinal média</div>
-      </div>
+      <h2>Mapa por bairro</h2>
+      <div class="hint">Cor por taxa de conformidade OK. Laranja/vermelho = maior concentração de NOK.</div>
     </div>
     <div id="map"></div>
   </div>
 
   <div class="panel">
     <div class="panelHead">
-      <div>
-        <h2>Bairros críticos</h2>
-        <div class="hint">Menores médias IPL</div>
-      </div>
+      <h2>Bairros críticos</h2>
+      <div class="hint">Menor taxa de conformidade, com volume mínimo de avaliações</div>
     </div>
     <div class="body" id="rankBairros"></div>
   </div>
-
 </div>
 
 <div class="grid2">
-
   <div class="panel">
     <div class="panelHead">
-      <h2>Ranking Superintendências</h2>
+      <h2>Ranking por Superintendência</h2>
+      <div class="hint">Taxa média de conformidade por região</div>
     </div>
     <div class="body" id="rankSup"></div>
   </div>
 
   <div class="panel">
     <div class="panelHead">
-      <h2>Itens críticos</h2>
+      <h2>Itens com maior NOK</h2>
+      <div class="hint">Itens que mais aparecem como não conformes</div>
     </div>
     <div class="body" id="rankItens"></div>
   </div>
-
 </div>
 
 <div class="panel">
   <div class="panelHead">
-    <h2>Detalhamento</h2>
+    <h2>Detalhamento das avaliações</h2>
+    <div class="hint">Primeiros 500 registros filtrados</div>
   </div>
 
   <div class="tblWrap">
@@ -428,13 +444,17 @@ td{
       <thead>
         <tr>
           <th>Mês</th>
+          <th>Data</th>
           <th>Superintendência</th>
           <th>Gerência</th>
           <th>Bairro</th>
-          <th>NotaFinal</th>
+          <th>Logradouro</th>
+          <th>Trecho</th>
+          <th class="num">OK</th>
+          <th class="num">NOK</th>
+          <th class="num">% OK</th>
         </tr>
       </thead>
-
       <tbody id="tbody"></tbody>
     </table>
   </div>
@@ -443,6 +463,7 @@ td{
 <footer class="footer">
   <b>HUB COMLURB</b>
   <span>IPL Territorial</span>
+  <span>Fonte: Avaliação dos Trechos + bases territoriais do GitHub</span>
 </footer>
 
 </div>
@@ -451,12 +472,24 @@ td{
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-
 const META = 77;
 
-const URL_IPL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vROo6VzcQvjvIvx3F2ZuCtrf3K369bpxhIXTBcnUcjEQ06rV0BAY5XJF6cQrnxWZBtnR_VwsGsUKwer/pub?output=csv';
+const URL_IPL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTcMXJxBYWRaLS_gTdPkAhjIXRHRs-MBNUbfwxmeoZaXMBE53gd1xXttAkQ_lb-HJZcboKMWhRHq8G_/pub?output=csv';
 
-const URL_BAIRROS_GEOJSON = './data/DLU_Novos_Bairros_estrutura2025.geojson';
+const GEOJSON_CANDIDATOS = [
+  '../assets/geojson/DLU_Novos_Bairros_estrutura2025.geojson',
+  '../assets/geojson/DLU_Novos_Bairros_estrutura2025.json',
+  './data/DLU_Novos_Bairros_estrutura2025.geojson',
+  './data/DLU_Novos_Bairros_estrutura2025.json'
+];
+
+const LOGOS_CANDIDATOS = [
+  '../assets/logos/comlurb_logo_transparent.png',
+  '../assets/logos/RIOPREFEITURA Comlurb horizontal monocromatica branco.png',
+  '../assets/logos/RIOPREFEITURA Comlurb horizontal azul.png',
+  '../assets/logos/RIO PREFEITURA Comlurb vertical monocromatica branco.png',
+  '../assets/logos/Imagem1.png'
+];
 
 let DATA = [];
 let FILTERED = [];
@@ -466,25 +499,23 @@ let geoLayer;
 
 const $ = id => document.getElementById(id);
 
-function num(v){
-  let n = parseFloat(String(v || '').replace(',','.'));
-  return isNaN(n) ? null : n;
+function normaliza(s){
+  return String(s || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g,'')
+    .trim()
+    .toUpperCase();
 }
 
-function avg(arr){
-  return arr.length
-    ? arr.reduce((s,x)=>s+x,0)/arr.length
-    : 0;
-}
-
-function fmt(n){
-  return Number(n || 0).toLocaleString('pt-BR',{
-    minimumFractionDigits:1,
-    maximumFractionDigits:1
+function fmt(n,d=1){
+  if(!isFinite(n)) n = 0;
+  return Number(n).toLocaleString('pt-BR',{
+    minimumFractionDigits:d,
+    maximumFractionDigits:d
   });
 }
 
-async function csv(url){
+function csv(url){
   return new Promise((resolve,reject)=>{
     Papa.parse(url,{
       download:true,
@@ -496,407 +527,401 @@ async function csv(url){
   });
 }
 
+async function fetchPrimeiro(urls){
+  for(const url of urls){
+    try{
+      const r = await fetch(url);
+      if(r.ok) return await r.json();
+    }catch(e){}
+  }
+  return null;
+}
+
+function arrumaLogo(){
+  const img = $('logoComlurb');
+  let i = 0;
+
+  img.onerror = function(){
+    i++;
+    if(i < LOGOS_CANDIDATOS.length){
+      img.src = LOGOS_CANDIDATOS[i];
+    }else{
+      img.style.display = 'none';
+    }
+  };
+
+  img.src = LOGOS_CANDIDATOS[0];
+}
+
+function calculaTrecho(row){
+  const ignorar = [
+    'CONTESTAR',
+    'FOTOS',
+    'MES',
+    'MÊS',
+    'MAT. AVALIADOR',
+    'SUPERINTENDENCIA',
+    'SUPERINTENDÊNCIA',
+    'DIRETORIA',
+    'GERENCIA',
+    'GERÊNCIA',
+    'CODIGO LOGRADOURO',
+    'CÓDIGO LOGRADOURO',
+    'TIPOLOGRADOURO',
+    'TIPO LOGRADOURO',
+    'NOME',
+    'BAIRRO',
+    'TRECHO',
+    'DATA',
+    'HORA INICIO',
+    'HORA INÍCIO',
+    'HORA FIM'
+  ];
+
+  let ok = 0;
+  let nok = 0;
+  const itensNok = [];
+
+  Object.keys(row).forEach(col=>{
+    const colNorm = normaliza(col);
+    if(ignorar.includes(colNorm)) return;
+
+    const v = normaliza(row[col]);
+
+    if(v === 'OK'){
+      ok++;
+    }
+
+    if(v === 'NOK'){
+      nok++;
+      itensNok.push(col);
+    }
+  });
+
+  const total = ok + nok;
+  const taxa = total ? (ok / total) * 100 : null;
+
+  return {ok,nok,total,taxa,itensNok};
+}
+
+function campo(row, nomes){
+  for(const n of nomes){
+    if(row[n] !== undefined) return row[n];
+  }
+  return '';
+}
+
 async function init(){
-
   try{
+    arrumaLogo();
 
-    const [ipl,geo] = await Promise.all([
+    $('status').style.display = 'block';
+    $('status').textContent = 'Carregando Avaliação dos Trechos e base territorial...';
+
+    const [base, geo] = await Promise.all([
       csv(URL_IPL),
-      fetch(URL_BAIRROS_GEOJSON).then(r=>r.json())
+      fetchPrimeiro(GEOJSON_CANDIDATOS)
     ]);
 
     GEO = geo;
 
-    DATA = ipl.map(r=>({
+    DATA = base.map(r=>{
+      const calc = calculaTrecho(r);
 
-      mes:
-        r['Mês'] ||
-        r['MES'] ||
-        r['Mes'] ||
-        '',
-
-      sup:
-        r['Superintendência'] ||
-        r['SUPERINTENDÊNCIA'] ||
-        r['Superintendencia'] ||
-        '',
-
-      ger:
-        r['Gerência'] ||
-        r['GERÊNCIA'] ||
-        r['Gerencia'] ||
-        '',
-
-      bairro:
-        r['Bairro'] ||
-        r['BAIRRO'] ||
-        '',
-
-      nota:
-        num(
-          r['NotaFinal'] ||
-          r['NOTAFINAL'] ||
-          r['Nota Final']
-        ),
-
-      raw:r
-
-    }))
-    .filter(r=>r.nota !== null);
+      return {
+        raw:r,
+        mes: campo(r,['Mês','Mes','MES']),
+        data: campo(r,['Data','DATA']),
+        sup: campo(r,['Superintendência','Superintendencia','SUPERINTENDÊNCIA','SUPERINTENDENCIA']),
+        diretoria: campo(r,['Diretoria','DIRETORIA']),
+        ger: campo(r,['Gerência','Gerencia','GERÊNCIA','GERENCIA']),
+        bairro: campo(r,['Bairro','BAIRRO']),
+        logradouro: campo(r,['Nome','NOME','Logradouro','LOGRADOURO']),
+        trecho: campo(r,['Trecho','TRECHO']),
+        ok: calc.ok,
+        nok: calc.nok,
+        total: calc.total,
+        taxa: calc.taxa,
+        itensNok: calc.itensNok
+      };
+    })
+    .filter(r => r.total > 0 && r.bairro);
 
     initMap();
-
     populate();
-
     render();
 
     $('status').style.display = 'none';
 
+    if(!GEO){
+      $('status').style.display = 'block';
+      $('status').textContent = 'Dados carregados. Atenção: GeoJSON de bairros não encontrado. Confira a pasta assets/geojson.';
+    }
+
   }catch(e){
-
-    $('status').innerHTML = 'Erro ao carregar base IPL';
-
+    $('status').style.display = 'block';
+    $('status').textContent = 'Erro ao carregar a base. Verifique se o link CSV está publicado e se o GitHub Pages já atualizou.';
     console.error(e);
-
   }
-
 }
 
 function populate(){
-
   const add = (id,arr)=>{
-
-    arr
-      .filter(Boolean)
-      .sort()
+    const sel = $(id);
+    arr.filter(Boolean)
+      .sort((a,b)=>String(a).localeCompare(String(b),'pt-BR'))
       .forEach(v=>{
-
         const o = document.createElement('option');
-
         o.value = v;
         o.textContent = v;
-
-        $(id).appendChild(o);
-
+        sel.appendChild(o);
       });
-
   };
 
   add('fMes',[...new Set(DATA.map(x=>x.mes))]);
   add('fSup',[...new Set(DATA.map(x=>x.sup))]);
   add('fGer',[...new Set(DATA.map(x=>x.ger))]);
   add('fBairro',[...new Set(DATA.map(x=>x.bairro))]);
-
 }
 
 function clearAll(){
-
-  ['fMes','fSup','fGer','fBairro']
-    .forEach(id=>$(id).value='');
-
+  ['fMes','fSup','fGer','fBairro'].forEach(id=>$(id).value='');
   render();
-
 }
 
 function apply(){
-
   FILTERED = DATA.filter(r=>
-
     (!$('fMes').value || r.mes === $('fMes').value) &&
     (!$('fSup').value || r.sup === $('fSup').value) &&
     (!$('fGer').value || r.ger === $('fGer').value) &&
     (!$('fBairro').value || r.bairro === $('fBairro').value)
-
   );
+}
 
+function avg(arr){
+  return arr.length ? arr.reduce((s,x)=>s+x,0)/arr.length : 0;
 }
 
 function group(field){
-
   const o = {};
 
   FILTERED.forEach(r=>{
-
     const k = r[field] || 'Não informado';
-
     if(!o[k]) o[k] = [];
-
     o[k].push(r);
-
   });
 
-  return Object.entries(o).map(([k,rows])=>({
+  return Object.entries(o).map(([k,rows])=>{
+    const ok = rows.reduce((s,r)=>s+r.ok,0);
+    const nok = rows.reduce((s,r)=>s+r.nok,0);
+    const total = ok + nok;
 
-    k,
-    rows,
-    n:rows.length,
-    media:avg(rows.map(r=>r.nota))
+    return {
+      k,
+      rows,
+      n:rows.length,
+      ok,
+      nok,
+      total,
+      taxa: total ? (ok / total) * 100 : 0
+    };
+  });
+}
 
-  }));
-
+function cor(v){
+  return v >= 85 ? '#78aaa3' :
+         v >= 77 ? '#6da5d8' :
+         v >= 65 ? '#e87535' :
+                   '#e84855';
 }
 
 function render(){
-
   apply();
-
   renderKpis();
   renderRanks();
   renderTable();
   renderInsight();
   renderMap();
-
 }
 
 function renderKpis(){
+  const ok = FILTERED.reduce((s,r)=>s+r.ok,0);
+  const nok = FILTERED.reduce((s,r)=>s+r.nok,0);
+  const total = ok + nok;
+  const taxa = total ? (ok / total) * 100 : 0;
+  const bairros = new Set(FILTERED.map(r=>normaliza(r.bairro))).size;
 
-  const media = avg(FILTERED.map(r=>r.nota));
+  const pior = group('bairro')
+    .filter(x=>x.n >= 5)
+    .sort((a,b)=>a.taxa-b.taxa)[0];
 
-  const abaixo = FILTERED.filter(r=>r.nota < META).length;
-
-  const bairros = new Set(FILTERED.map(r=>r.bairro)).size;
-
-  const pior =
-    group('bairro')
-      .sort((a,b)=>a.media-b.media)[0];
-
-  const melhor =
-    group('sup')
-      .sort((a,b)=>b.media-a.media)[0];
+  const melhor = group('sup')
+    .sort((a,b)=>b.taxa-a.taxa)[0];
 
   const cards = [
-
-    ['Nota IPL média',fmt(media),'Meta 77','orange'],
-    ['Avaliações',FILTERED.length,'registros',''],
-    ['Abaixo da meta',abaixo,`${fmt((abaixo/FILTERED.length)*100)}%`,'red'],
-    ['Bairros avaliados',bairros,'territórios',''],
-    ['Pior bairro',pior?.k || '-',fmt(pior?.media),'orange'],
-    ['Melhor Sup.',melhor?.k || '-',fmt(melhor?.media),'green']
-
+    ['Conformidade OK',fmt(taxa)+'%','OK / itens avaliados',taxa >= META ? 'green' : 'orange'],
+    ['Avaliações',FILTERED.length.toLocaleString('pt-BR'),'trechos avaliados',''],
+    ['Itens NOK',nok.toLocaleString('pt-BR'), total ? fmt(nok/total*100)+'%' : '0%','red'],
+    ['Bairros avaliados',bairros.toLocaleString('pt-BR'),'territórios',''],
+    ['Pior bairro',pior?.k || '-',pior ? fmt(pior.taxa)+'%' : '-','orange'],
+    ['Melhor Sup.',melhor?.k || '-',melhor ? fmt(melhor.taxa)+'%' : '-','green']
   ];
 
   $('kpis').innerHTML = cards.map(c=>`
-
     <div class="kpi ${c[3]}">
       <span>${c[0]}</span>
       <strong>${c[1]}</strong>
       <small>${c[2]}</small>
     </div>
-
   `).join('');
-
 }
 
 function renderInsight(){
+  const ok = FILTERED.reduce((s,r)=>s+r.ok,0);
+  const nok = FILTERED.reduce((s,r)=>s+r.nok,0);
+  const total = ok + nok;
+  const taxa = total ? ok / total * 100 : 0;
 
-  const media = avg(FILTERED.map(r=>r.nota));
+  const piorBairro = group('bairro').filter(x=>x.n >= 5).sort((a,b)=>a.taxa-b.taxa)[0];
+  const piorSup = group('sup').sort((a,b)=>a.taxa-b.taxa)[0];
 
-  $('insight').innerHTML = `
-    Média IPL atual em <b>${fmt(media)}</b>.
-    ${FILTERED.length.toLocaleString('pt-BR')} avaliações carregadas.
-  `;
-
-}
-
-function bar(v){
-
-  return v >= 77
-    ? '#78aaa3'
-    : v >= 65
-      ? '#e87535'
-      : '#e84855';
-
+  $('insight').innerHTML = FILTERED.length
+    ? `Leitura executiva: a conformidade média está em <b>${fmt(taxa)}%</b>, com <b>${nok.toLocaleString('pt-BR')}</b> itens NOK. O bairro mais crítico no filtro é <b>${piorBairro?.k || '-'}</b> e a superintendência com menor conformidade é <b>${piorSup?.k || '-'}</b>.`
+    : 'Sem dados no filtro atual.';
 }
 
 function rankHTML(arr){
-
   return arr.map(x=>`
-
     <div class="rank">
-
       <div>
-
         <b>${x.k}</b>
-
         <div class="bar">
-          <i style="
-            width:${x.media}%;
-            background:${bar(x.media)}
-          "></i>
+          <i style="width:${Math.min(100,Math.max(0,x.taxa))}%;background:${cor(x.taxa)}"></i>
         </div>
-
       </div>
-
-      <small>
-        ${fmt(x.media)} · ${x.n}
-      </small>
-
+      <small>${fmt(x.taxa)}% · ${x.n}</small>
     </div>
-
-  `).join('');
-
+  `).join('') || '<div class="status">Sem dados</div>';
 }
 
 function renderRanks(){
+  $('rankBairros').innerHTML = rankHTML(
+    group('bairro')
+      .filter(x=>x.n >= 5)
+      .sort((a,b)=>a.taxa-b.taxa)
+      .slice(0,18)
+  );
 
-  $('rankBairros').innerHTML =
-    rankHTML(
-      group('bairro')
-        .sort((a,b)=>a.media-b.media)
-        .slice(0,15)
-    );
+  $('rankSup').innerHTML = rankHTML(
+    group('sup')
+      .sort((a,b)=>a.taxa-b.taxa)
+  );
 
-  $('rankSup').innerHTML =
-    rankHTML(
-      group('sup')
-        .sort((a,b)=>a.media-b.media)
-    );
+  const itens = {};
 
-  const itens = [];
-
-  Object.keys(DATA[0].raw).forEach(c=>{
-
-    if(
-      c.toLowerCase().includes('nota') ||
-      c.toLowerCase().includes('item')
-    ) return;
-
-    const vals = FILTERED
-      .map(r=>num(r.raw[c]))
-      .filter(v=>v !== null);
-
-    if(vals.length){
-
-      itens.push({
-
-        k:c,
-        media:avg(vals),
-        n:vals.length
-
-      });
-
-    }
-
+  FILTERED.forEach(r=>{
+    r.itensNok.forEach(item=>{
+      itens[item] = (itens[item] || 0) + 1;
+    });
   });
 
-  $('rankItens').innerHTML =
-    rankHTML(
-      itens
-        .sort((a,b)=>a.media-b.media)
-        .slice(0,12)
-    );
+  const max = Math.max(...Object.values(itens),1);
 
+  $('rankItens').innerHTML = Object.entries(itens)
+    .sort((a,b)=>b[1]-a[1])
+    .slice(0,15)
+    .map(([item,n])=>`
+      <div class="rank">
+        <div>
+          <b>${item}</b>
+          <div class="bar">
+            <i style="width:${(n/max)*100}%;background:var(--orange)"></i>
+          </div>
+        </div>
+        <small>${n.toLocaleString('pt-BR')} NOK</small>
+      </div>
+    `).join('') || '<div class="status">Sem dados</div>';
 }
 
 function renderTable(){
-
-  $('tbody').innerHTML =
-    FILTERED
-      .slice(0,300)
-      .map(r=>`
-
-        <tr>
-          <td>${r.mes}</td>
-          <td>${r.sup}</td>
-          <td>${r.ger}</td>
-          <td>${r.bairro}</td>
-          <td class="num">${fmt(r.nota)}</td>
-        </tr>
-
-      `).join('');
-
+  $('tbody').innerHTML = FILTERED.slice(0,500).map(r=>`
+    <tr>
+      <td>${r.mes}</td>
+      <td>${r.data}</td>
+      <td>${r.sup}</td>
+      <td>${r.ger}</td>
+      <td>${r.bairro}</td>
+      <td>${r.logradouro}</td>
+      <td>${r.trecho || ''}</td>
+      <td class="num">${r.ok}</td>
+      <td class="num">${r.nok}</td>
+      <td class="num">${fmt(r.taxa)}%</td>
+    </tr>
+  `).join('') || '<tr><td colspan="10">Sem dados</td></tr>';
 }
 
 function initMap(){
-
-  map = L.map('map')
-    .setView([-22.91,-43.35],10);
+  map = L.map('map').setView([-22.91,-43.35],10);
 
   L.tileLayer(
-    'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+    'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+    {attribution:'&copy; OpenStreetMap & CARTO'}
   ).addTo(map);
+}
 
+function nomeBairroGeo(p){
+  return p?.BAIRRO ||
+         p?.Bairro ||
+         p?.NOME ||
+         p?.Nome ||
+         p?.NM_BAIRRO ||
+         p?.bairro ||
+         '';
 }
 
 function renderMap(){
+  if(!map || !GEO) return;
 
   if(geoLayer){
-
     map.removeLayer(geoLayer);
-
   }
 
   const byBairro = {};
-
-  group('bairro')
-    .forEach(x=>byBairro[x.k.toUpperCase()] = x);
+  group('bairro').forEach(x=>{
+    byBairro[normaliza(x.k)] = x;
+  });
 
   geoLayer = L.geoJSON(GEO,{
-
     style:f=>{
-
-      const nome =
-        (
-          f.properties.BAIRRO ||
-          f.properties.NOME ||
-          ''
-        ).toUpperCase();
-
-      const d = byBairro[nome];
+      const nome = nomeBairroGeo(f.properties);
+      const d = byBairro[normaliza(nome)];
 
       return {
-
         color:'#274260',
         weight:.7,
-
-        fillColor:
-          d
-            ? bar(d.media)
-            : '#1c2a3d',
-
-        fillOpacity:
-          d
-            ? .65
-            : .18
-
+        fillColor:d ? cor(d.taxa) : '#1c2a3d',
+        fillOpacity:d ? .68 : .15
       };
-
     },
 
     onEachFeature:(f,l)=>{
-
-      const nome =
-        (
-          f.properties.BAIRRO ||
-          f.properties.NOME ||
-          ''
-        ).toUpperCase();
-
-      const d = byBairro[nome];
+      const nome = nomeBairroGeo(f.properties);
+      const d = byBairro[normaliza(nome)];
 
       l.bindPopup(`
-
         <b>${nome}</b><br>
-
-        ${
-          d
-            ? `
-              Média IPL: ${fmt(d.media)}<br>
-              Avaliações: ${d.n}
-            `
-            : 'Sem avaliações'
-        }
-
+        ${d ? `
+          Conformidade: ${fmt(d.taxa)}%<br>
+          Avaliações: ${d.n}<br>
+          OK: ${d.ok}<br>
+          NOK: ${d.nok}
+        ` : 'Sem avaliação no filtro'}
       `);
-
     }
-
   }).addTo(map);
-
 }
 
 document.addEventListener('DOMContentLoaded',init);
-
 </script>
 
 </body>
