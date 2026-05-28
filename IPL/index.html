@@ -9,349 +9,83 @@
 
 <style>
 :root{
-  --bg:#07111f;
-  --panel:#0d1b2f;
-  --panel2:#10243d;
-  --line:#274260;
-  --ink:#f2f6ff;
-  --muted:#9fb0c7;
-  --blue:#6da5d8;
-  --orange:#e87535;
-  --green:#78aaa3;
-  --red:#e84855;
+  --bg:#07111f;--panel:#0d1b2f;--line:#274260;--ink:#f2f6ff;
+  --muted:#9fb0c7;--blue:#6da5d8;--orange:#e87535;--green:#78aaa3;--red:#e84855;
   --shadow:0 18px 45px rgba(0,0,0,.28);
 }
 
 *{box-sizing:border-box}
-
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--ink);
-  font-family:Inter,Segoe UI,Arial,sans-serif;
-}
-
-.app{
-  max-width:1880px;
-  margin:0 auto;
-  padding:18px;
-}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,Segoe UI,Arial,sans-serif}
+.app{max-width:1880px;margin:0 auto;padding:18px}
 
 .header{
-  display:flex;
-  align-items:center;
-  gap:24px;
-  padding:22px;
-  border:1px solid rgba(111,164,216,.25);
-  border-radius:22px;
-  background:#0b1a2e;
-  box-shadow:var(--shadow);
-  margin-bottom:14px;
+  display:flex;align-items:center;gap:24px;padding:22px;border:1px solid rgba(111,164,216,.25);
+  border-radius:22px;background:#0b1a2e;box-shadow:var(--shadow);margin-bottom:14px
 }
 
-.logo{
-  width:210px;
-  max-height:70px;
-  object-fit:contain;
-  border-right:1px solid rgba(255,255,255,.24);
-  padding-right:22px;
-}
+.logo{width:250px;max-height:76px;object-fit:contain;border-right:1px solid rgba(255,255,255,.24);padding-right:22px}
 
-.eyebrow{
-  font-size:11px;
-  font-weight:900;
-  letter-spacing:.16em;
-  text-transform:uppercase;
-  color:#b9c9dc;
-}
+.eyebrow{font-size:11px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:#b9c9dc}
+h1{margin:5px 0;font-size:clamp(28px,2.2vw,42px);line-height:1.05}
+.sub{color:#c5d5e8;font-size:14px}
 
-h1{
-  margin:5px 0;
-  font-size:clamp(28px,2.2vw,42px);
-  line-height:1.05;
-}
+.controls{display:grid;grid-template-columns:repeat(5,minmax(170px,1fr));gap:12px;margin:14px 0}
+.field,.btn{border:1px solid var(--line);background:var(--panel);border-radius:16px;padding:11px 12px}
+label{display:block;color:#aebbd0;font-size:10px;letter-spacing:.13em;text-transform:uppercase;font-weight:900;margin-bottom:6px}
+select{width:100%;background:transparent;border:0;color:#f2f6ff;font-weight:800;outline:0}
+select option{background:#0d1b2f;color:#fff}
+.btn{cursor:pointer;color:#fff;font-weight:950}
+.btn.orange{border-color:rgba(232,117,53,.75);background:#14243b}
 
-.sub{
-  color:#c5d5e8;
-  font-size:14px;
-}
+.status{margin:12px 0;padding:10px 12px;border:1px solid rgba(75,126,172,.55);background:#1b2130;border-radius:14px;color:#b8d4f2;font-size:13px}
+.insight{border:1px solid rgba(255,255,255,.10);background:#0b1a2e;border-radius:16px;padding:13px 14px;margin-bottom:14px;border-left:4px solid var(--orange);line-height:1.45}
 
-.controls{
-  display:grid;
-  grid-template-columns:repeat(5,minmax(170px,1fr));
-  gap:12px;
-  margin:14px 0;
-}
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:14px}
+.kpi{min-height:104px;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:16px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.kpi:before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:#4b7eac}
+.kpi.orange:before{background:var(--orange)}.kpi.green:before{background:var(--green)}.kpi.red:before{background:var(--red)}
+.kpi span{display:block;color:#aebbd0;font-size:11px;letter-spacing:.13em;text-transform:uppercase;font-weight:950}
+.kpi strong{display:block;font-size:clamp(22px,1.9vw,34px);margin:9px 0 4px;font-weight:950}
+.kpi small{color:#a8b8cf}
 
-.field,.btn{
-  border:1px solid var(--line);
-  background:var(--panel);
-  border-radius:16px;
-  padding:11px 12px;
-}
+.grid{display:grid;grid-template-columns:1.2fr .8fr;gap:14px;margin-bottom:14px}
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:14px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);overflow:hidden}
+.panelHead{padding:16px 18px;border-bottom:1px solid var(--line);background:#0b1a2e}
+.panel h2{margin:0;font-size:16px}
+.hint{font-size:12px;color:#a8b8cf;margin-top:4px}
+.body{padding:16px}
 
-label{
-  display:block;
-  color:#aebbd0;
-  font-size:10px;
-  letter-spacing:.13em;
-  text-transform:uppercase;
-  font-weight:900;
-  margin-bottom:6px;
-}
+.rank{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:10px 8px;border-bottom:1px solid rgba(255,255,255,.08)}
+.rank b{font-size:13px}
+.rank small{color:#a8b8cf;font-weight:900}
+.bar{height:8px;border-radius:999px;background:#1b3657;margin-top:6px;overflow:hidden}
+.bar i{display:block;height:100%}
 
-select{
-  width:100%;
-  background:transparent;
-  border:0;
-  color:#f2f6ff;
-  font-weight:800;
-  outline:0;
-}
+#map{height:560px;background:#07111f}
 
-select option{
-  background:#0d1b2f;
-  color:#fff;
-}
+.tblWrap{overflow:auto;max-height:520px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:#10243d;border-bottom:1px solid var(--line);padding:12px;text-align:left;color:#aebbd0;font-weight:950;font-size:10px;text-transform:uppercase;position:sticky;top:0}
+td{padding:12px;border-bottom:1px solid rgba(255,255,255,.05)}
+.num{text-align:right;font-weight:800}
 
-.btn{
-  cursor:pointer;
-  color:#fff;
-  font-weight:950;
-}
-
-.btn.orange{
-  border-color:rgba(232,117,53,.75);
-  background:#14243b;
-}
-
-.status{
-  margin:12px 0;
-  padding:10px 12px;
-  border:1px solid rgba(75,126,172,.55);
-  background:#1b2130;
-  border-radius:14px;
-  color:#b8d4f2;
-  font-size:13px;
-}
-
-.insight{
-  border:1px solid rgba(255,255,255,.10);
-  background:#0b1a2e;
-  border-radius:16px;
-  padding:13px 14px;
-  margin-bottom:14px;
-  border-left:4px solid var(--orange);
-  line-height:1.45;
-}
-
-.kpis{
-  display:grid;
-  grid-template-columns:repeat(6,1fr);
-  gap:12px;
-  margin-bottom:14px;
-}
-
-.kpi{
-  min-height:104px;
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:20px;
-  padding:16px;
-  box-shadow:var(--shadow);
-  position:relative;
-  overflow:hidden;
-}
-
-.kpi:before{
-  content:"";
-  position:absolute;
-  top:0;
-  left:0;
-  right:0;
-  height:4px;
-  background:#4b7eac;
-}
-
-.kpi.orange:before{background:var(--orange)}
-.kpi.green:before{background:var(--green)}
-.kpi.red:before{background:var(--red)}
-
-.kpi span{
-  display:block;
-  color:#aebbd0;
-  font-size:11px;
-  letter-spacing:.13em;
-  text-transform:uppercase;
-  font-weight:950;
-}
-
-.kpi strong{
-  display:block;
-  font-size:clamp(22px,1.9vw,34px);
-  margin:9px 0 4px;
-  font-weight:950;
-}
-
-.kpi small{
-  color:#a8b8cf;
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:1.2fr .8fr;
-  gap:14px;
-  margin-bottom:14px;
-}
-
-.grid2{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:14px;
-  margin-bottom:14px;
-}
-
-.panel{
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:22px;
-  box-shadow:var(--shadow);
-  overflow:hidden;
-}
-
-.panelHead{
-  padding:16px 18px;
-  border-bottom:1px solid var(--line);
-  background:#0b1a2e;
-}
-
-.panel h2{
-  margin:0;
-  font-size:16px;
-}
-
-.hint{
-  font-size:12px;
-  color:#a8b8cf;
-  margin-top:4px;
-}
-
-.body{
-  padding:16px;
-}
-
-.rank{
-  display:grid;
-  grid-template-columns:minmax(0,1fr) auto;
-  gap:8px;
-  padding:10px 8px;
-  border-bottom:1px solid rgba(255,255,255,.08);
-}
-
-.rank b{
-  font-size:13px;
-}
-
-.rank small{
-  color:#a8b8cf;
-  font-weight:900;
-}
-
-.bar{
-  height:8px;
-  border-radius:999px;
-  background:#1b3657;
-  margin-top:6px;
-  overflow:hidden;
-}
-
-.bar i{
-  display:block;
-  height:100%;
-}
-
-#map{
-  height:560px;
-  background:#07111f;
-}
-
-.tblWrap{
-  overflow:auto;
-  max-height:520px;
-}
-
-table{
-  width:100%;
-  border-collapse:collapse;
-  font-size:13px;
-}
-
-th{
-  background:#10243d;
-  border-bottom:1px solid var(--line);
-  padding:12px;
-  text-align:left;
-  color:#aebbd0;
-  font-weight:950;
-  font-size:10px;
-  text-transform:uppercase;
-  position:sticky;
-  top:0;
-}
-
-td{
-  padding:12px;
-  border-bottom:1px solid rgba(255,255,255,.05);
-}
-
-.num{
-  text-align:right;
-  font-weight:800;
-}
-
-.footer{
-  background:var(--panel);
-  border-top:1px solid var(--line);
-  padding:14px 18px;
-  display:flex;
-  gap:18px;
-  flex-wrap:wrap;
-  font-size:13px;
-  color:#c2d1e6;
-  margin-top:14px;
-}
+.footer{background:var(--panel);border-top:1px solid var(--line);padding:14px 18px;display:flex;gap:18px;flex-wrap:wrap;font-size:13px;color:#c2d1e6;margin-top:14px}
+.footer strong{color:#fff}
 
 @media(max-width:1100px){
-  .controls,.kpis,.grid,.grid2{
-    grid-template-columns:1fr;
-  }
-
-  .header{
-    flex-direction:column;
-    align-items:flex-start;
-  }
-
-  .logo{
-    width:180px;
-    border-right:0;
-    padding-right:0;
-  }
+  .controls,.kpis,.grid,.grid2{grid-template-columns:1fr}
+  .header{flex-direction:column;align-items:flex-start}
+  .logo{width:220px;border-right:0;padding-right:0}
 }
 </style>
 </head>
 
 <body>
-
 <div class="app">
 
 <header class="header">
-  <img
-    id="logoComlurb"
-    class="logo"
-    alt="COMLURB"
-    src="../assets/logos/comlurb_logo_transparent.png"
-  >
-
+  <img class="logo" alt="COMLURB" src="../assets/logos/RIOPREFEITURA%20Comlurb%20horizontal%20monocromatica%20branco.png">
   <div>
     <div class="eyebrow">HUB COMLURB · Inteligência Operacional</div>
     <h1>IPL · Análise Territorial</h1>
@@ -360,41 +94,15 @@ td{
 </header>
 
 <section class="controls">
-  <div class="field">
-    <label>Mês</label>
-    <select id="fMes" onchange="render()">
-      <option value="">Todos</option>
-    </select>
-  </div>
-
-  <div class="field">
-    <label>Superintendência</label>
-    <select id="fSup" onchange="render()">
-      <option value="">Todas</option>
-    </select>
-  </div>
-
-  <div class="field">
-    <label>Gerência</label>
-    <select id="fGer" onchange="render()">
-      <option value="">Todas</option>
-    </select>
-  </div>
-
-  <div class="field">
-    <label>Bairro</label>
-    <select id="fBairro" onchange="render()">
-      <option value="">Todos</option>
-    </select>
-  </div>
-
+  <div class="field"><label>Mês</label><select id="fMes" onchange="render()"><option value="">Todos</option></select></div>
+  <div class="field"><label>Superintendência</label><select id="fSup" onchange="render()"><option value="">Todas</option></select></div>
+  <div class="field"><label>Gerência</label><select id="fGer" onchange="render()"><option value="">Todas</option></select></div>
+  <div class="field"><label>Bairro</label><select id="fBairro" onchange="render()"><option value="">Todos</option></select></div>
   <button class="btn orange" onclick="clearAll()">Limpar</button>
 </section>
 
 <div id="status" class="status">Carregando bases...</div>
-
 <div id="insight" class="insight"></div>
-
 <div class="kpis" id="kpis"></div>
 
 <div class="grid">
@@ -438,21 +146,12 @@ td{
     <h2>Detalhamento das avaliações</h2>
     <div class="hint">Primeiros 500 registros filtrados</div>
   </div>
-
   <div class="tblWrap">
     <table>
       <thead>
         <tr>
-          <th>Mês</th>
-          <th>Data</th>
-          <th>Superintendência</th>
-          <th>Gerência</th>
-          <th>Bairro</th>
-          <th>Logradouro</th>
-          <th>Trecho</th>
-          <th class="num">OK</th>
-          <th class="num">NOK</th>
-          <th class="num">% OK</th>
+          <th>Mês</th><th>Data</th><th>Superintendência</th><th>Gerência</th><th>Bairro</th>
+          <th>Logradouro</th><th>Trecho</th><th class="num">OK</th><th class="num">NOK</th><th class="num">% OK</th>
         </tr>
       </thead>
       <tbody id="tbody"></tbody>
@@ -461,9 +160,10 @@ td{
 </div>
 
 <footer class="footer">
-  <b>HUB COMLURB</b>
-  <span>IPL Territorial</span>
-  <span>Fonte: Avaliação dos Trechos + bases territoriais do GitHub</span>
+  <span>
+    <strong>Gabinete</strong> da Presidência<br>
+    HUB COMLURB • Núcleo de Inteligência e Gestão Estratégica Operacional
+  </span>
 </footer>
 
 </div>
@@ -476,20 +176,7 @@ const META = 77;
 
 const URL_IPL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTcMXJxBYWRaLS_gTdPkAhjIXRHRs-MBNUbfwxmeoZaXMBE53gd1xXttAkQ_lb-HJZcboKMWhRHq8G_/pub?output=csv';
 
-const GEOJSON_CANDIDATOS = [
-  '../assets/geojson/DLU_Novos_Bairros_estrutura2025.geojson',
-  '../assets/geojson/DLU_Novos_Bairros_estrutura2025.json',
-  './data/DLU_Novos_Bairros_estrutura2025.geojson',
-  './data/DLU_Novos_Bairros_estrutura2025.json'
-];
-
-const LOGOS_CANDIDATOS = [
-  '../assets/logos/comlurb_logo_transparent.png',
-  '../assets/logos/RIOPREFEITURA Comlurb horizontal monocromatica branco.png',
-  '../assets/logos/RIOPREFEITURA Comlurb horizontal azul.png',
-  '../assets/logos/RIO PREFEITURA Comlurb vertical monocromatica branco.png',
-  '../assets/logos/Imagem1.png'
-];
+const URL_BAIRROS_GEOJSON = '../assets/geojson/DLU_Novos_Bairros_estrutura2025.geojson';
 
 let DATA = [];
 let FILTERED = [];
@@ -509,10 +196,7 @@ function normaliza(s){
 
 function fmt(n,d=1){
   if(!isFinite(n)) n = 0;
-  return Number(n).toLocaleString('pt-BR',{
-    minimumFractionDigits:d,
-    maximumFractionDigits:d
-  });
+  return Number(n).toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d});
 }
 
 function csv(url){
@@ -527,55 +211,24 @@ function csv(url){
   });
 }
 
-async function fetchPrimeiro(urls){
-  for(const url of urls){
-    try{
-      const r = await fetch(url);
-      if(r.ok) return await r.json();
-    }catch(e){}
-  }
-  return null;
+async function carregarGeo(){
+  const r = await fetch(URL_BAIRROS_GEOJSON);
+  if(!r.ok) throw new Error('GeoJSON não encontrado: ' + URL_BAIRROS_GEOJSON);
+  return await r.json();
 }
 
-function arrumaLogo(){
-  const img = $('logoComlurb');
-  let i = 0;
-
-  img.onerror = function(){
-    i++;
-    if(i < LOGOS_CANDIDATOS.length){
-      img.src = LOGOS_CANDIDATOS[i];
-    }else{
-      img.style.display = 'none';
-    }
-  };
-
-  img.src = LOGOS_CANDIDATOS[0];
+function campo(row, nomes){
+  for(const n of nomes){
+    if(row[n] !== undefined) return row[n];
+  }
+  return '';
 }
 
 function calculaTrecho(row){
   const ignorar = [
-    'CONTESTAR',
-    'FOTOS',
-    'MES',
-    'MÊS',
-    'MAT. AVALIADOR',
-    'SUPERINTENDENCIA',
-    'SUPERINTENDÊNCIA',
-    'DIRETORIA',
-    'GERENCIA',
-    'GERÊNCIA',
-    'CODIGO LOGRADOURO',
-    'CÓDIGO LOGRADOURO',
-    'TIPOLOGRADOURO',
-    'TIPO LOGRADOURO',
-    'NOME',
-    'BAIRRO',
-    'TRECHO',
-    'DATA',
-    'HORA INICIO',
-    'HORA INÍCIO',
-    'HORA FIM'
+    'CONTESTAR','FOTOS','MES','MÊS','MAT. AVALIADOR','SUPERINTENDENCIA','SUPERINTENDÊNCIA',
+    'DIRETORIA','GERENCIA','GERÊNCIA','CODIGO LOGRADOURO','CÓDIGO LOGRADOURO',
+    'TIPOLOGRADOURO','TIPO LOGRADOURO','NOME','BAIRRO','TRECHO','DATA','HORA INICIO','HORA INÍCIO','HORA FIM'
   ];
 
   let ok = 0;
@@ -588,10 +241,7 @@ function calculaTrecho(row){
 
     const v = normaliza(row[col]);
 
-    if(v === 'OK'){
-      ok++;
-    }
-
+    if(v === 'OK') ok++;
     if(v === 'NOK'){
       nok++;
       itensNok.push(col);
@@ -600,27 +250,17 @@ function calculaTrecho(row){
 
   const total = ok + nok;
   const taxa = total ? (ok / total) * 100 : null;
-
   return {ok,nok,total,taxa,itensNok};
-}
-
-function campo(row, nomes){
-  for(const n of nomes){
-    if(row[n] !== undefined) return row[n];
-  }
-  return '';
 }
 
 async function init(){
   try{
-    arrumaLogo();
-
     $('status').style.display = 'block';
     $('status').textContent = 'Carregando Avaliação dos Trechos e base territorial...';
 
     const [base, geo] = await Promise.all([
       csv(URL_IPL),
-      fetchPrimeiro(GEOJSON_CANDIDATOS)
+      carregarGeo()
     ]);
 
     GEO = geo;
@@ -644,8 +284,7 @@ async function init(){
         taxa: calc.taxa,
         itensNok: calc.itensNok
       };
-    })
-    .filter(r => r.total > 0 && r.bairro);
+    }).filter(r => r.total > 0 && r.bairro);
 
     initMap();
     populate();
@@ -653,14 +292,9 @@ async function init(){
 
     $('status').style.display = 'none';
 
-    if(!GEO){
-      $('status').style.display = 'block';
-      $('status').textContent = 'Dados carregados. Atenção: GeoJSON de bairros não encontrado. Confira a pasta assets/geojson.';
-    }
-
   }catch(e){
     $('status').style.display = 'block';
-    $('status').textContent = 'Erro ao carregar a base. Verifique se o link CSV está publicado e se o GitHub Pages já atualizou.';
+    $('status').textContent = 'Erro ao carregar: ' + e.message;
     console.error(e);
   }
 }
@@ -698,10 +332,6 @@ function apply(){
   );
 }
 
-function avg(arr){
-  return arr.length ? arr.reduce((s,x)=>s+x,0)/arr.length : 0;
-}
-
 function group(field){
   const o = {};
 
@@ -717,12 +347,7 @@ function group(field){
     const total = ok + nok;
 
     return {
-      k,
-      rows,
-      n:rows.length,
-      ok,
-      nok,
-      total,
+      k, rows, n:rows.length, ok, nok, total,
       taxa: total ? (ok / total) * 100 : 0
     };
   });
@@ -751,12 +376,8 @@ function renderKpis(){
   const taxa = total ? (ok / total) * 100 : 0;
   const bairros = new Set(FILTERED.map(r=>normaliza(r.bairro))).size;
 
-  const pior = group('bairro')
-    .filter(x=>x.n >= 5)
-    .sort((a,b)=>a.taxa-b.taxa)[0];
-
-  const melhor = group('sup')
-    .sort((a,b)=>b.taxa-a.taxa)[0];
+  const pior = group('bairro').filter(x=>x.n >= 5).sort((a,b)=>a.taxa-b.taxa)[0];
+  const melhor = group('sup').sort((a,b)=>b.taxa-a.taxa)[0];
 
   const cards = [
     ['Conformidade OK',fmt(taxa)+'%','OK / itens avaliados',taxa >= META ? 'green' : 'orange'],
@@ -806,15 +427,11 @@ function rankHTML(arr){
 
 function renderRanks(){
   $('rankBairros').innerHTML = rankHTML(
-    group('bairro')
-      .filter(x=>x.n >= 5)
-      .sort((a,b)=>a.taxa-b.taxa)
-      .slice(0,18)
+    group('bairro').filter(x=>x.n >= 5).sort((a,b)=>a.taxa-b.taxa).slice(0,18)
   );
 
   $('rankSup').innerHTML = rankHTML(
-    group('sup')
-      .sort((a,b)=>a.taxa-b.taxa)
+    group('sup').sort((a,b)=>a.taxa-b.taxa)
   );
 
   const itens = {};
@@ -870,21 +487,13 @@ function initMap(){
 }
 
 function nomeBairroGeo(p){
-  return p?.BAIRRO ||
-         p?.Bairro ||
-         p?.NOME ||
-         p?.Nome ||
-         p?.NM_BAIRRO ||
-         p?.bairro ||
-         '';
+  return p?.BAIRRO || p?.Bairro || p?.NOME || p?.Nome || p?.NM_BAIRRO || p?.bairro || p?.name || '';
 }
 
 function renderMap(){
   if(!map || !GEO) return;
 
-  if(geoLayer){
-    map.removeLayer(geoLayer);
-  }
+  if(geoLayer) map.removeLayer(geoLayer);
 
   const byBairro = {};
   group('bairro').forEach(x=>{
@@ -919,6 +528,10 @@ function renderMap(){
       `);
     }
   }).addTo(map);
+
+  try{
+    map.fitBounds(geoLayer.getBounds(), {padding:[20,20]});
+  }catch(e){}
 }
 
 document.addEventListener('DOMContentLoaded',init);
