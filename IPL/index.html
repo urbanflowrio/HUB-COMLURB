@@ -44,7 +44,7 @@ select option{background:#0d1b2f;color:#fff}
 .kpi strong{display:block;font-size:clamp(22px,1.9vw,34px);margin:9px 0 4px;font-weight:950}
 .kpi small{color:#a8b8cf}
 
-.grid{display:grid;grid-template-columns:1.2fr .8fr;gap:14px;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:1.15fr .85fr;gap:14px;margin-bottom:14px}
 .grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:14px}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);overflow:hidden}
 .panelHead{padding:16px 18px;border-bottom:1px solid var(--line);background:#0b1a2e}
@@ -52,22 +52,19 @@ select option{background:#0d1b2f;color:#fff}
 .hint{font-size:12px;color:#a8b8cf;margin-top:4px}
 .body{padding:16px}
 
-.rank{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:10px 8px;border-bottom:1px solid rgba(255,255,255,.08)}
+.rank{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:11px 8px;border-bottom:1px solid rgba(255,255,255,.08);cursor:pointer;border-radius:10px}
+.rank:hover{background:rgba(109,165,216,.08)}
 .rank b{font-size:13px}
 .rank small{color:#a8b8cf;font-weight:900}
 .bar{height:8px;border-radius:999px;background:#1b3657;margin-top:6px;overflow:hidden}
 .bar i{display:block;height:100%}
 
 #map{height:560px;background:#07111f}
-
-.tblWrap{overflow:auto;max-height:520px}
-table{width:100%;border-collapse:collapse;font-size:13px}
-th{background:#10243d;border-bottom:1px solid var(--line);padding:12px;text-align:left;color:#aebbd0;font-weight:950;font-size:10px;text-transform:uppercase;position:sticky;top:0}
-td{padding:12px;border-bottom:1px solid rgba(255,255,255,.05)}
-.num{text-align:right;font-weight:800}
-
 .footer{background:var(--panel);border-top:1px solid var(--line);padding:14px 18px;display:flex;gap:18px;flex-wrap:wrap;font-size:13px;color:#c2d1e6;margin-top:14px}
 .footer strong{color:#fff}
+
+.drawerTitle{font-size:13px;color:#fff;font-weight:900;margin-bottom:10px}
+.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:4px 8px;margin:2px;color:#cfe0f5;font-size:11px}
 
 @media(max-width:1100px){
   .controls,.kpis,.grid,.grid2{grid-template-columns:1fr}
@@ -85,15 +82,15 @@ td{padding:12px;border-bottom:1px solid rgba(255,255,255,.05)}
   <div>
     <div class="eyebrow">HUB COMLURB · Inteligência Operacional</div>
     <h1>IPL · Análise Territorial</h1>
-    <div class="sub">Avaliação dos trechos, bairros críticos, reincidência territorial e itens NOK</div>
+    <div class="sub">Mapa de calor, bairros críticos, reincidência por trecho e itens NOK</div>
   </div>
 </header>
 
 <section class="controls">
-  <div class="field"><label>Mês</label><select id="fMes" onchange="render()"><option value="">Todos</option></select></div>
-  <div class="field"><label>Superintendência</label><select id="fSup" onchange="render()"><option value="">Todas</option></select></div>
-  <div class="field"><label>Gerência</label><select id="fGer" onchange="render()"><option value="">Todas</option></select></div>
-  <div class="field"><label>Bairro</label><select id="fBairro" onchange="render()"><option value="">Todos</option></select></div>
+  <div class="field"><label>Mês</label><select id="fMes" onchange="onFilterChange()"><option value="">Todos</option></select></div>
+  <div class="field"><label>Superintendência</label><select id="fSup" onchange="onFilterChange()"><option value="">Todas</option></select></div>
+  <div class="field"><label>Gerência</label><select id="fGer" onchange="onFilterChange()"><option value="">Todas</option></select></div>
+  <div class="field"><label>Bairro</label><select id="fBairro" onchange="onFilterChange()"><option value="">Todos</option></select></div>
   <button class="btn orange" onclick="clearAll()">Limpar</button>
 </section>
 
@@ -104,8 +101,8 @@ td{padding:12px;border-bottom:1px solid rgba(255,255,255,.05)}
 <div class="grid">
   <div class="panel">
     <div class="panelHead">
-      <h2>Mapa por bairro</h2>
-      <div class="hint">Cor por taxa de conformidade OK. Laranja/vermelho = maior concentração de NOK.</div>
+      <h2>Mapa de calor territorial</h2>
+      <div class="hint">Calor por concentração de NOK. Contorno por bairro e intensidade por criticidade.</div>
     </div>
     <div id="map"></div>
   </div>
@@ -113,7 +110,7 @@ td{padding:12px;border-bottom:1px solid rgba(255,255,255,.05)}
   <div class="panel">
     <div class="panelHead">
       <h2>Bairros críticos</h2>
-      <div class="hint">Menor taxa de conformidade, com volume mínimo de avaliações</div>
+      <div class="hint">Clique em um bairro para abrir logradouros e trechos</div>
     </div>
     <div class="body" id="rankBairros"></div>
   </div>
@@ -122,10 +119,10 @@ td{padding:12px;border-bottom:1px solid rgba(255,255,255,.05)}
 <div class="grid2">
   <div class="panel">
     <div class="panelHead">
-      <h2>Ranking por Superintendência</h2>
-      <div class="hint">Taxa média de conformidade por região</div>
+      <h2>Reincidência por trecho</h2>
+      <div class="hint">Trechos com repetição de avaliação e maior volume de NOK</div>
     </div>
-    <div class="body" id="rankSup"></div>
+    <div class="body" id="rankReincidencia"></div>
   </div>
 
   <div class="panel">
@@ -139,19 +136,11 @@ td{padding:12px;border-bottom:1px solid rgba(255,255,255,.05)}
 
 <div class="panel">
   <div class="panelHead">
-    <h2>Detalhamento das avaliações</h2>
-    <div class="hint">Primeiros 500 registros filtrados</div>
+    <h2 id="drillTitle">Explosão territorial</h2>
+    <div class="hint">Clique em bairro, logradouro ou trecho para detalhar o problema sem abrir tabela analítica pesada</div>
   </div>
-  <div class="tblWrap">
-    <table>
-      <thead>
-        <tr>
-          <th>Mês</th><th>Data</th><th>Superintendência</th><th>Gerência</th><th>Bairro</th>
-          <th>Logradouro</th><th>Trecho</th><th class="num">OK</th><th class="num">NOK</th><th class="num">% OK</th>
-        </tr>
-      </thead>
-      <tbody id="tbody"></tbody>
-    </table>
+  <div class="body" id="drilldown">
+    <div class="status">Selecione um bairro crítico para visualizar os logradouros e trechos.</div>
   </div>
 </div>
 
@@ -166,6 +155,7 @@ td{padding:12px;border-bottom:1px solid rgba(255,255,255,.05)}
 
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
 
 <script>
 const META = 77;
@@ -173,12 +163,17 @@ const META = 77;
 const URL_IPL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTcMXJxBYWRaLS_gTdPkAhjIXRHRs-MBNUbfwxmeoZaXMBE53gd1xXttAkQ_lb-HJZcboKMWhRHq8G_/pub?output=csv';
 
 const URL_BAIRROS_GEOJSON = '../territorial/data/DLU_Novos_Bairros_estrutura2025.geojson';
+const URL_COORD_BAIRROS = '../territorial/data/coordenadas_bairros_rio.csv';
 
 let DATA = [];
 let FILTERED = [];
 let GEO = null;
+let COORDS = {};
 let map;
 let geoLayer;
+let heatLayer;
+let pointLayer;
+let selectedBairro = '';
 
 const $ = id => document.getElementById(id);
 
@@ -193,6 +188,11 @@ function normaliza(s){
 function fmt(n,d=1){
   if(!isFinite(n)) n = 0;
   return Number(n).toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d});
+}
+
+function num(v){
+  const n = parseFloat(String(v || '').replace(',','.'));
+  return isNaN(n) ? null : n;
 }
 
 function csv(url){
@@ -252,17 +252,21 @@ function calculaTrecho(row){
 async function init(){
   try{
     $('status').style.display = 'block';
-    $('status').textContent = 'Carregando Avaliação dos Trechos e base territorial...';
+    $('status').textContent = 'Carregando Avaliação dos Trechos, coordenadas e mapa territorial...';
 
-    const [base, geo] = await Promise.all([
+    const [base, geo, coords] = await Promise.all([
       csv(URL_IPL),
-      carregarGeo()
+      carregarGeo(),
+      csv(URL_COORD_BAIRROS).catch(()=>[])
     ]);
 
     GEO = geo;
+    COORDS = prepararCoords(coords);
 
     DATA = base.map(r=>{
       const calc = calculaTrecho(r);
+      const bairro = campo(r,['Bairro','BAIRRO']);
+      const coord = COORDS[normaliza(bairro)] || null;
 
       return {
         raw:r,
@@ -271,9 +275,11 @@ async function init(){
         sup: campo(r,['Superintendência','Superintendencia','SUPERINTENDÊNCIA','SUPERINTENDENCIA']),
         diretoria: campo(r,['Diretoria','DIRETORIA']),
         ger: campo(r,['Gerência','Gerencia','GERÊNCIA','GERENCIA']),
-        bairro: campo(r,['Bairro','BAIRRO']),
+        bairro,
         logradouro: campo(r,['Nome','NOME','Logradouro','LOGRADOURO']),
         trecho: campo(r,['Trecho','TRECHO']),
+        lat: coord?.lat || null,
+        lon: coord?.lon || null,
         ok: calc.ok,
         nok: calc.nok,
         total: calc.total,
@@ -295,37 +301,92 @@ async function init(){
   }
 }
 
-function populate(){
-  const add = (id,arr)=>{
-    const sel = $(id);
-    arr.filter(Boolean)
-      .sort((a,b)=>String(a).localeCompare(String(b),'pt-BR'))
-      .forEach(v=>{
-        const o = document.createElement('option');
-        o.value = v;
-        o.textContent = v;
-        sel.appendChild(o);
-      });
-  };
+function prepararCoords(rows){
+  const out = {};
 
-  add('fMes',[...new Set(DATA.map(x=>x.mes))]);
-  add('fSup',[...new Set(DATA.map(x=>x.sup))]);
-  add('fGer',[...new Set(DATA.map(x=>x.ger))]);
-  add('fBairro',[...new Set(DATA.map(x=>x.bairro))]);
+  rows.forEach(r=>{
+    const bairro = campo(r,['Bairro','BAIRRO','bairro','NOME','Nome','nome']);
+    const lat = num(campo(r,['lat','Lat','LAT','latitude','Latitude','LATITUDE']));
+    const lon = num(campo(r,['lon','Lon','LON','lng','Lng','LNG','longitude','Longitude','LONGITUDE']));
+
+    if(bairro && lat && lon){
+      out[normaliza(bairro)] = {lat,lon};
+    }
+  });
+
+  return out;
+}
+
+function getSelected(){
+  return {
+    mes: $('fMes').value,
+    sup: $('fSup').value,
+    ger: $('fGer').value,
+    bairro: $('fBairro').value
+  };
+}
+
+function filtraBase(excluirCampo = null){
+  const s = getSelected();
+
+  return DATA.filter(r =>
+    (excluirCampo === 'mes' || !s.mes || r.mes === s.mes) &&
+    (excluirCampo === 'sup' || !s.sup || r.sup === s.sup) &&
+    (excluirCampo === 'ger' || !s.ger || r.ger === s.ger) &&
+    (excluirCampo === 'bairro' || !s.bairro || r.bairro === s.bairro)
+  );
+}
+
+function setOptions(id, campo, labelTodos){
+  const atual = $(id).value;
+
+  const base =
+    id === 'fMes' ? filtraBase('mes') :
+    id === 'fSup' ? filtraBase('sup') :
+    id === 'fGer' ? filtraBase('ger') :
+    filtraBase('bairro');
+
+  const valores = [...new Set(base.map(r => r[campo]).filter(Boolean))]
+    .sort((a,b)=>String(a).localeCompare(String(b),'pt-BR'));
+
+  $(id).innerHTML = `<option value="">${labelTodos}</option>`;
+
+  valores.forEach(v=>{
+    const o = document.createElement('option');
+    o.value = v;
+    o.textContent = v;
+    $(id).appendChild(o);
+  });
+
+  if(valores.includes(atual)){
+    $(id).value = atual;
+  }
+}
+
+function populate(){
+  setOptions('fMes','mes','Todos');
+  setOptions('fSup','sup','Todas');
+  setOptions('fGer','ger','Todas');
+  setOptions('fBairro','bairro','Todos');
+}
+
+function onFilterChange(){
+  selectedBairro = $('fBairro').value || selectedBairro;
+  populate();
+  render();
 }
 
 function clearAll(){
   ['fMes','fSup','fGer','fBairro'].forEach(id=>$(id).value='');
+  selectedBairro = '';
+  populate();
   render();
+  $('drillTitle').textContent = 'Explosão territorial';
+  $('drilldown').innerHTML = '<div class="status">Selecione um bairro crítico para visualizar os logradouros e trechos.</div>';
 }
 
 function apply(){
-  FILTERED = DATA.filter(r=>
-    (!$('fMes').value || r.mes === $('fMes').value) &&
-    (!$('fSup').value || r.sup === $('fSup').value) &&
-    (!$('fGer').value || r.ger === $('fGer').value) &&
-    (!$('fBairro').value || r.bairro === $('fBairro').value)
-  );
+  FILTERED = filtraBase();
 }
 
 function group(field){
@@ -360,7 +421,7 @@ function render(){
   apply();
   renderKpis();
   renderRanks();
-  renderTable();
+  renderReincidencia();
   renderInsight();
   renderMap();
 }
@@ -409,7 +470,7 @@ function renderInsight(){
 
 function rankHTML(arr){
   return arr.map(x=>`
-    <div class="rank">
+    <div class="rank" onclick="abrirBairro('${encodeURIComponent(x.k)}')">
       <div>
         <b>${x.k}</b>
         <div class="bar">
@@ -424,10 +485,6 @@ function rankHTML(arr){
 function renderRanks(){
   $('rankBairros').innerHTML = rankHTML(
     group('bairro').filter(x=>x.n >= 5).sort((a,b)=>a.taxa-b.taxa).slice(0,18)
-  );
-
-  $('rankSup').innerHTML = rankHTML(
-    group('sup').sort((a,b)=>a.taxa-b.taxa)
   );
 
   const itens = {};
@@ -456,21 +513,51 @@ function renderRanks(){
     `).join('') || '<div class="status">Sem dados</div>';
 }
 
-function renderTable(){
-  $('tbody').innerHTML = FILTERED.slice(0,500).map(r=>`
-    <tr>
-      <td>${r.mes}</td>
-      <td>${r.data}</td>
-      <td>${r.sup}</td>
-      <td>${r.ger}</td>
-      <td>${r.bairro}</td>
-      <td>${r.logradouro}</td>
-      <td>${r.trecho || ''}</td>
-      <td class="num">${r.ok}</td>
-      <td class="num">${r.nok}</td>
-      <td class="num">${fmt(r.taxa)}%</td>
-    </tr>
-  `).join('') || '<tr><td colspan="10">Sem dados</td></tr>';
+function renderReincidencia(){
+  const trechos = {};
+
+  FILTERED.forEach(r=>{
+    const chave = [r.sup,r.ger,r.bairro,r.logradouro,r.trecho].join(' | ');
+
+    if(!trechos[chave]){
+      trechos[chave] = {
+        sup:r.sup,
+        ger:r.ger,
+        bairro:r.bairro,
+        logradouro:r.logradouro,
+        trecho:r.trecho,
+        avaliacoes:0,
+        ok:0,
+        nok:0
+      };
+    }
+
+    trechos[chave].avaliacoes++;
+    trechos[chave].ok += r.ok;
+    trechos[chave].nok += r.nok;
+  });
+
+  const dados = Object.values(trechos)
+    .map(t=>{
+      const total = t.ok + t.nok;
+      return {...t,total,taxa: total ? (t.ok/total)*100 : 0};
+    })
+    .filter(t => t.avaliacoes >= 2)
+    .sort((a,b)=>b.avaliacoes-a.avaliacoes || b.nok-a.nok || a.taxa-b.taxa)
+    .slice(0,20);
+
+  $('rankReincidencia').innerHTML = dados.map(t=>`
+    <div class="rank" onclick="abrirTrecho('${encodeURIComponent(t.bairro)}','${encodeURIComponent(t.logradouro)}','${encodeURIComponent(t.trecho || '')}')">
+      <div>
+        <b>${t.bairro} · ${t.logradouro}</b>
+        <div class="hint">${t.ger || '-'} · ${t.trecho || 'trecho não informado'}</div>
+        <div class="bar">
+          <i style="width:${Math.min(100,t.taxa)}%;background:${cor(t.taxa)}"></i>
+        </div>
+      </div>
+      <small>${t.avaliacoes}x · ${t.nok} NOK · ${fmt(t.taxa)}%</small>
+    </div>
+  `).join('') || '<div class="status">Sem reincidência no filtro atual</div>';
 }
 
 function initMap(){
@@ -480,6 +567,8 @@ function initMap(){
     'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
     {attribution:'&copy; OpenStreetMap & CARTO'}
   ).addTo(map);
+
+  pointLayer = L.layerGroup().addTo(map);
 }
 
 function nomeBairroGeo(p){
@@ -490,6 +579,8 @@ function renderMap(){
   if(!map || !GEO) return;
 
   if(geoLayer) map.removeLayer(geoLayer);
+  if(heatLayer) map.removeLayer(heatLayer);
+  if(pointLayer) pointLayer.clearLayers();
 
   const byBairro = {};
   group('bairro').forEach(x=>{
@@ -502,16 +593,17 @@ function renderMap(){
       const d = byBairro[normaliza(nome)];
 
       return {
-        color:'#274260',
-        weight:.7,
+        color:d ? '#2f85d7' : '#274260',
+        weight:d ? .9 : .5,
         fillColor:d ? cor(d.taxa) : '#1c2a3d',
-        fillOpacity:d ? .68 : .15
+        fillOpacity:d ? .25 : .08
       };
     },
-
     onEachFeature:(f,l)=>{
       const nome = nomeBairroGeo(f.properties);
       const d = byBairro[normaliza(nome)];
+
+      l.on('click',()=>abrirBairro(encodeURIComponent(nome)));
 
       l.bindPopup(`
         <b>${nome}</b><br>
@@ -525,9 +617,133 @@ function renderMap(){
     }
   }).addTo(map);
 
+  const pontos = [];
+
+  Object.values(byBairro).forEach(d=>{
+    const c = COORDS[normaliza(d.k)];
+    if(!c) return;
+
+    const intensidade = Math.max(0.15, Math.min(1, (d.nok / Math.max(1,d.total)) + (d.n / 120)));
+    pontos.push([c.lat,c.lon,intensidade]);
+
+    L.circleMarker([c.lat,c.lon],{
+      radius:Math.max(5,Math.min(18,d.n/10)),
+      color:cor(d.taxa),
+      fillColor:cor(d.taxa),
+      fillOpacity:.65,
+      weight:1
+    }).on('click',()=>abrirBairro(encodeURIComponent(d.k)))
+      .bindPopup(`<b>${d.k}</b><br>Conformidade: ${fmt(d.taxa)}%<br>Avaliações: ${d.n}<br>NOK: ${d.nok}`)
+      .addTo(pointLayer);
+  });
+
+  if(pontos.length){
+    heatLayer = L.heatLayer(pontos,{
+      radius:34,
+      blur:24,
+      maxZoom:13,
+      gradient:{
+        0.25:'#2f85d7',
+        0.45:'#e87535',
+        0.75:'#e84855',
+        1.0:'#ffffff'
+      }
+    }).addTo(map);
+  }
+
   try{
     map.fitBounds(geoLayer.getBounds(), {padding:[20,20]});
   }catch(e){}
+}
+
+function abrirBairro(bairroEncoded){
+  const bairro = decodeURIComponent(bairroEncoded);
+  selectedBairro = bairro;
+
+  const rows = FILTERED.filter(r=>normaliza(r.bairro) === normaliza(bairro));
+  const logs = {};
+
+  rows.forEach(r=>{
+    const k = r.logradouro || 'Não informado';
+    if(!logs[k]) logs[k] = {logradouro:k,avaliacoes:0,ok:0,nok:0,trechos:{}};
+
+    logs[k].avaliacoes++;
+    logs[k].ok += r.ok;
+    logs[k].nok += r.nok;
+
+    const t = r.trecho || 'trecho não informado';
+    if(!logs[k].trechos[t]) logs[k].trechos[t] = {trecho:t,avaliacoes:0,ok:0,nok:0};
+    logs[k].trechos[t].avaliacoes++;
+    logs[k].trechos[t].ok += r.ok;
+    logs[k].trechos[t].nok += r.nok;
+  });
+
+  const dados = Object.values(logs).map(x=>{
+    const total = x.ok+x.nok;
+    return {...x,taxa:total?(x.ok/total)*100:0,total};
+  }).sort((a,b)=>b.nok-a.nok || a.taxa-b.taxa).slice(0,20);
+
+  $('drillTitle').textContent = `Explosão territorial · ${bairro}`;
+
+  $('drilldown').innerHTML = dados.map(l=>`
+    <div class="rank" onclick="abrirLogradouro('${encodeURIComponent(bairro)}','${encodeURIComponent(l.logradouro)}')">
+      <div>
+        <b>${l.logradouro}</b>
+        <div class="hint">${l.avaliacoes} avaliações · ${l.nok} NOK · ${fmt(l.taxa)}% OK</div>
+        <div class="bar"><i style="width:${Math.min(100,l.taxa)}%;background:${cor(l.taxa)}"></i></div>
+      </div>
+      <small>abrir trechos</small>
+    </div>
+  `).join('') || '<div class="status">Sem dados para este bairro no filtro atual.</div>';
+}
+
+function abrirLogradouro(bairroEncoded, logradouroEncoded){
+  const bairro = decodeURIComponent(bairroEncoded);
+  const logradouro = decodeURIComponent(logradouroEncoded);
+
+  const rows = FILTERED.filter(r=>normaliza(r.bairro) === normaliza(bairro) && normaliza(r.logradouro) === normaliza(logradouro));
+  const trechos = {};
+
+  rows.forEach(r=>{
+    const k = r.trecho || 'trecho não informado';
+    if(!trechos[k]) trechos[k] = {trecho:k,avaliacoes:0,ok:0,nok:0,itens:{}};
+
+    trechos[k].avaliacoes++;
+    trechos[k].ok += r.ok;
+    trechos[k].nok += r.nok;
+
+    r.itensNok.forEach(item=>{
+      trechos[k].itens[item] = (trechos[k].itens[item] || 0) + 1;
+    });
+  });
+
+  const dados = Object.values(trechos).map(x=>{
+    const total = x.ok+x.nok;
+    return {...x,taxa:total?(x.ok/total)*100:0,total};
+  }).sort((a,b)=>b.nok-a.nok || b.avaliacoes-a.avaliacoes);
+
+  $('drillTitle').textContent = `Trechos · ${bairro} · ${logradouro}`;
+
+  $('drilldown').innerHTML = dados.map(t=>{
+    const itensTop = Object.entries(t.itens).sort((a,b)=>b[1]-a[1]).slice(0,5)
+      .map(([item,n])=>`<span class="pill">${item}: ${n}</span>`).join('');
+
+    return `
+      <div class="rank">
+        <div>
+          <b>${t.trecho}</b>
+          <div class="hint">${t.avaliacoes} avaliações · ${t.nok} NOK · ${fmt(t.taxa)}% OK</div>
+          <div>${itensTop || '<span class="pill">Sem NOK</span>'}</div>
+          <div class="bar"><i style="width:${Math.min(100,t.taxa)}%;background:${cor(t.taxa)}"></i></div>
+        </div>
+        <small>${t.nok} NOK</small>
+      </div>
+    `;
+  }).join('') || '<div class="status">Sem trechos para este logradouro.</div>';
+}
+
+function abrirTrecho(bairroEncoded, logradouroEncoded, trechoEncoded){
+  abrirLogradouro(bairroEncoded, logradouroEncoded);
 }
 
 document.addEventListener('DOMContentLoaded',init);
