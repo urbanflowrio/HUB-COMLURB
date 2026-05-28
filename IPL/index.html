@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+
 <title>IPL Territorial · HUB COMLURB</title>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -145,10 +146,6 @@ select option{
   line-height:1.45;
 }
 
-.insight b{
-  color:#fff;
-}
-
 .kpis{
   display:grid;
   grid-template-columns:repeat(6,1fr);
@@ -195,7 +192,6 @@ select option{
   font-size:clamp(22px,1.9vw,34px);
   margin:9px 0 4px;
   font-weight:950;
-  color:#fff;
 }
 
 .kpi small{
@@ -242,7 +238,6 @@ select option{
 .hint{
   font-size:12px;
   color:#a8b8cf;
-  margin-top:4px;
 }
 
 .body{
@@ -255,19 +250,10 @@ select option{
   gap:8px;
   padding:10px 8px;
   border-bottom:1px solid rgba(255,255,255,.08);
-  border-radius:10px;
-  min-width:0;
-}
-
-.rank:hover{
-  background:rgba(109,165,216,.08);
 }
 
 .rank b{
   font-size:13px;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
 }
 
 .rank small{
@@ -286,7 +272,6 @@ select option{
 .bar i{
   display:block;
   height:100%;
-  background:var(--orange);
 }
 
 #map{
@@ -312,24 +297,18 @@ th{
   text-align:left;
   color:#aebbd0;
   font-weight:950;
-  letter-spacing:.09em;
-  text-transform:uppercase;
   font-size:10px;
-  position:sticky;
-  top:0;
-  z-index:10;
+  text-transform:uppercase;
 }
 
 td{
   padding:12px;
   border-bottom:1px solid rgba(255,255,255,.05);
-  color:#d7e4f7;
 }
 
 .num{
   text-align:right;
   font-weight:800;
-  color:#fff;
 }
 
 .footer{
@@ -339,36 +318,23 @@ td{
   display:flex;
   gap:18px;
   flex-wrap:wrap;
-  align-items:center;
   font-size:13px;
   color:#c2d1e6;
   margin-top:14px;
-}
-
-@media(max-width:1100px){
-  .kpis,.controls,.grid,.grid2{
-    grid-template-columns:1fr;
-  }
-  .logo{
-    width:160px;
-  }
-  .header{
-    align-items:flex-start;
-    flex-direction:column;
-  }
 }
 </style>
 </head>
 
 <body>
+
 <div class="app">
 
 <header class="header">
-  <img src="./assets/logo-comlurb.png" onerror="this.style.display='none'" alt="COMLURB" class="logo">
+  <img src="./assets/logo-comlurb.png" class="logo">
   <div>
     <div class="eyebrow">HUB COMLURB · Inteligência Operacional</div>
     <h1>IPL · Análise Territorial</h1>
-    <div class="sub">NotaFinal, meta, bairros críticos, itens de maior perda e reincidência territorial</div>
+    <div class="sub">NotaFinal, meta, bairros críticos e análise territorial</div>
   </div>
 </header>
 
@@ -405,15 +371,18 @@ td{
 </section>
 
 <div id="status" class="status">Carregando bases...</div>
+
 <div id="insight" class="insight"></div>
+
 <div class="kpis" id="kpis"></div>
 
 <div class="grid">
+
   <div class="panel">
     <div class="panelHead">
       <div>
         <h2>Mapa por bairro</h2>
-        <div class="hint">Cor por NotaFinal média. Laranja/vermelho = abaixo da meta 77.</div>
+        <div class="hint">Cor por NotaFinal média</div>
       </div>
     </div>
     <div id="map"></div>
@@ -423,63 +392,57 @@ td{
     <div class="panelHead">
       <div>
         <h2>Bairros críticos</h2>
-        <div class="hint">Menor média IPL com volume mínimo</div>
+        <div class="hint">Menores médias IPL</div>
       </div>
     </div>
     <div class="body" id="rankBairros"></div>
   </div>
+
 </div>
 
 <div class="grid2">
+
   <div class="panel">
     <div class="panelHead">
-      <div>
-        <h2>Ranking por Superintendência</h2>
-        <div class="hint">NotaFinal média e volume avaliado</div>
-      </div>
+      <h2>Ranking Superintendências</h2>
     </div>
     <div class="body" id="rankSup"></div>
   </div>
 
   <div class="panel">
     <div class="panelHead">
-      <div>
-        <h2>Itens com maior perda</h2>
-        <div class="hint">Média mais baixa por item de avaliação</div>
-      </div>
+      <h2>Itens críticos</h2>
     </div>
     <div class="body" id="rankItens"></div>
   </div>
+
 </div>
 
 <div class="panel">
   <div class="panelHead">
     <h2>Detalhamento</h2>
-    <button class="btn orange" onclick="exportCSV()">Exportar CSV</button>
   </div>
+
   <div class="tblWrap">
     <table>
       <thead>
         <tr>
           <th>Mês</th>
-          <th>Data</th>
-          <th>Sup.</th>
+          <th>Superintendência</th>
           <th>Gerência</th>
           <th>Bairro</th>
-          <th>Logradouro</th>
-          <th>Trecho</th>
-          <th class="num">NotaFinal</th>
+          <th>NotaFinal</th>
         </tr>
       </thead>
+
       <tbody id="tbody"></tbody>
     </table>
   </div>
 </div>
 
 <footer class="footer">
-  <b>Gabinete da Presidência</b>
-  <span>Fonte: bases IPL publicadas no Google Sheets e arquivos territoriais no GitHub</span>
-  <span>v2 territorial</span>
+  <b>HUB COMLURB</b>
+  <span>IPL Territorial</span>
 </footer>
 
 </div>
@@ -488,442 +451,452 @@ td{
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
+
 const META = 77;
 
 const URL_IPL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vROo6VzcQvjvIvx3F2ZuCtrf3K369bpxhIXTBcnUcjEQ06rV0BAY5XJF6cQrnxWZBtnR_VwsGsUKwer/pub?output=csv';
 
-const URL_COORD_BAIRROS = './data/coordenadas_bairros_rio.csv';
 const URL_BAIRROS_GEOJSON = './data/DLU_Novos_Bairros_estrutura2025.geojson';
-const URL_GERENCIAS_GEOJSON = './data/GERENCIAS_DSU.geojson';
 
 let DATA = [];
 let FILTERED = [];
-let COORD = [];
-let GEOBAIRROS = null;
-let GEOGER = null;
-
+let GEO = null;
 let map;
-let bairroLayer;
-let gerLayer;
-let markerLayer;
+let geoLayer;
 
 const $ = id => document.getElementById(id);
 
-const norm = s => (s ?? '')
-  .toString()
-  .normalize('NFD')
-  .replace(/[\u0300-\u036f]/g,'')
-  .trim()
-  .toUpperCase();
-
-const num = v => {
-  if (v == null || v === '' || v === 'N/A') return null;
-  let n = parseFloat(String(v).replace(',','.'));
+function num(v){
+  let n = parseFloat(String(v || '').replace(',','.'));
   return isNaN(n) ? null : n;
-};
+}
 
-function pick(row, names){
-  for(const n of names){
-    if(row[n] !== undefined) return row[n];
-  }
-  return '';
+function avg(arr){
+  return arr.length
+    ? arr.reduce((s,x)=>s+x,0)/arr.length
+    : 0;
+}
+
+function fmt(n){
+  return Number(n || 0).toLocaleString('pt-BR',{
+    minimumFractionDigits:1,
+    maximumFractionDigits:1
+  });
 }
 
 async function csv(url){
-  return new Promise((resolve, reject) => {
-    Papa.parse(url, {
+  return new Promise((resolve,reject)=>{
+    Papa.parse(url,{
       download:true,
       header:true,
       skipEmptyLines:true,
-      complete:r => resolve(r.data),
-      error:err => reject(err)
+      complete:r=>resolve(r.data),
+      error:e=>reject(e)
     });
   });
 }
 
-async function json(url){
-  const r = await fetch(url);
-  if(!r.ok) throw new Error(url + ' não carregou');
-  return r.json();
-}
-
 async function init(){
-  try{
-    $('status').style.display = 'block';
-    $('status').textContent = 'Carregando avaliação IPL, coordenadas e geometrias...';
 
-    const [ipl, coord, geoB, geoG] = await Promise.allSettled([
+  try{
+
+    const [ipl,geo] = await Promise.all([
       csv(URL_IPL),
-      csv(URL_COORD_BAIRROS),
-      json(URL_BAIRROS_GEOJSON),
-      json(URL_GERENCIAS_GEOJSON)
+      fetch(URL_BAIRROS_GEOJSON).then(r=>r.json())
     ]);
 
-    if(ipl.status !== 'fulfilled'){
-      throw new Error('Não consegui carregar a base IPL publicada no Google Sheets. Verifique se a planilha está publicada como CSV.');
-    }
+    GEO = geo;
 
-    DATA = ipl.value.map(r => ({
-      raw:r,
-      mes: pick(r, ['Mês','Mes','MES','mes','Competência','COMPETENCIA']),
-      data: pick(r, ['Data','DATA','data','Dt Avaliação','Data Avaliação']),
-      sup: pick(r, ['Superintendência','Superintendencia','SUPERINTENDÊNCIA','SUPERINTENDENCIA','Sup','SUP']),
-      ger: pick(r, ['Gerência','Gerencia','GERÊNCIA','GERENCIA','Ger','GER']),
-      bairro: pick(r, ['Bairro','BAIRRO','bairro']),
-      nome: pick(r, ['Nome','Denominação','Logradouro','NOME','LOGRADOURO','logradouro']),
-      trecho: pick(r, ['Trecho','TRECHO','trecho']),
-      nota: num(pick(r, ['NotaFinal','Nota Final','NOTAFINAL','Nota','NOTA','nota_final']))
+    DATA = ipl.map(r=>({
+
+      mes:
+        r['Mês'] ||
+        r['MES'] ||
+        r['Mes'] ||
+        '',
+
+      sup:
+        r['Superintendência'] ||
+        r['SUPERINTENDÊNCIA'] ||
+        r['Superintendencia'] ||
+        '',
+
+      ger:
+        r['Gerência'] ||
+        r['GERÊNCIA'] ||
+        r['Gerencia'] ||
+        '',
+
+      bairro:
+        r['Bairro'] ||
+        r['BAIRRO'] ||
+        '',
+
+      nota:
+        num(
+          r['NotaFinal'] ||
+          r['NOTAFINAL'] ||
+          r['Nota Final']
+        ),
+
+      raw:r
+
     }))
-    .filter(r => r.nota !== null && r.bairro);
+    .filter(r=>r.nota !== null);
 
-    COORD = coord.status === 'fulfilled' ? coord.value : [];
-    GEOBAIRROS = geoB.status === 'fulfilled' ? geoB.value : null;
-    GEOGER = geoG.status === 'fulfilled' ? geoG.value : null;
+    initMap();
+
+    populate();
+
+    render();
 
     $('status').style.display = 'none';
 
-    initMap();
-    populateFilters();
-    render();
-
   }catch(e){
-    $('status').style.display = 'block';
-    $('status').textContent = 'Erro: ' + e.message;
+
+    $('status').innerHTML = 'Erro ao carregar base IPL';
+
     console.error(e);
+
   }
+
 }
 
-function populateFilters(){
-  const fill = (id, arr) => {
-    const sel = $(id);
+function populate(){
+
+  const add = (id,arr)=>{
+
     arr
       .filter(Boolean)
-      .sort((a,b) => a.localeCompare(b,'pt-BR'))
-      .forEach(v => {
+      .sort()
+      .forEach(v=>{
+
         const o = document.createElement('option');
+
         o.value = v;
         o.textContent = v;
-        sel.appendChild(o);
+
+        $(id).appendChild(o);
+
       });
+
   };
 
-  fill('fMes', [...new Set(DATA.map(r => r.mes))]);
-  fill('fSup', [...new Set(DATA.map(r => r.sup))]);
-  fill('fGer', [...new Set(DATA.map(r => r.ger))]);
-  fill('fBairro', [...new Set(DATA.map(r => r.bairro))]);
+  add('fMes',[...new Set(DATA.map(x=>x.mes))]);
+  add('fSup',[...new Set(DATA.map(x=>x.sup))]);
+  add('fGer',[...new Set(DATA.map(x=>x.ger))]);
+  add('fBairro',[...new Set(DATA.map(x=>x.bairro))]);
+
 }
 
 function clearAll(){
-  ['fMes','fSup','fGer','fBairro'].forEach(id => $(id).value = '');
+
+  ['fMes','fSup','fGer','fBairro']
+    .forEach(id=>$(id).value='');
+
   render();
+
 }
 
 function apply(){
-  const m = $('fMes').value;
-  const s = $('fSup').value;
-  const g = $('fGer').value;
-  const b = $('fBairro').value;
 
-  FILTERED = DATA.filter(r =>
-    (!m || r.mes === m) &&
-    (!s || r.sup === s) &&
-    (!g || r.ger === g) &&
-    (!b || r.bairro === b)
+  FILTERED = DATA.filter(r=>
+
+    (!$('fMes').value || r.mes === $('fMes').value) &&
+    (!$('fSup').value || r.sup === $('fSup').value) &&
+    (!$('fGer').value || r.ger === $('fGer').value) &&
+    (!$('fBairro').value || r.bairro === $('fBairro').value)
+
   );
+
 }
 
-function avg(a){
-  return a.length ? a.reduce((s,x) => s + x, 0) / a.length : 0;
-}
+function group(field){
 
-function fmt(n,d=1){
-  if(n === null || n === undefined || isNaN(n)) return '-';
-  return n.toLocaleString('pt-BR', {
-    maximumFractionDigits:d,
-    minimumFractionDigits:d
-  });
-}
-
-function group(key){
   const o = {};
 
-  FILTERED.forEach(r => {
-    const k = r[key] || 'Não informado';
+  FILTERED.forEach(r=>{
+
+    const k = r[field] || 'Não informado';
+
     if(!o[k]) o[k] = [];
+
     o[k].push(r);
+
   });
 
-  return Object.entries(o).map(([k,rows]) => ({
+  return Object.entries(o).map(([k,rows])=>({
+
     k,
     rows,
-    n: rows.length,
-    media: avg(rows.map(r => r.nota)),
-    abaixo: rows.filter(r => r.nota < META).length
+    n:rows.length,
+    media:avg(rows.map(r=>r.nota))
+
   }));
+
 }
 
 function render(){
+
   apply();
+
   renderKpis();
   renderRanks();
   renderTable();
   renderInsight();
   renderMap();
-}
 
-function worstBairro(){
-  return group('bairro')
-    .filter(x => x.n >= 5)
-    .sort((a,b) => a.media - b.media)[0];
-}
-
-function bestSup(){
-  return group('sup')
-    .sort((a,b) => b.media - a.media)[0];
 }
 
 function renderKpis(){
-  const notas = FILTERED.map(r => r.nota);
-  const media = avg(notas);
-  const abaixo = FILTERED.filter(r => r.nota < META).length;
-  const bairros = new Set(FILTERED.map(r => norm(r.bairro))).size;
-  const pior = worstBairro();
-  const melhorSup = bestSup();
+
+  const media = avg(FILTERED.map(r=>r.nota));
+
+  const abaixo = FILTERED.filter(r=>r.nota < META).length;
+
+  const bairros = new Set(FILTERED.map(r=>r.bairro)).size;
+
+  const pior =
+    group('bairro')
+      .sort((a,b)=>a.media-b.media)[0];
+
+  const melhor =
+    group('sup')
+      .sort((a,b)=>b.media-a.media)[0];
 
   const cards = [
-    ['Nota IPL média', fmt(media), 'Meta 77', media >= META ? 'green' : 'orange'],
-    ['Avaliações', FILTERED.length.toLocaleString('pt-BR'), 'registros filtrados', ''],
-    ['Abaixo da meta', abaixo.toLocaleString('pt-BR'), FILTERED.length ? fmt(abaixo / FILTERED.length * 100) + '%' : '0%', 'red'],
-    ['Bairros avaliados', bairros.toLocaleString('pt-BR'), 'territórios', ''],
-    ['Pior bairro', pior?.k || '-', pior ? fmt(pior.media) : '-', 'orange'],
-    ['Melhor Sup.', melhorSup?.k || '-', melhorSup ? fmt(melhorSup.media) : '-', 'green']
+
+    ['Nota IPL média',fmt(media),'Meta 77','orange'],
+    ['Avaliações',FILTERED.length,'registros',''],
+    ['Abaixo da meta',abaixo,`${fmt((abaixo/FILTERED.length)*100)}%`,'red'],
+    ['Bairros avaliados',bairros,'territórios',''],
+    ['Pior bairro',pior?.k || '-',fmt(pior?.media),'orange'],
+    ['Melhor Sup.',melhor?.k || '-',fmt(melhor?.media),'green']
+
   ];
 
-  $('kpis').innerHTML = cards.map(k => `
-    <div class="kpi ${k[3]}">
-      <span>${k[0]}</span>
-      <strong>${k[1]}</strong>
-      <small>${k[2]}</small>
+  $('kpis').innerHTML = cards.map(c=>`
+
+    <div class="kpi ${c[3]}">
+      <span>${c[0]}</span>
+      <strong>${c[1]}</strong>
+      <small>${c[2]}</small>
     </div>
+
   `).join('');
+
 }
 
 function renderInsight(){
-  const w = worstBairro();
-  const sup = group('sup').sort((a,b) => a.media - b.media)[0];
-  const media = avg(FILTERED.map(r => r.nota));
-  const abaixo = FILTERED.filter(r => r.nota < META).length;
 
-  $('insight').innerHTML = FILTERED.length
-    ? `<b>Leitura executiva:</b> a média filtrada está em <b>${fmt(media)}</b>. ${abaixo.toLocaleString('pt-BR')} avaliações estão abaixo da meta. O bairro mais crítico no filtro é <b>${w?.k || '-'}</b> e a superintendência com menor média é <b>${sup?.k || '-'}</b>.`
-    : 'Sem dados no filtro atual.';
+  const media = avg(FILTERED.map(r=>r.nota));
+
+  $('insight').innerHTML = `
+    Média IPL atual em <b>${fmt(media)}</b>.
+    ${FILTERED.length.toLocaleString('pt-BR')} avaliações carregadas.
+  `;
+
+}
+
+function bar(v){
+
+  return v >= 77
+    ? '#78aaa3'
+    : v >= 65
+      ? '#e87535'
+      : '#e84855';
+
 }
 
 function rankHTML(arr){
-  return arr.map(x => {
-    const pct = x.media;
-    const color = x.media >= META ? 'var(--green)' : (x.media < 65 ? 'var(--red)' : 'var(--orange)');
 
-    return `
-      <div class="rank">
-        <div>
-          <b>${x.k}</b>
-          <div class="bar">
-            <i style="width:${Math.min(100,Math.max(0,pct))}%;background:${color}"></i>
-          </div>
+  return arr.map(x=>`
+
+    <div class="rank">
+
+      <div>
+
+        <b>${x.k}</b>
+
+        <div class="bar">
+          <i style="
+            width:${x.media}%;
+            background:${bar(x.media)}
+          "></i>
         </div>
-        <small>${fmt(x.media)} · ${x.n}</small>
+
       </div>
-    `;
-  }).join('') || '<div class="status">Sem dados</div>';
+
+      <small>
+        ${fmt(x.media)} · ${x.n}
+      </small>
+
+    </div>
+
+  `).join('');
+
 }
 
 function renderRanks(){
-  $('rankBairros').innerHTML = rankHTML(
-    group('bairro')
-      .filter(x => x.n >= 5)
-      .sort((a,b) => a.media - b.media)
-      .slice(0,15)
-  );
 
-  $('rankSup').innerHTML = rankHTML(
-    group('sup')
-      .sort((a,b) => a.media - b.media)
-  );
+  $('rankBairros').innerHTML =
+    rankHTML(
+      group('bairro')
+        .sort((a,b)=>a.media-b.media)
+        .slice(0,15)
+    );
 
-  const itemCols = [
-    'LixoBranco',
-    'ColetaDomiciliar',
-    'CaixaRalo',
-    'BensInserviveis',
-    'PapeleirasConteinerCheia',
-    'PapeleiraConteinerSuja',
-    'PapeleiraConteinerQuebrada',
-    'LixoCriticoFezes',
-    'LixoCriticoPerfuroCortante',
-    'Galhada',
-    'Propaganda',
-    'Capina',
-    'RocadaareaverdeAvaliacao',
-    'animalmorto',
-    'ResiduoMoradorRua',
-    'ResiduosLimpeza',
-    'LamaAreia',
-    'DescarteIrregularPontoCritico',
-    'CaixaMetalicaDempster'
-  ];
+  $('rankSup').innerHTML =
+    rankHTML(
+      group('sup')
+        .sort((a,b)=>a.media-b.media)
+    );
 
-  const itens = itemCols.map(c => {
-    const vals = FILTERED.map(r => num(r.raw[c])).filter(v => v !== null);
-    return {
-      k:c,
-      n:vals.length,
-      media:avg(vals),
-      rows:[]
-    };
-  })
-  .filter(x => x.n > 0)
-  .sort((a,b) => a.media - b.media)
-  .slice(0,12);
+  const itens = [];
 
-  $('rankItens').innerHTML = rankHTML(itens);
+  Object.keys(DATA[0].raw).forEach(c=>{
+
+    if(
+      c.toLowerCase().includes('nota') ||
+      c.toLowerCase().includes('item')
+    ) return;
+
+    const vals = FILTERED
+      .map(r=>num(r.raw[c]))
+      .filter(v=>v !== null);
+
+    if(vals.length){
+
+      itens.push({
+
+        k:c,
+        media:avg(vals),
+        n:vals.length
+
+      });
+
+    }
+
+  });
+
+  $('rankItens').innerHTML =
+    rankHTML(
+      itens
+        .sort((a,b)=>a.media-b.media)
+        .slice(0,12)
+    );
+
 }
 
 function renderTable(){
-  $('tbody').innerHTML = FILTERED.slice(0,300).map(r => `
-    <tr>
-      <td>${r.mes}</td>
-      <td>${String(r.data).slice(0,10)}</td>
-      <td>${r.sup}</td>
-      <td>${r.ger}</td>
-      <td>${r.bairro}</td>
-      <td>${r.nome}</td>
-      <td>${r.trecho || ''}</td>
-      <td class="num">${fmt(r.nota)}</td>
-    </tr>
-  `).join('') || '<tr><td colspan="8">Sem dados</td></tr>';
+
+  $('tbody').innerHTML =
+    FILTERED
+      .slice(0,300)
+      .map(r=>`
+
+        <tr>
+          <td>${r.mes}</td>
+          <td>${r.sup}</td>
+          <td>${r.ger}</td>
+          <td>${r.bairro}</td>
+          <td class="num">${fmt(r.nota)}</td>
+        </tr>
+
+      `).join('');
+
 }
 
 function initMap(){
-  map = L.map('map', {zoomControl:true}).setView([-22.91,-43.35],10);
 
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution:'&copy; OpenStreetMap & CARTO'
-  }).addTo(map);
+  map = L.map('map')
+    .setView([-22.91,-43.35],10);
 
-  markerLayer = L.layerGroup().addTo(map);
-}
+  L.tileLayer(
+    'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+  ).addTo(map);
 
-function color(v){
-  return v >= 85 ? '#78aaa3' :
-         v >= 77 ? '#6da5d8' :
-         v >= 65 ? '#e87535' :
-                   '#e84855';
-}
-
-function propName(p){
-  return p?.BAIRRO ||
-         p?.Bairro ||
-         p?.NOME ||
-         p?.nome ||
-         p?.NM_BAIRRO ||
-         p?.bairro ||
-         p?.name ||
-         '';
 }
 
 function renderMap(){
-  if(!map) return;
 
-  const byB = {};
-  group('bairro').forEach(x => byB[norm(x.k)] = x);
+  if(geoLayer){
 
-  if(bairroLayer){
-    map.removeLayer(bairroLayer);
+    map.removeLayer(geoLayer);
+
   }
 
-  if(GEOBAIRROS){
-    bairroLayer = L.geoJSON(GEOBAIRROS, {
-      style:f => {
-        const name = propName(f.properties);
-        const d = byB[norm(name)];
+  const byBairro = {};
 
-        return {
-          color:'#274260',
-          weight:.7,
-          fillColor:d ? color(d.media) : '#16263d',
-          fillOpacity:d?.n ? 0.62 : 0.18
-        };
-      },
-      onEachFeature:(f,l) => {
-        const name = propName(f.properties);
-        const d = byB[norm(name)];
+  group('bairro')
+    .forEach(x=>byBairro[x.k.toUpperCase()] = x);
 
-        l.bindPopup(`
-          <b>${name}</b><br>
-          ${d ? `
-            Nota média: ${fmt(d.media)}<br>
-            Avaliações: ${d.n}<br>
-            Abaixo da meta: ${d.abaixo}
-          ` : 'Sem avaliação no filtro'}
-        `);
-      }
-    }).addTo(map);
-  }
+  geoLayer = L.geoJSON(GEO,{
 
-  markerLayer.clearLayers();
+    style:f=>{
 
-  const coords = {};
+      const nome =
+        (
+          f.properties.BAIRRO ||
+          f.properties.NOME ||
+          ''
+        ).toUpperCase();
 
-  COORD.forEach(r => {
-    const b = norm(pick(r, ['Bairro','BAIRRO','bairro','nome','NOME']));
-    const lat = num(pick(r, ['lat','latitude','Latitude','LAT']));
-    const lon = num(pick(r, ['lon','lng','longitude','Longitude','LON','LONG']));
+      const d = byBairro[nome];
 
-    if(b && lat && lon){
-      coords[b] = [lat,lon];
+      return {
+
+        color:'#274260',
+        weight:.7,
+
+        fillColor:
+          d
+            ? bar(d.media)
+            : '#1c2a3d',
+
+        fillOpacity:
+          d
+            ? .65
+            : .18
+
+      };
+
+    },
+
+    onEachFeature:(f,l)=>{
+
+      const nome =
+        (
+          f.properties.BAIRRO ||
+          f.properties.NOME ||
+          ''
+        ).toUpperCase();
+
+      const d = byBairro[nome];
+
+      l.bindPopup(`
+
+        <b>${nome}</b><br>
+
+        ${
+          d
+            ? `
+              Média IPL: ${fmt(d.media)}<br>
+              Avaliações: ${d.n}
+            `
+            : 'Sem avaliações'
+        }
+
+      `);
+
     }
-  });
 
-  Object.values(byB).forEach(d => {
-    const c = coords[norm(d.k)];
+  }).addTo(map);
 
-    if(c){
-      L.circleMarker(c, {
-        radius:Math.max(5,Math.min(18,d.n/15)),
-        color:color(d.media),
-        fillColor:color(d.media),
-        fillOpacity:.72,
-        weight:1
-      })
-      .bindPopup(`
-        <b>${d.k}</b><br>
-        Nota média: ${fmt(d.media)}<br>
-        Avaliações: ${d.n}<br>
-        Abaixo da meta: ${d.abaixo}
-      `)
-      .addTo(markerLayer);
-    }
-  });
 }
 
-function exportCSV(){
-  const rows = [
-    ['Mês','Data','Superintendência','Gerência','Bairro','Logradouro','Trecho','NotaFinal'],
-    ...FILTERED.map(r => [r.mes,r.data,r.sup,r.ger,r.bairro,r.nome,r.trecho,r.nota])
-  ];
+document.addEventListener('DOMContentLoaded',init);
 
-  const csv = rows.map(r =>
-    r.map(v => '"' + String(v ?? '').replaceAll('"','""') + '"').join(',')
-  ).join('\n');
-
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8'}));
-  a.download = 'ipl_filtrado_' + new Date().toISOString().slice(0,10) + '.csv';
-  a.click();
-}
-
-document.addEventListener('DOMContentLoaded', init);
 </script>
 
 </body>
