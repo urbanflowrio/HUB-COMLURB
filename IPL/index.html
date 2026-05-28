@@ -3,523 +3,179 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>IPL · Inteligência Territorial · HUB COMLURB</title>
+<title>IPL · Análise Territorial · HUB COMLURB</title>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
 <style>
-
 :root{
-  --bg:#07111f;
-  --panel:#0d1b2f;
-  --panel2:#10243d;
-  --line:#274260;
-  --ink:#f2f6ff;
-  --muted:#9fb0c7;
-  --blue:#6da5d8;
-  --orange:#e87535;
-  --green:#78aaa3;
-  --red:#e84855;
+  --bg:#07111f;--panel:#0d1b2f;--line:#274260;--ink:#f2f6ff;
+  --muted:#9fb0c7;--blue:#6da5d8;--orange:#e87535;--green:#78aaa3;--red:#e84855;
   --shadow:0 18px 45px rgba(0,0,0,.28);
 }
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,Segoe UI,Arial,sans-serif}
+.app{max-width:1880px;margin:0 auto;padding:18px}
 
-*{
-  box-sizing:border-box;
-}
+.header{display:flex;align-items:center;gap:24px;padding:22px;border:1px solid rgba(111,164,216,.25);border-radius:22px;background:#0b1a2e;box-shadow:var(--shadow);margin-bottom:14px}
+.logo{width:250px;max-height:76px;object-fit:contain;border-right:1px solid rgba(255,255,255,.24);padding-right:22px}
+.eyebrow{font-size:11px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:#b9c9dc}
+h1{margin:5px 0;font-size:clamp(28px,2.2vw,42px);line-height:1.05}
+.sub{color:#c5d5e8;font-size:14px}
 
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--ink);
-  font-family:Inter,Segoe UI,Arial,sans-serif;
-}
+.controls{display:grid;grid-template-columns:repeat(5,minmax(170px,1fr));gap:12px;margin:14px 0}
+.field,.btn{border:1px solid var(--line);background:var(--panel);border-radius:16px;padding:11px 12px}
+label{display:block;color:#aebbd0;font-size:10px;letter-spacing:.13em;text-transform:uppercase;font-weight:900;margin-bottom:6px}
+select{width:100%;background:transparent;border:0;color:#f2f6ff;font-weight:800;outline:0}
+select option{background:#0d1b2f;color:#fff}
+.btn{cursor:pointer;color:#fff;font-weight:950}
+.btn.orange{border-color:rgba(232,117,53,.75);background:#14243b}
 
-.app{
-  max-width:1880px;
-  margin:0 auto;
-  padding:18px;
-}
+.status{margin:12px 0;padding:10px 12px;border:1px solid rgba(75,126,172,.55);background:#1b2130;border-radius:14px;color:#b8d4f2;font-size:13px}
+.insight{border:1px solid rgba(255,255,255,.10);background:#0b1a2e;border-radius:16px;padding:14px 16px;margin-bottom:14px;border-left:4px solid var(--orange);line-height:1.5;font-size:14px}
 
-.header{
-  display:flex;
-  align-items:center;
-  gap:24px;
-  padding:22px;
-  border:1px solid rgba(111,164,216,.25);
-  border-radius:22px;
-  background:#0b1a2e;
-  box-shadow:var(--shadow);
-  margin-bottom:14px;
-}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:14px}
+.kpi{min-height:108px;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:16px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.kpi:before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:#4b7eac}
+.kpi.orange:before{background:var(--orange)}
+.kpi.green:before{background:var(--green)}
+.kpi.red:before{background:var(--red)}
+.kpi span{display:block;color:#aebbd0;font-size:11px;letter-spacing:.13em;text-transform:uppercase;font-weight:950}
+.kpi strong{display:block;font-size:clamp(22px,1.9vw,34px);margin:9px 0 4px;font-weight:950}
+.kpi small{color:#a8b8cf}
 
-.logo{
-  width:250px;
-  max-height:76px;
-  object-fit:contain;
-  border-right:1px solid rgba(255,255,255,.24);
-  padding-right:22px;
-}
+.grid{display:grid;grid-template-columns:1.15fr .85fr;gap:14px;margin-bottom:14px}
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:14px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);overflow:hidden}
+.panelHead{padding:16px 18px;border-bottom:1px solid var(--line);background:#0b1a2e}
+.panel h2{margin:0;font-size:16px}
+.hint{font-size:12px;color:#a8b8cf;margin-top:4px}
+.body{padding:16px}
 
-.eyebrow{
-  font-size:11px;
-  font-weight:900;
-  letter-spacing:.16em;
-  text-transform:uppercase;
-  color:#b9c9dc;
-}
+.rank{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:12px 8px;border-bottom:1px solid rgba(255,255,255,.08);cursor:pointer;border-radius:10px}
+.rank:hover{background:rgba(109,165,216,.08)}
+.rank b{font-size:13px}
+.rank small{color:#a8b8cf;font-weight:900}
+.bar{height:7px;border-radius:999px;background:#1b3657;margin-top:7px;overflow:hidden}
+.bar i{display:block;height:100%}
 
-h1{
-  margin:5px 0;
-  font-size:clamp(28px,2.2vw,42px);
-  line-height:1.05;
-}
+#map{height:620px;background:#07111f}
 
-.sub{
-  color:#c5d5e8;
-  font-size:14px;
-}
+.execHero{padding:16px;border:1px solid rgba(255,255,255,.10);border-radius:18px;background:#0b1a2e;margin-bottom:12px}
+.execHero span{display:block;color:#9fb0c7;font-size:10px;font-weight:950;letter-spacing:.13em;text-transform:uppercase;margin-bottom:8px}
+.execHero strong{display:block;font-size:28px;line-height:1.05;color:#fff;margin-bottom:8px}
+.execHero p{margin:0;color:#c5d5e8;font-size:13px}
 
-.controls{
-  display:grid;
-  grid-template-columns:repeat(5,minmax(170px,1fr));
-  gap:12px;
-  margin:14px 0;
-}
+.miniList{display:grid;gap:8px}
+.miniList div{padding:11px 12px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(255,255,255,.025);cursor:pointer}
+.miniList div:hover{background:rgba(109,165,216,.08)}
+.miniList b{display:block;font-size:13px;color:#fff;margin-bottom:4px}
+.miniList small{color:#9fb0c7}
 
-.field,.btn{
-  border:1px solid var(--line);
-  background:var(--panel);
-  border-radius:16px;
-  padding:11px 12px;
-}
+.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:4px 8px;margin:2px;color:#cfe0f5;font-size:11px}
 
-label{
-  display:block;
-  color:#aebbd0;
-  font-size:10px;
-  letter-spacing:.13em;
-  text-transform:uppercase;
-  font-weight:900;
-  margin-bottom:6px;
-}
-
-select{
-  width:100%;
-  background:transparent;
-  border:0;
-  color:#f2f6ff;
-  font-weight:800;
-  outline:0;
-}
-
-select option{
-  background:#0d1b2f;
-  color:#fff;
-}
-
-.btn{
-  cursor:pointer;
-  color:#fff;
-  font-weight:950;
-}
-
-.btn.orange{
-  border-color:rgba(232,117,53,.75);
-  background:#14243b;
-}
-
-.status{
-  margin:12px 0;
-  padding:10px 12px;
-  border:1px solid rgba(75,126,172,.55);
-  background:#1b2130;
-  border-radius:14px;
-  color:#b8d4f2;
-  font-size:13px;
-}
-
-.insight{
-  border:1px solid rgba(255,255,255,.10);
-  background:#0b1a2e;
-  border-radius:16px;
-  padding:14px 16px;
-  margin-bottom:14px;
-  border-left:4px solid var(--orange);
-  line-height:1.5;
-  font-size:14px;
-}
-
-.kpis{
-  display:grid;
-  grid-template-columns:repeat(5,1fr);
-  gap:12px;
-  margin-bottom:14px;
-}
-
-.kpi{
-  min-height:108px;
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:20px;
-  padding:16px;
-  box-shadow:var(--shadow);
-  position:relative;
-  overflow:hidden;
-}
-
-.kpi::before{
-  content:"";
-  position:absolute;
-  top:0;
-  left:0;
-  right:0;
-  height:4px;
-  background:#4b7eac;
-}
-
-.kpi.orange::before{
-  background:var(--orange);
-}
-
-.kpi.green::before{
-  background:var(--green);
-}
-
-.kpi.red::before{
-  background:var(--red);
-}
-
-.kpi span{
-  display:block;
-  color:#aebbd0;
-  font-size:11px;
-  letter-spacing:.13em;
-  text-transform:uppercase;
-  font-weight:950;
-}
-
-.kpi strong{
-  display:block;
-  font-size:clamp(22px,1.9vw,34px);
-  margin:9px 0 4px;
-  font-weight:950;
-}
-
-.kpi small{
-  color:#a8b8cf;
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:1.15fr .85fr;
-  gap:14px;
-  margin-bottom:14px;
-}
-
-.grid2{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:14px;
-  margin-bottom:14px;
-}
-
-.panel{
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:22px;
-  box-shadow:var(--shadow);
-  overflow:hidden;
-}
-
-.panelHead{
-  padding:16px 18px;
-  border-bottom:1px solid var(--line);
-  background:#0b1a2e;
-}
-
-.panel h2{
-  margin:0;
-  font-size:16px;
-}
-
-.hint{
-  font-size:12px;
-  color:#a8b8cf;
-  margin-top:4px;
-}
-
-.body{
-  padding:16px;
-}
-
-.rank{
-  display:grid;
-  grid-template-columns:minmax(0,1fr) auto;
-  gap:8px;
-  padding:11px 8px;
-  border-bottom:1px solid rgba(255,255,255,.08);
-  cursor:pointer;
-  border-radius:10px;
-}
-
-.rank:hover{
-  background:rgba(109,165,216,.08);
-}
-
-.rank b{
-  font-size:13px;
-}
-
-.rank small{
-  color:#a8b8cf;
-  font-weight:900;
-}
-
-.bar{
-  height:8px;
-  border-radius:999px;
-  background:#1b3657;
-  margin-top:6px;
-  overflow:hidden;
-}
-
-.bar i{
-  display:block;
-  height:100%;
-}
-
-#map{
-  height:620px;
-  background:#07111f;
-}
-
-.drawerTitle{
-  font-size:13px;
-  color:#fff;
-  font-weight:900;
-  margin-bottom:10px;
-}
-
-.pill{
-  display:inline-block;
-  border:1px solid var(--line);
-  border-radius:999px;
-  padding:4px 8px;
-  margin:2px;
-  color:#cfe0f5;
-  font-size:11px;
-}
-
-.footer{
-  border-top:1px solid rgba(255,255,255,.12);
-  padding:24px 18px;
-  margin-top:20px;
-  color:#7f8fa6;
-  font-size:13px;
-  background:transparent;
-}
-
-.footer strong{
-  color:#8b98ad;
-  font-weight:900;
-}
+.footer{border-top:1px solid rgba(255,255,255,.12);padding:24px 18px;margin-top:20px;color:#7f8fa6;font-size:13px;background:transparent}
+.footer strong{color:#8b98ad;font-weight:900}
 
 @media(max-width:1100px){
-
-  .controls,
-  .kpis,
-  .grid,
-  .grid2{
-    grid-template-columns:1fr;
-  }
-
-  .header{
-    flex-direction:column;
-    align-items:flex-start;
-  }
-
-  .logo{
-    width:220px;
-    border-right:0;
-    padding-right:0;
-  }
-
+  .controls,.kpis,.grid,.grid2{grid-template-columns:1fr}
+  .header{flex-direction:column;align-items:flex-start}
+  .logo{width:220px;border-right:0;padding-right:0}
 }
-
 </style>
 </head>
 
 <body>
-
 <div class="app">
 
 <header class="header">
-
-  <img
-    class="logo"
-    alt="COMLURB"
-    src="../assets/logos/RIOPREFEITURA%20Comlurb%20horizontal%20monocromatica%20branco.png"
-  >
-
+  <img class="logo" alt="COMLURB" src="../assets/logos/RIOPREFEITURA%20Comlurb%20horizontal%20monocromatica%20branco.png">
   <div>
-    <div class="eyebrow">
-      HUB COMLURB · Inteligência Operacional
-    </div>
-
-    <h1>
-      IPL · Análise Territorial
-    </h1>
-
-    <div class="sub">
-      Criticidade territorial, reincidência operacional e concentração de não conformidades
-    </div>
+    <div class="eyebrow">HUB COMLURB · Inteligência Operacional</div>
+    <h1>IPL · Análise Territorial</h1>
+    <div class="sub">Criticidade territorial, reincidência operacional e concentração de não conformidades</div>
   </div>
-
 </header>
 
 <section class="controls">
-
   <div class="field">
     <label>Mês</label>
-
-    <select id="fMes" onchange="onMesChange()">
-      <option value="">Todos</option>
-    </select>
+    <select id="fMes" onchange="onMesChange()"><option value="">Todos</option></select>
   </div>
 
   <div class="field">
     <label>Superintendência</label>
-
-    <select id="fSup" onchange="onSupChange()">
-      <option value="">Todas</option>
-    </select>
+    <select id="fSup" onchange="onSupChange()"><option value="">Todas</option></select>
   </div>
 
   <div class="field">
     <label>Gerência</label>
-
-    <select id="fGer" onchange="onGerChange()">
-      <option value="">Todas</option>
-    </select>
+    <select id="fGer" onchange="onGerChange()"><option value="">Todas</option></select>
   </div>
 
   <div class="field">
     <label>Bairro</label>
-
-    <select id="fBairro" onchange="render()">
-      <option value="">Todos</option>
-    </select>
+    <select id="fBairro" onchange="onBairroChange()"><option value="">Todos</option></select>
   </div>
 
-  <button class="btn orange" onclick="clearAll()">
-    Limpar
-  </button>
-
+  <button class="btn orange" onclick="clearAll()">Limpar</button>
 </section>
 
-<div id="status" class="status">
-  Carregando bases territoriais...
-</div>
-
+<div id="status" class="status">Carregando bases territoriais...</div>
 <div id="insight" class="insight"></div>
-
 <div class="kpis" id="kpis"></div>
 
 <div class="grid">
-
   <div class="panel">
-
     <div class="panelHead">
       <h2>Mapa de calor territorial</h2>
-
-      <div class="hint">
-        Intensidade territorial de não conformidade, reincidência e concentração operacional
-      </div>
+      <div class="hint">Intensidade territorial de não conformidade, reincidência e concentração operacional</div>
     </div>
-
     <div id="map"></div>
-
   </div>
 
   <div class="panel">
-
     <div class="panelHead">
       <h2>Bairros críticos</h2>
-
-      <div class="hint">
-        Clique em um bairro para abrir logradouros e trechos críticos
-      </div>
+      <div class="hint">Clique em um bairro para abrir ruas e trechos críticos</div>
     </div>
-
     <div class="body" id="rankBairros"></div>
-
   </div>
-
 </div>
 
 <div class="grid2">
-
   <div class="panel">
-
     <div class="panelHead">
-      <h2>Reincidência por trecho</h2>
-
-      <div class="hint">
-        Trechos com repetição operacional e maior concentração de NOK
-      </div>
+      <h2>Síntese de reincidência</h2>
+      <div class="hint">Onde o problema se repete com maior impacto operacional</div>
     </div>
-
-    <div class="body" id="rankReincidencia"></div>
-
+    <div class="body" id="sinteseReincidencia"></div>
   </div>
 
   <div class="panel">
-
     <div class="panelHead">
-      <h2>Itens críticos recorrentes</h2>
-
-      <div class="hint">
-        Itens com maior repetição territorial de não conformidade
-      </div>
+      <h2>Síntese de não conformidade</h2>
+      <div class="hint">Itens que mais explicam a perda de conformidade</div>
     </div>
-
-    <div class="body" id="rankItens"></div>
-
+    <div class="body" id="sinteseItens"></div>
   </div>
-
 </div>
 
 <div class="panel">
-
   <div class="panelHead">
-
-    <h2 id="drillTitle">
-      Explosão territorial
-    </h2>
-
-    <div class="hint">
-      Navegação territorial executiva sem tabela analítica pesada
-    </div>
-
+    <h2 id="drillTitle">Explosão territorial</h2>
+    <div class="hint">Clique em um bairro, rua ou trecho para abrir o detalhe executivo</div>
   </div>
-
   <div class="body" id="drilldown">
-
-    <div class="status">
-      Selecione um bairro crítico para visualizar logradouros e trechos.
-    </div>
-
+    <div class="status">Selecione um bairro crítico para visualizar ruas e trechos.</div>
   </div>
-
 </div>
 
 <footer class="footer">
-
   <span>
     <strong>Gabinete da Presidência</strong><br>
     HUB COMLURB • Núcleo de Inteligência e Gestão Estratégica Operacional
   </span>
-
 </footer>
 
 </div>
@@ -529,16 +185,11 @@ select option{
 <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
 
 <script>
-  const META = 77;
+const META = 77;
 
-const URL_IPL =
-  'https://docs.google.com/spreadsheets/d/e/2PACX-1vTcMXJxBYWRaLS_gTdPkAhjIXRHRs-MBNUbfwxmeoZaXMBE53gd1xXttAkQ_lb-HJZcboKMWhRHq8G_/pub?output=csv';
-
-const URL_BAIRROS_GEOJSON =
-  '../territorial/data/DLU_Novos_Bairros_estrutura2025.geojson';
-
-const URL_COORD_BAIRROS =
-  '../territorial/data/coordenadas_bairros_rio.csv';
+const URL_IPL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTcMXJxBYWRaLS_gTdPkAhjIXRHRs-MBNUbfwxmeoZaXMBE53gd1xXttAkQ_lb-HJZcboKMWhRHq8G_/pub?output=csv';
+const URL_BAIRROS_GEOJSON = '../territorial/data/DLU_Novos_Bairros_estrutura2025.geojson';
+const URL_COORD_BAIRROS = '../territorial/data/coordenadas_bairros_rio.csv';
 
 let DATA = [];
 let FILTERED = [];
@@ -552,19 +203,12 @@ let pointLayer;
 const $ = id => document.getElementById(id);
 
 function normaliza(s){
-  return String(s || '')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g,'')
-    .trim()
-    .toUpperCase();
+  return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toUpperCase();
 }
 
 function fmt(n,d=1){
   if(!isFinite(n)) n = 0;
-  return Number(n).toLocaleString('pt-BR',{
-    minimumFractionDigits:d,
-    maximumFractionDigits:d
-  });
+  return Number(n).toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d});
 }
 
 function num(v){
@@ -574,21 +218,13 @@ function num(v){
 
 function csv(url){
   return new Promise((resolve,reject)=>{
-    Papa.parse(url,{
-      download:true,
-      header:true,
-      skipEmptyLines:true,
-      complete:r=>resolve(r.data),
-      error:e=>reject(e)
-    });
+    Papa.parse(url,{download:true,header:true,skipEmptyLines:true,complete:r=>resolve(r.data),error:e=>reject(e)});
   });
 }
 
 async function carregarGeo(){
   const r = await fetch(URL_BAIRROS_GEOJSON);
-  if(!r.ok){
-    throw new Error('GeoJSON não encontrado: ' + URL_BAIRROS_GEOJSON);
-  }
+  if(!r.ok) throw new Error('GeoJSON não encontrado: ' + URL_BAIRROS_GEOJSON);
   return await r.json();
 }
 
@@ -601,27 +237,9 @@ function campo(row, nomes){
 
 function calculaTrecho(row){
   const ignorar = [
-    'CONTESTAR',
-    'FOTOS',
-    'MES',
-    'MÊS',
-    'MAT. AVALIADOR',
-    'SUPERINTENDENCIA',
-    'SUPERINTENDÊNCIA',
-    'DIRETORIA',
-    'GERENCIA',
-    'GERÊNCIA',
-    'CODIGO LOGRADOURO',
-    'CÓDIGO LOGRADOURO',
-    'TIPOLOGRADOURO',
-    'TIPO LOGRADOURO',
-    'NOME',
-    'BAIRRO',
-    'TRECHO',
-    'DATA',
-    'HORA INICIO',
-    'HORA INÍCIO',
-    'HORA FIM'
+    'CONTESTAR','FOTOS','MES','MÊS','MAT. AVALIADOR','SUPERINTENDENCIA','SUPERINTENDÊNCIA',
+    'DIRETORIA','GERENCIA','GERÊNCIA','CODIGO LOGRADOURO','CÓDIGO LOGRADOURO',
+    'TIPOLOGRADOURO','TIPO LOGRADOURO','NOME','BAIRRO','TRECHO','DATA','HORA INICIO','HORA INÍCIO','HORA FIM'
   ];
 
   let ok = 0;
@@ -630,15 +248,11 @@ function calculaTrecho(row){
 
   Object.keys(row).forEach(col=>{
     const colNorm = normaliza(col);
-
     if(ignorar.includes(colNorm)) return;
 
     const v = normaliza(row[col]);
 
-    if(v === 'OK'){
-      ok++;
-    }
-
+    if(v === 'OK') ok++;
     if(v === 'NOK'){
       nok++;
       itensNok.push(col);
@@ -660,35 +274,9 @@ function prepararCoords(rows){
   const out = {};
 
   rows.forEach(r=>{
-    const bairro = campo(r,[
-      'Bairro',
-      'BAIRRO',
-      'bairro',
-      'NOME',
-      'Nome',
-      'nome'
-    ]);
-
-    const lat = num(campo(r,[
-      'lat',
-      'Lat',
-      'LAT',
-      'latitude',
-      'Latitude',
-      'LATITUDE'
-    ]));
-
-    const lon = num(campo(r,[
-      'lon',
-      'Lon',
-      'LON',
-      'lng',
-      'Lng',
-      'LNG',
-      'longitude',
-      'Longitude',
-      'LONGITUDE'
-    ]));
+    const bairro = campo(r,['Bairro','BAIRRO','bairro','NOME','Nome','nome']);
+    const lat = num(campo(r,['lat','Lat','LAT','latitude','Latitude','LATITUDE']));
+    const lon = num(campo(r,['lon','Lon','LON','lng','Lng','LNG','longitude','Longitude','LONGITUDE']));
 
     if(bairro && lat && lon){
       out[normaliza(bairro)] = {lat,lon};
@@ -701,8 +289,7 @@ function prepararCoords(rows){
 async function init(){
   try{
     $('status').style.display = 'block';
-    $('status').textContent =
-      'Carregando Avaliação dos Trechos, coordenadas e mapa territorial...';
+    $('status').textContent = 'Carregando Avaliação dos Trechos, coordenadas e mapa territorial...';
 
     const [base, geo, coords] = await Promise.all([
       csv(URL_IPL),
@@ -715,38 +302,18 @@ async function init(){
 
     DATA = base.map(r=>{
       const calc = calculaTrecho(r);
-
-      const bairro = campo(r,[
-        'Bairro',
-        'BAIRRO'
-      ]);
-
+      const bairro = campo(r,['Bairro','BAIRRO']);
       const coord = COORDS[normaliza(bairro)] || null;
 
       return {
         raw:r,
         mes: campo(r,['Mês','Mes','MES']),
         data: campo(r,['Data','DATA']),
-        sup: campo(r,[
-          'Superintendência',
-          'Superintendencia',
-          'SUPERINTENDÊNCIA',
-          'SUPERINTENDENCIA'
-        ]),
+        sup: campo(r,['Superintendência','Superintendencia','SUPERINTENDÊNCIA','SUPERINTENDENCIA']),
         diretoria: campo(r,['Diretoria','DIRETORIA']),
-        ger: campo(r,[
-          'Gerência',
-          'Gerencia',
-          'GERÊNCIA',
-          'GERENCIA'
-        ]),
+        ger: campo(r,['Gerência','Gerencia','GERÊNCIA','GERENCIA']),
         bairro,
-        logradouro: campo(r,[
-          'Nome',
-          'NOME',
-          'Logradouro',
-          'LOGRADOURO'
-        ]),
+        logradouro: campo(r,['Nome','NOME','Logradouro','LOGRADOURO']),
         trecho: campo(r,['Trecho','TRECHO']),
         lat: coord?.lat || null,
         lon: coord?.lon || null,
@@ -759,7 +326,7 @@ async function init(){
     }).filter(r => r.total > 0 && r.bairro);
 
     initMap();
-    populate();
+    populateAll();
     render();
 
     $('status').style.display = 'none';
@@ -771,22 +338,38 @@ async function init(){
   }
 }
 
-function basePorSelecao(nivel){
+/* FILTROS EM CASCATA REAL */
+function baseMes(){
+  return DATA;
+}
+
+function baseSup(){
+  const mes = $('fMes').value;
+  return DATA.filter(r => !mes || r.mes === mes);
+}
+
+function baseGer(){
+  const mes = $('fMes').value;
+  const sup = $('fSup').value;
+  return DATA.filter(r =>
+    (!mes || r.mes === mes) &&
+    (!sup || r.sup === sup)
+  );
+}
+
+function baseBairro(){
   const mes = $('fMes').value;
   const sup = $('fSup').value;
   const ger = $('fGer').value;
-
-  return DATA.filter(r=>{
-    if(nivel !== 'mes' && mes && r.mes !== mes) return false;
-    if(nivel !== 'sup' && sup && r.sup !== sup) return false;
-    if(nivel !== 'ger' && ger && r.ger !== ger) return false;
-    return true;
-  });
+  return DATA.filter(r =>
+    (!mes || r.mes === mes) &&
+    (!sup || r.sup === sup) &&
+    (!ger || r.ger === ger)
+  );
 }
 
-function preencherSelect(id,campo,label,base){
-  const atual = $(id).value;
-
+function preencherSelect(id,campo,label,base,preservar=true){
+  const atual = preservar ? $(id).value : '';
   const valores = [...new Set(base.map(r=>r[campo]).filter(Boolean))]
     .sort((a,b)=>String(a).localeCompare(String(b),'pt-BR'));
 
@@ -799,16 +382,16 @@ function preencherSelect(id,campo,label,base){
     $(id).appendChild(o);
   });
 
-  if(valores.includes(atual)){
+  if(preservar && valores.includes(atual)){
     $(id).value = atual;
   }
 }
 
-function populate(){
-  preencherSelect('fMes','mes','Todos',DATA);
-  preencherSelect('fSup','sup','Todas',basePorSelecao('sup'));
-  preencherSelect('fGer','ger','Todas',basePorSelecao('ger'));
-  preencherSelect('fBairro','bairro','Todos',basePorSelecao('bairro'));
+function populateAll(){
+  preencherSelect('fMes','mes','Todos',baseMes());
+  preencherSelect('fSup','sup','Todas',baseSup());
+  preencherSelect('fGer','ger','Todas',baseGer());
+  preencherSelect('fBairro','bairro','Todos',baseBairro());
 }
 
 function onMesChange(){
@@ -816,10 +399,11 @@ function onMesChange(){
   $('fGer').value = '';
   $('fBairro').value = '';
 
-  preencherSelect('fSup','sup','Todas',basePorSelecao('sup'));
-  preencherSelect('fGer','ger','Todas',basePorSelecao('ger'));
-  preencherSelect('fBairro','bairro','Todos',basePorSelecao('bairro'));
+  preencherSelect('fSup','sup','Todas',baseSup(),false);
+  preencherSelect('fGer','ger','Todas',baseGer(),false);
+  preencherSelect('fBairro','bairro','Todos',baseBairro(),false);
 
+  resetDrill();
   render();
 }
 
@@ -827,18 +411,28 @@ function onSupChange(){
   $('fGer').value = '';
   $('fBairro').value = '';
 
-  preencherSelect('fGer','ger','Todas',basePorSelecao('ger'));
-  preencherSelect('fBairro','bairro','Todos',basePorSelecao('bairro'));
+  preencherSelect('fGer','ger','Todas',baseGer(),false);
+  preencherSelect('fBairro','bairro','Todos',baseBairro(),false);
 
+  resetDrill();
   render();
 }
 
 function onGerChange(){
   $('fBairro').value = '';
 
-  preencherSelect('fBairro','bairro','Todos',basePorSelecao('bairro'));
+  preencherSelect('fBairro','bairro','Todos',baseBairro(),false);
 
+  resetDrill();
   render();
+}
+
+function onBairroChange(){
+  resetDrill();
+  render();
+
+  const b = $('fBairro').value;
+  if(b) abrirBairro(encodeURIComponent(b));
 }
 
 function clearAll(){
@@ -847,13 +441,14 @@ function clearAll(){
   $('fGer').value = '';
   $('fBairro').value = '';
 
-  populate();
+  populateAll();
+  resetDrill();
   render();
+}
 
+function resetDrill(){
   $('drillTitle').textContent = 'Explosão territorial';
-
-  $('drilldown').innerHTML =
-    '<div class="status">Selecione um bairro crítico para visualizar logradouros e trechos.</div>';
+  $('drilldown').innerHTML = '<div class="status">Selecione um bairro crítico para visualizar ruas e trechos.</div>';
 }
 
 function apply(){
@@ -875,11 +470,7 @@ function group(field){
 
   FILTERED.forEach(r=>{
     const k = r[field] || 'Não informado';
-
-    if(!o[k]){
-      o[k] = [];
-    }
-
+    if(!o[k]) o[k] = [];
     o[k].push(r);
   });
 
@@ -890,13 +481,7 @@ function group(field){
     const reincidentes = contaReincidencia(rows);
 
     return {
-      k,
-      rows,
-      n:rows.length,
-      ok,
-      nok,
-      total,
-      reincidentes,
+      k, rows, n:rows.length, ok, nok, total, reincidentes,
       taxa: total ? (ok / total) * 100 : 0,
       criticidade: calculaCriticidade(rows)
     };
@@ -907,12 +492,7 @@ function contaReincidencia(rows){
   const chaves = {};
 
   rows.forEach(r=>{
-    const k = [
-      normaliza(r.bairro),
-      normaliza(r.logradouro),
-      normaliza(r.trecho)
-    ].join('|');
-
+    const k = [normaliza(r.bairro),normaliza(r.logradouro),normaliza(r.trecho)].join('|');
     chaves[k] = (chaves[k] || 0) + 1;
   });
 
@@ -930,13 +510,6 @@ function calculaCriticidade(rows){
   return (taxaNok * 60) + (Math.min(reincidencia,20) * 2) + Math.min(volume / 10,20);
 }
 
-function cor(v){
-  return v >= 85 ? '#78aaa3' :
-         v >= 77 ? '#6da5d8' :
-         v >= 65 ? '#e87535' :
-                   '#e84855';
-}
-
 function corCriticidade(v){
   return v >= 60 ? '#e84855' :
          v >= 40 ? '#e87535' :
@@ -949,7 +522,7 @@ function render(){
   renderKpis();
   renderInsight();
   renderRanks();
-  renderReincidencia();
+  renderSinteses();
   renderMap();
 }
 
@@ -961,46 +534,16 @@ function renderKpis(){
 
   const bairros = group('bairro');
   const bairrosCriticos = bairros.filter(x=>x.n >= 5 && x.taxa < META).length;
-
-  const pior = bairros
-    .filter(x=>x.n >= 5)
-    .sort((a,b)=>b.criticidade-a.criticidade)[0];
-
+  const pior = bairros.filter(x=>x.n >= 5).sort((a,b)=>b.criticidade-a.criticidade)[0];
   const reincidentes = totalReincidentes(FILTERED);
-
   const piorItem = itemMaisCritico();
 
   const cards = [
-    [
-      'Conformidade territorial',
-      fmt(taxa)+'%',
-      'OK médio no filtro',
-      taxa >= META ? 'green' : 'orange'
-    ],
-    [
-      'Bairros críticos',
-      bairrosCriticos.toLocaleString('pt-BR'),
-      'abaixo da meta 77',
-      bairrosCriticos ? 'red' : 'green'
-    ],
-    [
-      'Trechos reincidentes',
-      reincidentes.toLocaleString('pt-BR'),
-      'repetição territorial',
-      reincidentes ? 'orange' : 'green'
-    ],
-    [
-      'Área mais crítica',
-      pior?.k || '-',
-      pior ? fmt(pior.taxa)+'% OK' : '-',
-      'orange'
-    ],
-    [
-      'Item dominante',
-      piorItem?.item || '-',
-      piorItem ? `${piorItem.n.toLocaleString('pt-BR')} ocorrências` : '-',
-      'red'
-    ]
+    ['Conformidade territorial',fmt(taxa)+'%','OK médio no filtro',taxa >= META ? 'green' : 'orange'],
+    ['Bairros críticos',bairrosCriticos.toLocaleString('pt-BR'),'abaixo da meta 77',bairrosCriticos ? 'red' : 'green'],
+    ['Trechos reincidentes',reincidentes.toLocaleString('pt-BR'),'repetição territorial',reincidentes ? 'orange' : 'green'],
+    ['Área mais crítica',pior?.k || '-',pior ? fmt(pior.taxa)+'% OK' : '-','orange'],
+    ['Item dominante',piorItem?.item || '-',piorItem ? `${piorItem.n.toLocaleString('pt-BR')} ocorrências` : '-','red']
   ];
 
   $('kpis').innerHTML = cards.map(c=>`
@@ -1016,14 +559,7 @@ function totalReincidentes(rows){
   const chaves = {};
 
   rows.forEach(r=>{
-    const k = [
-      normaliza(r.sup),
-      normaliza(r.ger),
-      normaliza(r.bairro),
-      normaliza(r.logradouro),
-      normaliza(r.trecho)
-    ].join('|');
-
+    const k = [normaliza(r.sup),normaliza(r.ger),normaliza(r.bairro),normaliza(r.logradouro),normaliza(r.trecho)].join('|');
     chaves[k] = (chaves[k] || 0) + 1;
   });
 
@@ -1039,11 +575,9 @@ function itemMaisCritico(){
     });
   });
 
-  const arr = Object.entries(itens)
+  return Object.entries(itens)
     .map(([item,n])=>({item,n}))
-    .sort((a,b)=>b.n-a.n);
-
-  return arr[0] || null;
+    .sort((a,b)=>b.n-a.n)[0] || null;
 }
 
 function renderInsight(){
@@ -1052,14 +586,8 @@ function renderInsight(){
   const total = ok + nok;
   const taxa = total ? ok / total * 100 : 0;
 
-  const bairros = group('bairro');
-  const piorBairro = bairros
-    .filter(x=>x.n >= 5)
-    .sort((a,b)=>b.criticidade-a.criticidade)[0];
-
-  const piorSup = group('sup')
-    .sort((a,b)=>a.taxa-b.taxa)[0];
-
+  const piorBairro = group('bairro').filter(x=>x.n >= 5).sort((a,b)=>b.criticidade-a.criticidade)[0];
+  const piorSup = group('sup').sort((a,b)=>a.taxa-b.taxa)[0];
   const reincidentes = totalReincidentes(FILTERED);
   const item = itemMaisCritico();
 
@@ -1073,11 +601,9 @@ function rankHTML(arr){
     <div class="rank" onclick="abrirBairro('${encodeURIComponent(x.k)}')">
       <div>
         <b>${x.k}</b>
-        <div class="hint">
-          ${x.n} avaliações · ${x.reincidentes} trechos reincidentes · ${x.nok} NOK
-        </div>
+        <div class="hint">${x.n} avaliações · ${x.reincidentes} trechos reincidentes · ${x.nok} NOK</div>
         <div class="bar">
-          <i style="width:${Math.min(100,Math.max(0,x.criticidade))}%;background:${corCriticidade(x.criticidade)}"></i>
+          <i style="width:${Math.min(100,Math.max(8,x.criticidade))}%;background:${corCriticidade(x.criticidade)}"></i>
         </div>
       </div>
       <small>${fmt(x.taxa)}% OK</small>
@@ -1090,9 +616,52 @@ function renderRanks(){
     group('bairro')
       .filter(x=>x.n >= 5)
       .sort((a,b)=>b.criticidade-a.criticidade)
-      .slice(0,18)
+      .slice(0,14)
   );
+}
 
+function renderSinteses(){
+  renderSinteseReincidencia();
+  renderSinteseItens();
+}
+
+function renderSinteseReincidencia(){
+  const trechos = montarTrechos(FILTERED);
+
+  const ranking = Object.values(trechos)
+    .map(t=>{
+      const total = t.ok + t.nok;
+      return {
+        ...t,
+        taxa: total ? (t.ok / total) * 100 : 0,
+        criticidade: (t.nok * 2) + (t.avaliacoes * 4)
+      };
+    })
+    .filter(t => t.avaliacoes >= 2)
+    .sort((a,b)=>b.criticidade-a.criticidade)
+    .slice(0,3);
+
+  const pior = ranking[0];
+
+  $('sinteseReincidencia').innerHTML = pior ? `
+    <div class="execHero">
+      <span>Maior reincidência</span>
+      <strong>${pior.bairro}</strong>
+      <p>${pior.logradouro} · ${pior.avaliacoes} avaliações · ${pior.nok} NOK</p>
+    </div>
+
+    <div class="miniList">
+      ${ranking.map((t,i)=>`
+        <div onclick="abrirTrecho('${encodeURIComponent(t.bairro)}','${encodeURIComponent(t.logradouro)}','${encodeURIComponent(t.trecho || '')}')">
+          <b>${i+1}. ${t.logradouro}</b>
+          <small>${t.bairro} · ${t.avaliacoes}x · ${t.nok} NOK</small>
+        </div>
+      `).join('')}
+    </div>
+  ` : '<div class="status">Sem reincidência relevante no filtro atual.</div>';
+}
+
+function renderSinteseItens(){
   const itens = {};
 
   FILTERED.forEach(r=>{
@@ -1101,43 +670,44 @@ function renderRanks(){
     });
   });
 
-  const max = Math.max(...Object.values(itens),1);
+  const totalItens = Object.values(itens).reduce((a,b)=>a+b,0);
 
-  $('rankItens').innerHTML = Object.entries(itens)
-    .sort((a,b)=>b[1]-a[1])
-    .slice(0,15)
-    .map(([item,n])=>`
-      <div class="rank">
+  const ranking = Object.entries(itens)
+    .map(([item,n])=>({item,n,pct:totalItens ? (n/totalItens)*100 : 0}))
+    .sort((a,b)=>b.n-a.n)
+    .slice(0,5);
+
+  const dominante = ranking[0];
+
+  $('sinteseItens').innerHTML = dominante ? `
+    <div class="execHero">
+      <span>Item dominante</span>
+      <strong>${dominante.item}</strong>
+      <p>${dominante.n.toLocaleString('pt-BR')} ocorrências · ${fmt(dominante.pct)}% dos NOK</p>
+    </div>
+
+    <div class="miniList">
+      ${ranking.slice(1).map((i,idx)=>`
         <div>
-          <b>${item}</b>
-          <div class="bar">
-            <i style="width:${(n/max)*100}%;background:var(--orange)"></i>
-          </div>
+          <b>${idx+2}. ${i.item}</b>
+          <small>${i.n.toLocaleString('pt-BR')} ocorrências · ${fmt(i.pct)}%</small>
         </div>
-        <small>${n.toLocaleString('pt-BR')}</small>
-      </div>
-    `).join('') || '<div class="status">Sem dados</div>';
+      `).join('')}
+    </div>
+  ` : '<div class="status">Sem NOK no filtro atual.</div>';
 }
 
-function renderReincidencia(){
+function montarTrechos(rows){
   const trechos = {};
 
-  FILTERED.forEach(r=>{
-    const chave = [
-      r.sup,
-      r.ger,
-      r.bairro,
-      r.logradouro,
-      r.trecho
-    ].join(' | ');
+  rows.forEach(r=>{
+    const chave = [r.bairro,r.logradouro,r.trecho].join(' | ');
 
     if(!trechos[chave]){
       trechos[chave] = {
-        sup:r.sup,
-        ger:r.ger,
         bairro:r.bairro,
         logradouro:r.logradouro,
-        trecho:r.trecho,
+        trecho:r.trecho || 'trecho não informado',
         avaliacoes:0,
         ok:0,
         nok:0,
@@ -1154,34 +724,7 @@ function renderReincidencia(){
     });
   });
 
-  const dados = Object.values(trechos)
-    .map(t=>{
-      const total = t.ok + t.nok;
-      return {
-        ...t,
-        total,
-        taxa: total ? (t.ok / total) * 100 : 0,
-        criticidade: (t.nok * 2) + (t.avaliacoes * 3)
-      };
-    })
-    .filter(t => t.avaliacoes >= 2)
-    .sort((a,b)=>b.criticidade-a.criticidade)
-    .slice(0,20);
-
-  $('rankReincidencia').innerHTML = dados.map(t=>`
-    <div class="rank" onclick="abrirTrecho('${encodeURIComponent(t.bairro)}','${encodeURIComponent(t.logradouro)}','${encodeURIComponent(t.trecho || '')}')">
-      <div>
-        <b>${t.bairro} · ${t.logradouro}</b>
-        <div class="hint">
-          ${t.ger || '-'} · ${t.trecho || 'trecho não informado'} · ${t.avaliacoes}x
-        </div>
-        <div class="bar">
-          <i style="width:${Math.min(100,t.criticidade)}%;background:${corCriticidade(t.criticidade)}"></i>
-        </div>
-      </div>
-      <small>${t.nok} NOK</small>
-    </div>
-  `).join('') || '<div class="status">Sem reincidência no filtro atual</div>';
+  return trechos;
 }
 
 function initMap(){
@@ -1196,14 +739,7 @@ function initMap(){
 }
 
 function nomeBairroGeo(p){
-  return p?.BAIRRO ||
-         p?.Bairro ||
-         p?.NOME ||
-         p?.Nome ||
-         p?.NM_BAIRRO ||
-         p?.bairro ||
-         p?.name ||
-         '';
+  return p?.BAIRRO || p?.Bairro || p?.NOME || p?.Nome || p?.NM_BAIRRO || p?.bairro || p?.name || '';
 }
 
 function renderMap(){
@@ -1214,10 +750,7 @@ function renderMap(){
   if(pointLayer) pointLayer.clearLayers();
 
   const byBairro = {};
-
-  group('bairro').forEach(x=>{
-    byBairro[normaliza(x.k)] = x;
-  });
+  group('bairro').forEach(x=>{ byBairro[normaliza(x.k)] = x; });
 
   geoLayer = L.geoJSON(GEO,{
     style:f=>{
@@ -1255,10 +788,7 @@ function renderMap(){
     const c = COORDS[normaliza(d.k)];
     if(!c) return;
 
-    const intensidade = Math.max(
-      0.18,
-      Math.min(1, d.criticidade / 100)
-    );
+    const intensidade = Math.max(0.18, Math.min(1, d.criticidade / 100));
 
     pontos.push([c.lat,c.lon,intensidade]);
 
@@ -1302,9 +832,7 @@ function renderMap(){
 function abrirBairro(bairroEncoded){
   const bairro = decodeURIComponent(bairroEncoded);
 
-  const rows = FILTERED.filter(r=>
-    normaliza(r.bairro) === normaliza(bairro)
-  );
+  const rows = FILTERED.filter(r => normaliza(r.bairro) === normaliza(bairro));
 
   const logs = {};
 
@@ -1312,13 +840,7 @@ function abrirBairro(bairroEncoded){
     const k = r.logradouro || 'Não informado';
 
     if(!logs[k]){
-      logs[k] = {
-        logradouro:k,
-        avaliacoes:0,
-        ok:0,
-        nok:0,
-        trechos:{}
-      };
+      logs[k] = {logradouro:k,avaliacoes:0,ok:0,nok:0,trechos:{}};
     }
 
     logs[k].avaliacoes++;
@@ -1328,13 +850,7 @@ function abrirBairro(bairroEncoded){
     const t = r.trecho || 'trecho não informado';
 
     if(!logs[k].trechos[t]){
-      logs[k].trechos[t] = {
-        trecho:t,
-        avaliacoes:0,
-        ok:0,
-        nok:0,
-        itens:{}
-      };
+      logs[k].trechos[t] = {trecho:t,avaliacoes:0,ok:0,nok:0,itens:{}};
     }
 
     logs[k].trechos[t].avaliacoes++;
@@ -1342,15 +858,13 @@ function abrirBairro(bairroEncoded){
     logs[k].trechos[t].nok += r.nok;
 
     r.itensNok.forEach(item=>{
-      logs[k].trechos[t].itens[item] =
-        (logs[k].trechos[t].itens[item] || 0) + 1;
+      logs[k].trechos[t].itens[item] = (logs[k].trechos[t].itens[item] || 0) + 1;
     });
   });
 
   const dados = Object.values(logs).map(x=>{
     const total = x.ok + x.nok;
-    const reincidentes = Object.values(x.trechos)
-      .filter(t=>t.avaliacoes >= 2).length;
+    const reincidentes = Object.values(x.trechos).filter(t=>t.avaliacoes >= 2).length;
 
     return {
       ...x,
@@ -1369,11 +883,9 @@ function abrirBairro(bairroEncoded){
     <div class="rank" onclick="abrirLogradouro('${encodeURIComponent(bairro)}','${encodeURIComponent(l.logradouro)}')">
       <div>
         <b>${l.logradouro}</b>
-        <div class="hint">
-          ${l.avaliacoes} avaliações · ${l.reincidentes} trechos reincidentes · ${l.nok} NOK
-        </div>
+        <div class="hint">${l.avaliacoes} avaliações · ${l.reincidentes} trechos reincidentes · ${l.nok} NOK</div>
         <div class="bar">
-          <i style="width:${Math.min(100,l.criticidade)}%;background:${corCriticidade(l.criticidade)}"></i>
+          <i style="width:${Math.min(100,Math.max(8,l.criticidade))}%;background:${corCriticidade(l.criticidade)}"></i>
         </div>
       </div>
       <small>${fmt(l.taxa)}% OK</small>
@@ -1385,34 +897,12 @@ function abrirLogradouro(bairroEncoded,logradouroEncoded){
   const bairro = decodeURIComponent(bairroEncoded);
   const logradouro = decodeURIComponent(logradouroEncoded);
 
-  const rows = FILTERED.filter(r=>
+  const rows = FILTERED.filter(r =>
     normaliza(r.bairro) === normaliza(bairro) &&
     normaliza(r.logradouro) === normaliza(logradouro)
   );
 
-  const trechos = {};
-
-  rows.forEach(r=>{
-    const k = r.trecho || 'trecho não informado';
-
-    if(!trechos[k]){
-      trechos[k] = {
-        trecho:k,
-        avaliacoes:0,
-        ok:0,
-        nok:0,
-        itens:{}
-      };
-    }
-
-    trechos[k].avaliacoes++;
-    trechos[k].ok += r.ok;
-    trechos[k].nok += r.nok;
-
-    r.itensNok.forEach(item=>{
-      trechos[k].itens[item] = (trechos[k].itens[item] || 0) + 1;
-    });
-  });
+  const trechos = montarTrechos(rows);
 
   const dados = Object.values(trechos).map(x=>{
     const total = x.ok + x.nok;
@@ -1423,11 +913,9 @@ function abrirLogradouro(bairroEncoded,logradouroEncoded){
       taxa: total ? (x.ok / total) * 100 : 0,
       criticidade:(x.nok * 2) + (x.avaliacoes * 3)
     };
-  })
-  .sort((a,b)=>b.criticidade-a.criticidade);
+  }).sort((a,b)=>b.criticidade-a.criticidade);
 
-  $('drillTitle').textContent =
-    `Trechos · ${bairro} · ${logradouro}`;
+  $('drillTitle').textContent = `Trechos · ${bairro} · ${logradouro}`;
 
   $('drilldown').innerHTML = dados.map(t=>{
     const itensTop = Object.entries(t.itens)
@@ -1440,14 +928,10 @@ function abrirLogradouro(bairroEncoded,logradouroEncoded){
       <div class="rank">
         <div>
           <b>${t.trecho}</b>
-          <div class="hint">
-            ${t.avaliacoes} avaliações · ${t.nok} NOK · ${fmt(t.taxa)}% OK
-          </div>
-          <div>
-            ${itensTop || '<span class="pill">Sem NOK</span>'}
-          </div>
+          <div class="hint">${t.avaliacoes} avaliações · ${t.nok} NOK · ${fmt(t.taxa)}% OK</div>
+          <div>${itensTop || '<span class="pill">Sem NOK</span>'}</div>
           <div class="bar">
-            <i style="width:${Math.min(100,t.criticidade)}%;background:${corCriticidade(t.criticidade)}"></i>
+            <i style="width:${Math.min(100,Math.max(8,t.criticidade))}%;background:${corCriticidade(t.criticidade)}"></i>
           </div>
         </div>
         <small>${t.nok} NOK</small>
@@ -1461,7 +945,7 @@ function abrirTrecho(bairroEncoded,logradouroEncoded,trechoEncoded){
 }
 
 document.addEventListener('DOMContentLoaded',init);
-
 </script>
+
 </body>
 </html>
