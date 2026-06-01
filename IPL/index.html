@@ -61,9 +61,7 @@ select option{background:#0d1b2f;color:#fff}
 .bar i{display:block;height:100%}
 
 /* badge meta no ranking */
-.mbadge{font-size:10px;font-weight:900;margin-left:7px;vertical-align:middle}
-.mbadge.ok{color:var(--green)}
-.mbadge.off{color:var(--red)}
+.mbadge{font-size:10px;font-weight:700;margin-left:7px;vertical-align:middle;display:inline-block;padding:2px 7px;border-radius:999px;border:1px solid rgba(91,155,213,.35);color:#9fc8e8;background:rgba(91,155,213,.10)}
 
 #map{height:620px;background:#07111f}
 .bairro-popup .leaflet-popup-content-wrapper{background:#0d1b2f;border:1px solid #5b9bd5;border-radius:10px;color:#f7f9ff;font-size:13px;font-weight:700;padding:4px 2px;box-shadow:0 4px 18px rgba(0,0,0,.5)}
@@ -352,10 +350,23 @@ function baseBairro(){
   const m=$('fMes').value,s=$('fSup').value,g=$('fGer').value;
   return DATA.filter(r=>(!m||r.mes===m)&&(!s||r.sup===s)&&(!g||r.ger===g));
 }
+const ORDEM_MESES=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+function ordemMes(v){
+  const s=String(v||'').toLowerCase().trim();
+  const idx=ORDEM_MESES.findIndex(m=>s.startsWith(m));
+  return idx>=0?idx:99;
+}
 function preencherSelect(id,campo,label,base,preservar=true){
   const atual=preservar?$(id).value:'';
-  const vals=[...new Set(base.map(r=>r[campo]).filter(Boolean))]
-    .sort((a,b)=>String(a).localeCompare(String(b),'pt-BR'));
+  const vals=[...new Set(base.map(r=>r[campo]).filter(Boolean))];
+  if(campo==='mes'){
+    vals.sort((a,b)=>{
+      const oa=ordemMes(a),ob=ordemMes(b);
+      return oa!==ob?oa-ob:String(a).localeCompare(String(b),'pt-BR');
+    });
+  } else {
+    vals.sort((a,b)=>String(a).localeCompare(String(b),'pt-BR'));
+  }
   $(id).innerHTML=`<option value="">${label}</option>`;
   vals.forEach(v=>{ const o=document.createElement('option'); o.value=v; o.textContent=v; $(id).appendChild(o); });
   if(preservar&&vals.includes(atual)) $(id).value=atual;
@@ -476,7 +487,7 @@ function renderKpis(){
 
   const cards=[
     ['Conformidade territorial',fmt(taxa)+'%','OK médio no filtro',taxa>=META?'green':'orange'],
-    ['Bairros críticos',bairrosCriticos.toLocaleString('pt-BR'),'abaixo da meta 77',bairrosCriticos?'red':'green'],
+    ['Bairros abaixo de 77%',bairrosCriticos.toLocaleString('pt-BR'),'referência anterior',bairrosCriticos?'red':'green'],
     ['Trechos reincidentes',reincidentes.toLocaleString('pt-BR'),'repetição territorial',reincidentes?'orange':'green'],
     ['Área mais crítica',pior?.k||'-',pior?fmt(pior.taxa)+'% OK':'-','orange'],
     ['Item dominante',piorItem?.item||'-',piorItem?`${piorItem.n.toLocaleString('pt-BR')} ocorrências`:'-','red']
@@ -514,12 +525,14 @@ function renderInsight(){
 }
 
 /* ── RANK COM BADGE DE META ── */
+function gerenciaDoBairro(bairro){
+  const r=FILTERED.find(x=>normaliza(x.bairro)===normaliza(bairro));
+  return r?.ger||'';
+}
 function rankHTML(arr){
   return arr.map(x=>{
-    const diff=x.taxa-META;
-    const badge=diff>=0
-      ?`<span class="mbadge ok">✓ meta</span>`
-      :`<span class="mbadge off">▼ ${fmt(Math.abs(diff),1)}pp</span>`;
+    const ger=gerenciaDoBairro(x.k);
+    const badge=ger?`<span class="mbadge ger">${ger}</span>`:'';
     return`
       <div class="rank" onclick="abrirBairro('${encodeURIComponent(x.k)}')">
         <div>
@@ -708,6 +721,15 @@ function renderMap(){
     heatLayer=L.heatLayer(pontos,{radius:36,blur:26,maxZoom:13,gradient:{0.20:'#2f85d7',0.45:'#e87535',0.75:'#e84855',1.00:'#ffffff'}}).addTo(map);
   }
   try{ map.fitBounds(geoLayer.getBounds(),{padding:[20,20]}); }catch(e){}
+
+  // diagnóstico: lista bairros da planilha sem polígono no GeoJSON
+  const nomesgeo=new Set(GEO.features.map(f=>normaliza(nomeBairroGeo(f.properties))).filter(Boolean));
+  const semPoly=[...new Set(FILTERED.map(r=>r.bairro).filter(Boolean))]
+    .filter(b=>!nomesgeo.has(normaliza(b)));
+  if(semPoly.length) console.warn('Bairros sem polígono GeoJSON:',semPoly);
+  const semCentroide=Object.keys(byBairro)
+    .filter(k=>{ const c=construirCentroiDesGeo(GEO)[normaliza(k)]||COORDS[normaliza(k)]; return!c; });
+  if(semCentroide.length) console.warn('Bairros sem coordenada (não plotados):',semCentroide);
 }
 
 /* ── ZOOM E HIGHLIGHT NO MAPA ── */
