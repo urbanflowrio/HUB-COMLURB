@@ -66,6 +66,8 @@ select option{background:#0d1b2f;color:#fff}
 .mbadge.off{color:var(--red)}
 
 #map{height:620px;background:#07111f}
+.bairro-popup .leaflet-popup-content-wrapper{background:#0d1b2f;border:1px solid #5b9bd5;border-radius:10px;color:#f7f9ff;font-size:13px;font-weight:700;padding:4px 2px;box-shadow:0 4px 18px rgba(0,0,0,.5)}
+.bairro-popup .leaflet-popup-tip{background:#0d1b2f}
 
 /* execHero executivo */
 .execHero{padding:16px;border:1px solid rgba(255,255,255,.10);border-radius:18px;background:#0b1a2e;margin-bottom:12px}
@@ -198,7 +200,7 @@ const URL_BAIRROS_GEOJSON = '../territorial/data/DLU_Novos_Bairros_estrutura2025
 const URL_COORD_BAIRROS   = '../territorial/data/coordenadas_bairros_rio.csv';
 
 let DATA = [], FILTERED = [], GEO = null, COORDS = {};
-let map, geoLayer, heatLayer, pointLayer;
+let map, geoLayer, heatLayer, pointLayer, highlightLayer;
 
 const $ = id => document.getElementById(id);
 
@@ -255,6 +257,38 @@ function prepararCoords(rows){
     const lat=num(campo(r,['lat','Lat','LAT','latitude','Latitude','LATITUDE']));
     const lon=num(campo(r,['lon','Lon','LON','lng','Lng','LNG','longitude','Longitude','LONGITUDE']));
     if(b&&lat&&lon) out[normaliza(b)]={lat,lon};
+  });
+  return out;
+}
+
+/* calcula centroide simples de um feature GeoJSON (média dos vértices do primeiro anel) */
+function centroideFeature(feature){
+  try{
+    const geom=feature.geometry;
+    let coords=[];
+    if(geom.type==='Polygon') coords=geom.coordinates[0];
+    else if(geom.type==='MultiPolygon'){
+      // pega o anel do maior polígono
+      let maior=0,idx=0;
+      geom.coordinates.forEach((p,i)=>{ if(p[0].length>maior){maior=p[0].length;idx=i;} });
+      coords=geom.coordinates[idx][0];
+    }
+    if(!coords.length) return null;
+    let sumLat=0,sumLon=0;
+    coords.forEach(c=>{ sumLon+=c[0]; sumLat+=c[1]; });
+    return{lat:sumLat/coords.length, lon:sumLon/coords.length};
+  }catch(e){ return null; }
+}
+
+/* monta mapa de centroides a partir do GeoJSON carregado */
+function construirCentroiDesGeo(geo){
+  const out={};
+  if(!geo||!geo.features) return out;
+  geo.features.forEach(f=>{
+    const nome=nomeBairroGeo(f.properties);
+    if(!nome) return;
+    const c=centroideFeature(f);
+    if(c) out[normaliza(nome)]=c;
   });
   return out;
 }
@@ -353,7 +387,8 @@ function onGerChange(){
 function onBairroChange(){
   resetDrill(); render();
   const b=$('fBairro').value;
-  if(b) abrirBairro(encodeURIComponent(b));
+  if(b){ abrirBairro(encodeURIComponent(b)); }
+  else if(geoLayer){ try{ map.fitBounds(geoLayer.getBounds(),{padding:[20,20]}); }catch(e){} if(highlightLayer){map.removeLayer(highlightLayer);highlightLayer=null;} }
 }
 function clearAll(){
   $('fMes').value='';$('fSup').value='';$('fGer').value='';$('fBairro').value='';
@@ -393,7 +428,7 @@ function group(field){
   });
 }
 
-/* ── CHAVE UNIFICADA — mesma em contaReincidencia e totalReincidentes ── */
+/* ── CHAVE UNIFICADA ── */
 function chaveReincidencia(r){
   return [normaliza(r.bairro),normaliza(r.logradouro),normaliza(r.trecho)].join('|');
 }
@@ -474,7 +509,7 @@ function renderInsight(){
   const item=itemMaisCritico();
 
   $('insight').innerHTML=FILTERED.length
-    ?`Leitura executiva: o recorte <b>${labelContexto()}</b> apresenta <b>${fmt(taxa)}% de conformidade</b>. A criticidade se concentra em <b>${piorBairro?.k||'-'}</b>, com <b>${reincidentes.toLocaleString('pt-BR')}</b> trechos reincidentes. A superintendência com menor desempenho é <b>${piorSup?.k||'-'}</b> e o item mais recorrente de não conformidade é <b>${item?.item||'-'}</b>.`
+    ?`Leitura executiva: o recorte <b>${labelContexto()}</b> apresenta <b>${fmt(taxa)}% de conformidade</b>. Maior concentração de registros em <b>${piorBairro?.k||'-'}</b> (${reincidentes.toLocaleString('pt-BR')} trechos com ocorrências repetidas). Superintendência <b>${piorSup?.k||'-'}</b> registra o menor índice no período. Item mais frequente: <b>${item?.item||'-'}</b>.`
     :'Sem dados no filtro atual.';
 }
 
@@ -509,7 +544,7 @@ function renderSinteses(){
   renderSinteseItens();
 }
 
-/* ── SÍNTESE REINCIDÊNCIA COM NARRATIVA CONDICIONAL ── */
+/* ── SÍNTESE REINCIDÊNCIA ── */
 function renderSinteseReincidencia(){
   const trechos=montarTrechos(FILTERED);
 
@@ -526,7 +561,6 @@ function renderSinteseReincidencia(){
 
   const pior=ranking[0];
 
-  // logradouros distintos com reincidência no mesmo bairro do pior
   const logsReinc=[...new Set(
     Object.values(trechos)
       .filter(t=>t.avaliacoes>=2&&normaliza(t.bairro)===normaliza(pior.bairro))
@@ -535,11 +569,11 @@ function renderSinteseReincidencia(){
 
   let narrativa;
   if(logsReinc>=4){
-    narrativa=`Reincidência distribuída em <b>${logsReinc} logradouros</b> em ${pior.bairro} — indica falha sistêmica ou subfiscalização estrutural, não incidente pontual. Recomenda-se revisão de rota e cobertura de supervisão.`;
+    narrativa=`Registros em <b>${logsReinc} logradouros</b> em ${pior.bairro} no período analisado.`;
   } else if(logsReinc>=2){
-    narrativa=`Reincidência em <b>${logsReinc} logradouros</b> em ${pior.bairro} — possível falha de cobertura em rota específica. Verificar escala e frequência de passagem da equipe.`;
+    narrativa=`Registros em <b>${logsReinc} logradouros</b> em ${pior.bairro} no período analisado.`;
   } else {
-    narrativa=`Reincidência isolada em <b>${pior.logradouro}</b> — ponto crítico recorrente. Indicado registro de causa raiz e intervenção dirigida.`;
+    narrativa=`Trecho <b>${pior.logradouro}</b> com ${pior.avaliacoes} avaliações registradas no período.`;
   }
 
   $('sinteseReincidencia').innerHTML=`
@@ -560,7 +594,7 @@ function renderSinteseReincidencia(){
   `;
 }
 
-/* ── SÍNTESE ITENS COM NARRATIVA CONDICIONAL ── */
+/* ── SÍNTESE ITENS ── */
 function renderSinteseItens(){
   const itens={};
   FILTERED.forEach(r=>{ r.itensNok.forEach(item=>{ itens[item]=(itens[item]||0)+1; }); });
@@ -580,11 +614,11 @@ function renderSinteseItens(){
 
   let narrativa;
   if(dom.pct>=40){
-    narrativa=`<b>${dom.item}</b> responde por ${fmt(dom.pct)}% de todos os NOK — concentração atípica. Aponta para falha de treinamento ou insumo específico, não falha difusa de execução.`;
+    narrativa=`<b>${dom.item}</b> corresponde a ${fmt(dom.pct)}% dos registros de não conformidade no período.`;
   } else if(top3pct>=65){
-    narrativa=`Os 3 primeiros itens somam ${fmt(top3pct)}% dos NOK — perfil concentrado, compatível com gap de protocolo. Revisão de POP pode resolver a maior parte da perda de conformidade.`;
+    narrativa=`Os 3 primeiros itens somam ${fmt(top3pct)}% dos registros de não conformidade no período.`;
   } else {
-    narrativa=`Distribuição difusa de não conformidades — sem item dominante. Indica falha generalizada de execução, que pode sinalizar sobrecarga operacional ou baixa cobertura de supervisão de campo.`;
+    narrativa=`Ocorrências distribuídas entre múltiplos itens, sem item predominante no período.`;
   }
 
   $('sinteseItens').innerHTML=`
@@ -605,7 +639,7 @@ function renderSinteseItens(){
   `;
 }
 
-/* ── MONTA TRECHOS (utilitário compartilhado) ── */
+/* ── MONTA TRECHOS ── */
 function montarTrechos(rows){
   const t={};
   rows.forEach(r=>{
@@ -637,6 +671,7 @@ function renderMap(){
   const byBairro={};
   group('bairro').forEach(x=>{ byBairro[normaliza(x.k)]=x; });
 
+  const geoFeatures={};
   geoLayer=L.geoJSON(GEO,{
     style:f=>{
       const nome=nomeBairroGeo(f.properties);
@@ -646,14 +681,18 @@ function renderMap(){
     onEachFeature:(f,l)=>{
       const nome=nomeBairroGeo(f.properties);
       const d=byBairro[normaliza(nome)];
+      geoFeatures[normaliza(nome)]=l;
       l.on('click',()=>abrirBairro(encodeURIComponent(nome)));
       l.bindPopup(`<b>${nome}</b><br>${d?`Conformidade: ${fmt(d.taxa)}%<br>Avaliações: ${d.n}<br>Reincidentes: ${d.reincidentes}<br>NOK: ${d.nok}`:'Sem avaliação no filtro'}`);
     }
   }).addTo(map);
+  map._geoFeatures=geoFeatures;
 
+  const centroiGeo=construirCentroiDesGeo(GEO);
   const pontos=[];
   Object.values(byBairro).forEach(d=>{
-    const c=COORDS[normaliza(d.k)];
+    // prioriza centroide calculado do polígono; fallback para CSV
+    const c=centroiGeo[normaliza(d.k)]||COORDS[normaliza(d.k)];
     if(!c) return;
     pontos.push([c.lat,c.lon,Math.max(0.18,Math.min(1,d.criticidade/100))]);
     L.circleMarker([c.lat,c.lon],{
@@ -671,9 +710,38 @@ function renderMap(){
   try{ map.fitBounds(geoLayer.getBounds(),{padding:[20,20]}); }catch(e){}
 }
 
+/* ── ZOOM E HIGHLIGHT NO MAPA ── */
+function focarBairroNoMapa(bairro){
+  if(!map) return;
+  // remove highlight anterior
+  if(highlightLayer){ map.removeLayer(highlightLayer); highlightLayer=null; }
+  const features=map._geoFeatures||{};
+  const key=normaliza(bairro);
+  const layer=features[key];
+  if(layer){
+    // zoom no bairro
+    try{ map.fitBounds(layer.getBounds(),{padding:[40,40],maxZoom:14}); }catch(e){}
+    // cria layer de destaque por cima
+    highlightLayer=L.geoJSON(layer.feature,{
+      style:{color:'#f7f9ff',weight:2.5,fillColor:'transparent',fillOpacity:0,dashArray:'6 3'}
+    }).addTo(map);
+    // popup com nome do bairro
+    const center=layer.getBounds().getCenter();
+    L.popup({className:'bairro-popup',closeButton:false,autoClose:true,offset:[0,-4]})
+      .setLatLng(center)
+      .setContent(`<b>${bairro}</b>`)
+      .openOn(map);
+  } else {
+    // fallback: centroide do CSV
+    const c=COORDS[key];
+    if(c) map.setView([c.lat,c.lon],14);
+  }
+}
+
 /* ── DRILL: BAIRRO ── */
 function abrirBairro(bairroEncoded){
   const bairro=decodeURIComponent(bairroEncoded);
+  focarBairroNoMapa(bairro);
   const rows=FILTERED.filter(r=>normaliza(r.bairro)===normaliza(bairro));
   const logs={};
 
@@ -710,7 +778,7 @@ function abrirBairro(bairroEncoded){
   `).join('')||'<div class="status">Sem dados para este bairro no filtro atual.</div>';
 }
 
-/* ── DRILL: LOGRADOURO — aceita trecho opcional para highlight ── */
+/* ── DRILL: LOGRADOURO ── */
 function abrirLogradouro(bairroEncoded,logradouroEncoded,trechoHighlight=''){
   const bairro=decodeURIComponent(bairroEncoded);
   const logradouro=decodeURIComponent(logradouroEncoded);
@@ -748,7 +816,6 @@ function abrirLogradouro(bairroEncoded,logradouroEncoded,trechoHighlight=''){
     `;
   }).join('')||'<div class="status">Sem trechos para este logradouro.</div>';
 
-  // scroll automático até o trecho destacado
   if(alvo){
     setTimeout(()=>{
       const el=$('drilldown').querySelector('.rank.destaque');
@@ -757,7 +824,7 @@ function abrirLogradouro(bairroEncoded,logradouroEncoded,trechoHighlight=''){
   }
 }
 
-/* ── abrirTrecho AGORA USA o parâmetro trecho ── */
+/* ── abrirTrecho ── */
 function abrirTrecho(bairroEncoded,logradouroEncoded,trechoEncoded){
   abrirLogradouro(bairroEncoded,logradouroEncoded,trechoEncoded);
 }
