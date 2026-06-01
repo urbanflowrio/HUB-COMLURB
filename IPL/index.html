@@ -699,7 +699,7 @@ function renderInsight(){
   const nok=FILTERED.reduce((s,r)=>s+r.nok,0);
   const total=ok+nok;
   const taxa=total?ok/total*100:0;
-  const piorBairro=group('bairro').filter(x=>x.n>=5).sort((a,b)=>b.criticidade-a.criticidade)[0];
+  const piorBairro=group('bairro').filter(x=>x.n>=1).sort((a,b)=>b.criticidade-a.criticidade)[0];
   const piorSup=group('sup').sort((a,b)=>a.taxa-b.taxa)[0];
   const reincidentes=totalReincidentes(FILTERED);
   const item=itemMaisCritico();
@@ -733,7 +733,7 @@ function rankHTML(arr){
 
 function renderRanks(){
   $('rankBairros').innerHTML=rankHTML(
-    group('bairro').filter(x=>x.n>=5).sort((a,b)=>b.criticidade-a.criticidade).slice(0,14)
+    group('bairro').filter(x=>x.n>=1).sort((a,b)=>b.criticidade-a.criticidade).slice(0,14)
   );
 }
 
@@ -889,7 +889,8 @@ function renderMap(){
           abrirBairro(encodeURIComponent(nome));
         }
       });
-      l.bindPopup(`<b>${nome}</b><br>${d?`Conformidade: ${fmt(d.taxa)}%<br>Avaliações: ${d.n}<br>Reincidentes: ${d.reincidentes}<br>NOK: ${d.nok}`:'Sem avaliação no filtro'}`);
+      const gerPop=d?DATA.find(r=>normaliza(r.bairro)===normaliza(nome))?.ger||'':'';
+      l.bindPopup(`<b>${nome}</b>${gerPop?` <small style="color:#9fc8e8">${gerPop}</small>`:''}<br>${d?`Conformidade: ${fmt(d.taxa)}%<br>Avaliações: ${d.n}<br>Reincidentes: ${d.reincidentes}<br>NOK: ${d.nok}`:'Sem avaliação no filtro'}`);
     }
   }).addTo(map);
   map._geoFeatures=geoFeatures;
@@ -919,17 +920,12 @@ function renderMap(){
   if(pontos.length){
     heatLayer=L.heatLayer(pontos,{radius:36,blur:26,maxZoom:13,gradient:{0.20:'#2f85d7',0.45:'#e87535',0.75:'#e84855',1.00:'#ffffff'}}).addTo(map);
   }
-  // se há gerência selecionada, reaplica destaque sem alterar zoom manual
+  // se há gerência selecionada, focarGerenciaNoMapa cuida do zoom e cores
   const _g=$('fGer').value;
-  if(_g) setTimeout(()=>focarGerenciaNoMapa(_g),80);
-  else{
-    if(geoLayer) geoLayer.eachLayer(l=>{
-      const nm=normaliza(nomeBairroGeo(l.feature?.properties||{}));
-      const byB={}; group('bairro').forEach(x=>{byB[normaliza(x.k)]=x;});
-      const d=byB[nm];
-      l.setStyle({color:d?'#2f85d7':'#274260',weight:d?.9:.5,fillColor:d?corCriticidade(d.criticidade):'#1c2a3d',fillOpacity:d?.30:.08});
-    });
+  if(!_g){
     try{ map.fitBounds(geoLayer.getBounds(),{padding:[20,20]}); }catch(e){}
+  } else {
+    setTimeout(()=>focarGerenciaNoMapa(_g),80);
   }
 
   // diagnóstico: lista bairros da planilha sem polígono no GeoJSON
@@ -946,29 +942,32 @@ function renderMap(){
 function focarGerenciaNoMapa(ger){
   if(!map||!GEO) return;
   if(highlightLayer){ map.removeLayer(highlightLayer); highlightLayer=null; }
-  // bairros da gerência no filtro atual
-  const bairrosGer=new Set(FILTERED.map(r=>normaliza(r.bairro)));
+  // pega bairros da gerência a partir de DATA (não FILTERED, para não depender de filtro de bairro)
+  const gerNorm=normaliza(ger);
+  const bairrosGer=new Set(DATA.filter(r=>normaliza(r.ger)===gerNorm).map(r=>normaliza(r.bairro)));
+  if(!bairrosGer.size) return;
   const features=map._geoFeatures||{};
   const layers=Object.entries(features)
     .filter(([k])=>bairrosGer.has(k))
     .map(([,l])=>l);
-  if(!layers.length) return;
-  // highlight: realça polígonos da gerência, apaga os outros
+  // highlight: bairros da gerência em azul, demais esmaecidos
   if(geoLayer){
     geoLayer.eachLayer(l=>{
       const nm=normaliza(nomeBairroGeo(l.feature?.properties||{}));
       if(bairrosGer.has(nm)){
-        l.setStyle({color:'#5b9bd5',weight:2,fillOpacity:0.35});
+        l.setStyle({color:'#5b9bd5',weight:2,fillColor:'#5b9bd5',fillOpacity:0.18});
       } else {
-        l.setStyle({color:'#274260',weight:0.4,fillColor:'#1c2a3d',fillOpacity:0.06});
+        l.setStyle({color:'#1e3050',weight:0.4,fillColor:'#0d1b2f',fillOpacity:0.55});
       }
     });
   }
-  // zoom nos bounds da gerência
-  try{
-    const bounds=L.latLngBounds(layers.map(l=>l.getBounds()));
-    map.fitBounds(bounds,{padding:[30,30],maxZoom:13});
-  }catch(e){}
+  // zoom nos bounds dos bairros da gerência
+  if(layers.length){
+    try{
+      const bounds=L.latLngBounds(layers.map(l=>l.getBounds()));
+      map.fitBounds(bounds,{padding:[30,30],maxZoom:13});
+    }catch(e){}
+  }
 }
 
 
@@ -1027,7 +1026,8 @@ function abrirBairro(bairroEncoded){
     return{...x,total,reincidentes:reinc,taxa:total?(x.ok/total)*100:0,criticidade:(x.nok*2)+(reinc*5)+x.avaliacoes};
   }).sort((a,b)=>b.criticidade-a.criticidade).slice(0,20);
 
-  $('drillTitle').textContent=`Explosão territorial · ${bairro}`;
+  const gerBairro=FILTERED.find(r=>normaliza(r.bairro)===normaliza(bairro))?.ger||'';
+  $('drillTitle').textContent=`${bairro}${gerBairro?' · '+gerBairro:''}`;
   $('drilldown').innerHTML=dados.map(l=>`
     <div class="rank" onclick="abrirLogradouro('${encodeURIComponent(bairro)}','${encodeURIComponent(l.logradouro)}')">
       <div>
