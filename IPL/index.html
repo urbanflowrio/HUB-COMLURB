@@ -409,24 +409,125 @@ function campo(row,nomes){
   return '';
 }
 
+/* ── PESOS IPL (sem Lixo Branco — placeholder pendente metodologia) ──
+   Fonte: planilha PESO POR ITEM IPL
+   Lixo Branco (30%) excluído — depende de extensão/classe do logradouro
+   Os demais itens são normalizados sobre 70% → taxa expressa em 0-100%       */
+const PESOS_IPL = {
+  // col exata no CSV (normalizada) : peso
+  'COLETA DOMICILIAR'           : 0.20,
+  'RALO'                        : 0.06,
+  // Bens inservíveis + Entulho + Material de Obra + Pneus = 6% dividido em 4
+  'ENTULHO'                     : 0.015,
+  'BENS INSERVÍVEIS'            : 0.015,
+  'BENS INSERVIVEIS'            : 0.015,
+  'MATERIAL DE OBRA'            : 0.015,
+  'PNEUS'                       : 0.015,
+  // Papeleira/Contêiner — condicional (só entra se logradouro tem)
+  'PAPELEIRA/CONTEINER – SUJA'  : 0.02,
+  'PAPELEIRA/CONTEINER - SUJA'  : 0.02,
+  'PAPELEIRA/CONTEINER – CHEIA' : 0.02,
+  'PAPELEIRA/CONTEINER - CHEIA' : 0.02,
+  'PAPELEIRA/CONTEINER – QUEBRADA': 0.02,
+  'PAPELEIRA/CONTEINER - QUEBRADA': 0.02,
+  // Lixo crítico
+  'LIXO CRITICO - FEZES'        : 0.03,
+  'LIXO CRÍTICO - FEZES'        : 0.03,
+  'LIXO CRITICO'                : 0.03,
+  'LIXO CRÍTICO'                : 0.03,
+  // Resíduos 2%
+  'GALHADA'                     : 0.02,
+  'PROPAGANDA'                  : 0.02,
+  'CAPINA'                      : 0.02,
+  'ROCADA AREA VERDE AVALIACAO' : 0.02,
+  'ROCADA AREA VERDE'           : 0.02,
+  'ÁREAS VERDES AVALIAÇÃO'      : 0.02,
+  'AREAS VERDES AVALIACAO'      : 0.02,
+  // Resíduos 1%
+  'ANIMAL MORTO'                : 0.01,
+  'RESIDUO MORADOR DE RUA'      : 0.01,
+  'RESÍDUO MORADOR DE RUA'      : 0.01,
+  'RESIDUOS LIMPEZA'            : 0.01,
+  'RESÍDUO PÓS SERVICO'         : 0.01,
+  'RESIDUO POS SERVICO'         : 0.01,
+  'LAMA/AREIA'                  : 0.01,
+  'DESCARTE IRREGULAR (PONTO CRITICO)': 0.01,
+  'PONTO CRITICO'               : 0.01,
+  'PONTO CRÍTICO'               : 0.01,
+  'CAIXA METALICA AVALIACAO'    : 0.01,
+  'CAIXA METÁLICA AVALIAÇÃO'    : 0.01,
+};
+
+/* Colunas que indicam SE o item condicional existe (Sim/Não) */
+const COND_GATILHO = {
+  'PAPELEIRA/CONTEINER': ['PAPELEIRA/CONTEINER – SUJA','PAPELEIRA/CONTEINER - SUJA',
+                          'PAPELEIRA/CONTEINER – CHEIA','PAPELEIRA/CONTEINER - CHEIA',
+                          'PAPELEIRA/CONTEINER – QUEBRADA','PAPELEIRA/CONTEINER - QUEBRADA'],
+  'PAPELEIRA/CONTÊINER': ['PAPELEIRA/CONTEINER – SUJA','PAPELEIRA/CONTEINER - SUJA',
+                           'PAPELEIRA/CONTEINER – CHEIA','PAPELEIRA/CONTEINER - CHEIA',
+                           'PAPELEIRA/CONTEINER – QUEBRADA','PAPELEIRA/CONTEINER - QUEBRADA'],
+  'AREAS VERDES'       : ['ROCADA AREA VERDE AVALIACAO','ROCADA AREA VERDE','ÁREAS VERDES AVALIAÇÃO','AREAS VERDES AVALIACAO'],
+  'ÁREAS VERDES'       : ['ROCADA AREA VERDE AVALIACAO','ROCADA AREA VERDE','ÁREAS VERDES AVALIAÇÃO','AREAS VERDES AVALIACAO'],
+  'CAIXA METALICA'     : ['CAIXA METALICA AVALIACAO','CAIXA METÁLICA AVALIAÇÃO'],
+  'CAIXA METÁLICA'     : ['CAIXA METALICA AVALIACAO','CAIXA METÁLICA AVALIAÇÃO'],
+};
+
 function calculaTrecho(row){
-  const ignorar=[
-    'CONTESTAR','FOTOS','MES','MÊS','MAT. AVALIADOR','SUPERINTENDENCIA','SUPERINTENDÊNCIA',
-    'DIRETORIA','GERENCIA','GERÊNCIA','CODIGO LOGRADOURO','CÓDIGO LOGRADOURO',
-    'TIPOLOGRADOURO','TIPO LOGRADOURO','NOME','BAIRRO','TRECHO','DATA',
-    'HORA INICIO','HORA INÍCIO','HORA FIM'
-  ];
-  let ok=0,nok=0;
-  const itensNok=[];
-  Object.keys(row).forEach(col=>{
-    const cn=normaliza(col);
-    if(ignorar.includes(cn)) return;
-    const v=normaliza(row[col]);
-    if(v==='OK') ok++;
-    if(v==='NOK'){ nok++; itensNok.push(col); }
+  // — monta mapa normalizado da linha —
+  const rowNorm = {};
+  Object.keys(row).forEach(col=>{ rowNorm[normaliza(col)] = normaliza(row[col]); });
+
+  // — identifica quais itens condicionais estão ATIVOS —
+  const inativas = new Set();
+  Object.entries(COND_GATILHO).forEach(([gatilho, filhos])=>{
+    const val = rowNorm[gatilho];
+    if(val === 'NAO' || val === 'N/A' || val === '') {
+      filhos.forEach(f => inativas.add(normaliza(f)));
+    }
   });
-  const total=ok+nok;
-  return{ok,nok,total,taxa:total?(ok/total)*100:null,itensNok};
+
+  // — Coleta domiciliar: numérica, 0 = OK —
+  const coletaRaw = row['Coleta domiciliar'] ?? row['COLETA DOMICILIAR'];
+  const coletaNum = parseFloat(String(coletaRaw ?? '').replace(',','.'));
+  const coletaOk  = !isNaN(coletaNum) ? (coletaNum === 0 ? 1 : 0) : null;
+
+  let somaPeso = 0, somaOk = 0;
+  let ok = 0, nok = 0;
+  const itensNok = [];
+
+  // — Coleta domiciliar —
+  if(coletaOk !== null){
+    somaPeso += 0.20;
+    somaOk   += coletaOk * 0.20;
+    if(coletaOk === 0) itensNok.push('Coleta domiciliar');
+    if(coletaOk === 1) ok++; else nok++;
+  }
+
+  // — Demais itens ponderados —
+  Object.entries(PESOS_IPL).forEach(([colNorm, peso])=>{
+    if(colNorm === 'COLETA DOMICILIAR') return; // já tratado
+    if(inativas.has(colNorm)) return;           // condicional inativo
+    const val = rowNorm[colNorm];
+    if(val === undefined || val === '' || val === 'N/A') return;
+    if(val === 'OK'){
+      somaPeso += peso; somaOk += peso; ok++;
+    } else if(val === 'NOK'){
+      somaPeso += peso;
+      nok++;
+      // nome original do col para exibir no drilldown
+      const colOrig = Object.keys(row).find(c=>normaliza(c)===colNorm) || colNorm;
+      itensNok.push(colOrig);
+    }
+  });
+
+  const total = ok + nok;
+  // taxa ponderada (0-100); fallback simples se somaPeso=0
+  const taxa = somaPeso > 0 ? (somaOk / somaPeso) * 100 : (total > 0 ? (ok/total)*100 : null);
+
+  return { ok, nok, total, taxa, itensNok,
+           somaPeso, somaOk,
+           // flag: Lixo Branco presente mas sem peso (placeholder)
+           lbPresente: Object.keys(row).some(c=>normaliza(c).includes('LIXO BRANCO')) };
 }
 
 function prepararCoords(rows){
@@ -502,7 +603,8 @@ async function init(){
         trecho:campo(r,['Trecho','TRECHO']),
         lat:coord?.lat||null,
         lon:coord?.lon||null,
-        ok:calc.ok,nok:calc.nok,total:calc.total,taxa:calc.taxa,itensNok:calc.itensNok
+        ok:calc.ok,nok:calc.nok,total:calc.total,taxa:calc.taxa,itensNok:calc.itensNok,
+        somaPeso:calc.somaPeso,somaOk:calc.somaOk,lbPresente:calc.lbPresente
       };
     }).filter(r=>r.total>0&&r.bairro);
 
@@ -620,7 +722,10 @@ function group(field){
     const nok=rows.reduce((s,r)=>s+r.nok,0);
     const total=ok+nok;
     const reincidentes=contaReincidencia(rows);
-    return{k,rows,n:rows.length,ok,nok,total,reincidentes,taxa:total?(ok/total)*100:0,criticidade:calculaCriticidade(rows)};
+    // taxa ponderada: média das taxas ponderadas individuais
+    const taxas=rows.map(r=>r.taxa).filter(t=>t!==null&&t!==undefined);
+    const taxa=taxas.length?taxas.reduce((s,t)=>s+t,0)/taxas.length:0;
+    return{k,rows,n:rows.length,ok,nok,total,reincidentes,taxa,criticidade:calculaCriticidade(rows)};
   });
 }
 
@@ -661,7 +766,9 @@ function renderKpis(){
   const ok=FILTERED.reduce((s,r)=>s+r.ok,0);
   const nok=FILTERED.reduce((s,r)=>s+r.nok,0);
   const total=ok+nok;
-  const taxa=total?(ok/total)*100:0;
+  // taxa ponderada global: média das taxas individuais ponderadas
+  const taxas_ind=FILTERED.map(r=>r.taxa).filter(t=>t!==null&&t!==undefined);
+  const taxa=taxas_ind.length?taxas_ind.reduce((s,t)=>s+t,0)/taxas_ind.length:0;
 
   const bairros=group('bairro');
   const bairrosCriticos=bairros.filter(x=>x.n>=5&&x.taxa<META).length;
@@ -671,7 +778,7 @@ function renderKpis(){
   const ctx=labelContexto();
 
   const cards=[
-    ['Conformidade territorial',fmt(taxa)+'%','itens OK / total avaliados',taxa>=META?'green':'orange'],
+    ['Conformidade territorial',fmt(taxa)+'%','ponderado · sem Lixo Branco (30%)',taxa>=META?'green':'orange'],
     ['Bairros abaixo de 77%',bairrosCriticos.toLocaleString('pt-BR'),'referência anterior',bairrosCriticos?'red':'green'],
     ['Trechos reincidentes',reincidentes.toLocaleString('pt-BR'),'repetição territorial',reincidentes?'orange':'green'],
     ['Área mais crítica',pior?.k||'-',pior?fmt(pior.taxa)+'% OK':'-','orange'],
@@ -698,14 +805,15 @@ function renderInsight(){
   const ok=FILTERED.reduce((s,r)=>s+r.ok,0);
   const nok=FILTERED.reduce((s,r)=>s+r.nok,0);
   const total=ok+nok;
-  const taxa=total?ok/total*100:0;
+  const taxas_ins=FILTERED.map(r=>r.taxa).filter(t=>t!==null&&t!==undefined);
+  const taxa=taxas_ins.length?taxas_ins.reduce((s,t)=>s+t,0)/taxas_ins.length:0;
   const piorBairro=group('bairro').filter(x=>x.n>=1).sort((a,b)=>b.criticidade-a.criticidade)[0];
   const piorSup=group('sup').sort((a,b)=>a.taxa-b.taxa)[0];
   const reincidentes=totalReincidentes(FILTERED);
   const item=itemMaisCritico();
 
   $('insight').innerHTML=FILTERED.length
-    ?`Leitura executiva: o recorte <b>${labelContexto()}</b> apresenta <b>${fmt(taxa)}% de conformidade</b>. Maior concentração de registros em <b>${piorBairro?.k||'-'}</b> (${reincidentes.toLocaleString('pt-BR')} trechos com ocorrências repetidas). Superintendência <b>${piorSup?.k||'-'}</b> registra o menor índice no período. Item mais frequente: <b>${item?.item||'-'}</b>.`
+    ?`Leitura executiva: o recorte <b>${labelContexto()}</b> apresenta <b>${fmt(taxa)}% de conformidade</b>. Maior concentração de registros em <b>${piorBairro?.k||'-'}</b> (${reincidentes.toLocaleString('pt-BR')} trechos com ocorrências repetidas). Superintendência <b>${piorSup?.k||'-'}</b> registra o menor índice no período. Item mais frequente: <b>${item?.item||'-'}</b>. <small style='color:#9fb0c7'>&nbsp;· Lixo Branco (30%) pendente.</small>`
     :'Sem dados no filtro atual.';
 }
 
