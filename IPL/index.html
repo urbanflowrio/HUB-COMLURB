@@ -671,7 +671,7 @@ function renderKpis(){
   const ctx=labelContexto();
 
   const cards=[
-    ['Conformidade territorial',fmt(taxa)+'%','OK médio no filtro',taxa>=META?'green':'orange'],
+    ['Conformidade territorial',fmt(taxa)+'%','itens OK / total avaliados',taxa>=META?'green':'orange'],
     ['Bairros abaixo de 77%',bairrosCriticos.toLocaleString('pt-BR'),'referência anterior',bairrosCriticos?'red':'green'],
     ['Trechos reincidentes',reincidentes.toLocaleString('pt-BR'),'repetição territorial',reincidentes?'orange':'green'],
     ['Área mais crítica',pior?.k||'-',pior?fmt(pior.taxa)+'% OK':'-','orange'],
@@ -718,11 +718,15 @@ function rankHTML(arr){
   return arr.map(x=>{
     const ger=gerenciaDoBairro(x.k);
     const badge=ger?`<span class="mbadge ger">${ger}</span>`:'';
+    // top 2 itens NOK do bairro
+    const itensB={};
+    x.rows.forEach(r=>r.itensNok.forEach(i=>{itensB[i]=(itensB[i]||0)+1;}));
+    const topItens=Object.entries(itensB).sort((a,b)=>b[1]-a[1]).slice(0,2).map(([i])=>i).join(' · ');
     return`
       <div class="rank" onclick="abrirBairro('${encodeURIComponent(x.k)}')">
         <div>
           <b>${x.k}</b>${badge}
-          <div class="hint">${x.n} avaliações · ${x.reincidentes} reincidentes · ${x.nok} NOK</div>
+          <div class="hint">${x.n} avaliações · ${x.reincidentes} reincidentes · ${x.nok} NOK${topItens?' · '+topItens:''}</div>
           <div class="bar"><i style="width:${Math.min(100,Math.max(8,x.criticidade))}%;background:${corCriticidade(x.criticidade)}"></i></div>
         </div>
         <small>${fmt(x.taxa)}% OK</small>
@@ -753,7 +757,29 @@ function renderSinteseReincidencia(){
     .slice(0,3);
 
   if(!ranking.length){
-    $('sinteseReincidencia').innerHTML='<div class="status">Sem reincidência relevante no filtro atual.</div>';
+    // fallback: mostrar top logradouros por NOK mesmo sem reincidência
+    const trechosSingle=Object.values(trechos)
+      .map(t=>{const tot=t.ok+t.nok;return{...t,taxa:tot?(t.ok/tot)*100:0};})
+      .sort((a,b)=>b.nok-a.nok).slice(0,3);
+    if(!trechosSingle.length){
+      $('sinteseReincidencia').innerHTML='<div class="status">Sem registros no filtro atual.</div>';
+      return;
+    }
+    $('sinteseReincidencia').innerHTML=`
+      <div class="execHero">
+        <span class="label">Logradouros com mais registros · ${labelContexto()}</span>
+        <strong>${trechosSingle[0].bairro}</strong>
+        <p>${trechosSingle[0].logradouro} · ${trechosSingle[0].avaliacoes} avaliação(ões) · ${trechosSingle[0].nok} NOK</p>
+      </div>
+      <div class="miniList">
+        ${trechosSingle.map((t,i)=>`
+          <div onclick="abrirTrecho('${encodeURIComponent(t.bairro)}','${encodeURIComponent(t.logradouro)}','${encodeURIComponent(t.trecho||'')}')">
+            <b>${i+1}. ${t.logradouro}</b>
+            <small>${t.bairro} · ${t.avaliacoes}x · ${t.nok} NOK · ${fmt(t.taxa)}% OK</small>
+          </div>
+        `).join('')}
+      </div>
+    `;
     return;
   }
 
@@ -882,8 +908,8 @@ function renderMap(){
       geoFeatures[normaliza(nome)]=l;
       l.on('click',()=>{
         if(nome){
-          $('fBairro').value=nome;
-          preencherSelect('fBairro','bairro','Todos',baseBairro());
+          // garante valor após repopulação do select
+          preencherSelect('fBairro','bairro','Todos',baseBairro(),false);
           $('fBairro').value=nome;
           resetDrill(); render();
           abrirBairro(encodeURIComponent(nome));
@@ -907,8 +933,7 @@ function renderMap(){
       color:corCriticidade(d.criticidade),fillColor:corCriticidade(d.criticidade),fillOpacity:.68,weight:1
     })
     .on('click',()=>{
-      $('fBairro').value=d.k;
-      preencherSelect('fBairro','bairro','Todos',baseBairro());
+      preencherSelect('fBairro','bairro','Todos',baseBairro(),false);
       $('fBairro').value=d.k;
       resetDrill(); render();
       abrirBairro(encodeURIComponent(d.k));
