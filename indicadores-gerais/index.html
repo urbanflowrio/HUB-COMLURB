@@ -13,97 +13,156 @@
   --green:#78aaa3;--red:#ef6a5d;--yellow:#e8c335;--purple:#a78bfa;
   --shadow:0 18px 45px rgba(0,0,0,.28);
 }
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,Segoe UI,Arial,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:Inter,Segoe UI,Arial,sans-serif}
 .app{max-width:1880px;margin:0 auto;padding:18px}
 
 /* HEADER */
 .header{display:flex;align-items:center;gap:22px;padding:20px 22px;border:1px solid rgba(111,164,216,.25);border-radius:22px;background:#0b1a2e;box-shadow:var(--shadow);margin-bottom:14px}
-.logo{width:230px;max-height:58px;object-fit:contain;border-right:1px solid rgba(255,255,255,.35);padding-right:20px}
+.logo{width:230px;max-height:58px;object-fit:contain;border-right:1px solid rgba(255,255,255,.35);padding-right:20px;flex-shrink:0}
 .eyebrow{font-size:11px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:#b9c9dc}
-h1{margin:4px 0;font-size:clamp(22px,2vw,34px);line-height:1.05;color:#fff}
-.sub{color:#c5d5e8;font-size:14px}
+h1{margin:4px 0;font-size:clamp(20px,2vw,32px);line-height:1.05;color:#fff}
+.sub{color:#c5d5e8;font-size:13px;margin-top:2px}
 
 /* FILTROS */
-.controls{display:grid;grid-template-columns:120px 1fr 1fr 1fr 1fr 1fr 1fr 130px;gap:10px;margin:14px 0}
-.field,.btn{border:1px solid var(--line);background:var(--panel);border-radius:16px;padding:11px 12px}
-label{display:block;color:#aebbd0;font-size:10px;letter-spacing:.13em;text-transform:uppercase;font-weight:900;margin-bottom:6px}
-select{width:100%;background:transparent;border:0;color:#f2f6ff;font-weight:800;outline:0;cursor:pointer}
+.controls{display:grid;grid-template-columns:110px 1fr 1fr 1fr 1fr 110px;gap:10px;margin:14px 0}
+.field{border:1px solid var(--line);background:var(--panel);border-radius:14px;padding:10px 12px}
+.btn-clear{border:1px solid rgba(232,117,53,.75);background:#14243b;border-radius:14px;padding:10px 12px;cursor:pointer;color:#fff;font-weight:950;font-size:13px;transition:.15s}
+.btn-clear:hover{background:#1e3352}
+label{display:block;color:#aebbd0;font-size:10px;letter-spacing:.13em;text-transform:uppercase;font-weight:900;margin-bottom:5px}
+select{width:100%;background:transparent;border:0;color:#f2f6ff;font-weight:800;outline:0;cursor:pointer;font-size:13px}
 select option{background:#0d1b2f;color:#fff}
-.btn{cursor:pointer;color:#fff;font-weight:950;border-color:rgba(232,117,53,.75);background:#14243b}
-.btn:hover{background:#1a2e4a}
 
 /* KPIs */
-.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:14px}
-.kpi{position:relative;overflow:hidden;min-height:104px;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:16px;box-shadow:var(--shadow)}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:14px}
+.kpi{position:relative;overflow:hidden;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:var(--shadow)}
 .kpi:before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:#4b7eac}
-.kpi.orange:before{background:var(--orange)}.kpi.green:before{background:var(--green)}
-.kpi.red:before{background:var(--red)}.kpi.yellow:before{background:var(--yellow)}
-.kpi.purple:before{background:var(--purple)}
-.kpi span{display:block;color:#aebbd0;font-size:11px;letter-spacing:.13em;text-transform:uppercase;font-weight:950}
-.kpi strong{display:block;font-size:clamp(20px,1.8vw,32px);margin:9px 0 4px;font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff}
-.kpi small{color:#a8b8cf;font-size:12px}
+.kpi.green:before{background:var(--green)}.kpi.red:before{background:var(--red)}
+.kpi.orange:before{background:var(--orange)}.kpi.yellow:before{background:var(--yellow)}
+.kpi span{display:block;color:#aebbd0;font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:950}
+.kpi strong{display:block;font-size:clamp(20px,1.8vw,30px);margin:8px 0 3px;font-weight:950;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi small{color:#a8b8cf;font-size:11px}
 
 /* PAINEIS */
-.panel{background:var(--panel);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);overflow:hidden}
-.panelHead{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 18px;border-bottom:1px solid var(--line);background:#0b1a2e}
-.panel h2,.panel h3{margin:0;font-size:15px;color:#fff}
-.hint{font-size:12px;color:#a8b8cf;margin-top:4px}
-.badge{font-size:12px;color:#dceaff;border:1px solid var(--line);border-radius:999px;padding:7px 10px;background:#0d2037;white-space:nowrap}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);overflow:hidden}
+.panelHead{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:15px 18px;border-bottom:1px solid var(--line);background:#0b1a2e}
+.panel h2{margin:0;font-size:14px;color:#fff;font-weight:800}
+.hint{font-size:11px;color:#a8b8cf;margin-top:3px}
+.badge{font-size:11px;color:#dceaff;border:1px solid var(--line);border-radius:999px;padding:5px 10px;background:#0d2037;white-space:nowrap;flex-shrink:0}
 
-/* LAYOUT PRINCIPAL */
-.layoutMain{display:grid;grid-template-columns:minmax(0,1fr) 390px;gap:14px;margin-bottom:14px}
+/* LAYOUT */
+.layoutMain{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:14px;margin-bottom:14px}
 .colMain{display:flex;flex-direction:column;gap:14px}
 .side{display:flex;flex-direction:column;gap:14px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+/* CHARTS */
+.chartWrap{padding:14px 16px 18px}
+.chartWrap canvas{max-height:270px}
+.chartWrap.tall canvas{max-height:320px}
+
+/* INSIGHT NARRATIVO */
+.insight-box{padding:16px 18px}
+.insight-box p{color:#d7e4f7;line-height:1.7;font-size:13px;margin-top:8px}
 
 /* HIGHLIGHTS */
-.highlightGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:12px}
-.hl{border:1px solid rgba(255,255,255,.10);background:#0b1a2e;border-radius:16px;padding:12px;min-height:86px;position:relative;overflow:hidden;transition:transform .16s,border-color .16s,box-shadow .16s}
-.hl:hover{transform:translateY(-1px);border-color:rgba(109,165,216,.42);box-shadow:0 14px 34px rgba(0,0,0,.28)}
+.hl-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px}
+.hl{border:1px solid rgba(255,255,255,.09);background:#0b1a2e;border-radius:14px;padding:12px;position:relative;overflow:hidden;transition:transform .15s,border-color .15s,box-shadow .15s}
+.hl:hover{transform:translateY(-2px);border-color:rgba(109,165,216,.4);box-shadow:0 12px 30px rgba(0,0,0,.3)}
 .hl:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--blue)}
-.hl.warn:before{background:var(--orange)}.hl.good:before{background:var(--green)}.hl.bad:before{background:var(--red)}
-.hl:after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 12%,rgba(255,255,255,.08),transparent 34%);pointer-events:none}
-.hl small{display:block;color:#9fb0c7;font-weight:900;text-transform:uppercase;letter-spacing:.10em;font-size:9px;margin-bottom:6px}
-.hl b{display:block;color:#fff;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hl span{display:block;color:#c2d1e6;font-size:12px;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hl .mini{height:5px;margin-top:9px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
-.hl .mini i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--blue),rgba(232,117,53,.95))}
+.hl.good:before{background:var(--green)}.hl.warn:before{background:var(--orange)}.hl.bad:before{background:var(--red)}
+.hl:after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 10%,rgba(255,255,255,.07),transparent 38%);pointer-events:none}
+.hl small{display:block;color:#9fb0c7;font-weight:900;text-transform:uppercase;letter-spacing:.1em;font-size:9px;margin-bottom:5px}
+.hl b{display:block;color:#fff;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hl span{display:block;color:#c2d1e6;font-size:11px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hl .mini{height:4px;margin-top:8px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
+.hl .mini i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--blue),var(--orange))}
 .hl.good .mini i{background:linear-gradient(90deg,var(--green),var(--blue))}
 .hl.warn .mini i{background:linear-gradient(90deg,var(--orange),#f0b36d)}
 .hl.bad  .mini i{background:linear-gradient(90deg,var(--red),var(--orange))}
 
-/* CHARTS */
-.chartWrap{padding:16px 18px 20px}
-.chartWrap canvas{max-height:290px}
-.chartWrap.tall canvas{max-height:340px}
-
-/* INSIGHT */
-.insight{padding:18px}
-.insight p{margin:10px 0 0;color:#d7e4f7;line-height:1.65;font-size:13.5px}
-
 /* RANKING */
-.ranking{padding:12px 14px}
-.rank{display:grid;grid-template-columns:22px minmax(0,1fr) 68px;gap:8px;align-items:center;padding:10px 8px;border-bottom:1px solid rgba(255,255,255,.07)}
+.ranking{padding:10px 14px}
+.rank{display:grid;grid-template-columns:20px minmax(0,1fr) 62px;gap:8px;align-items:center;padding:9px 6px;border-bottom:1px solid rgba(255,255,255,.06)}
 .rank:last-child{border-bottom:0}
-.rank:hover{background:rgba(109,165,216,.07);border-radius:10px}
+.rank:hover{background:rgba(109,165,216,.06);border-radius:8px}
 .rank-n{font-size:11px;font-weight:900;color:var(--muted);text-align:center}
 .rank-info b{display:block;font-size:12px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.rank-info small{color:#a8b8cf;font-size:11px}
-.rank-bar{height:4px;background:#0e2035;border-radius:10px;overflow:hidden;margin-top:4px}
+.rank-info small{color:#a8b8cf;font-size:10px}
+.rank-bar{height:3px;background:#0e2035;border-radius:10px;overflow:hidden;margin-top:3px}
 .rank-bar i{display:block;height:100%;border-radius:10px;background:linear-gradient(90deg,var(--blue),var(--orange))}
 .rank-bar i.bad{background:linear-gradient(90deg,var(--red),var(--orange))}
-.rank-val{font-size:12px;font-weight:900;text-align:right;white-space:nowrap}
+.rank-val{font-size:12px;font-weight:900;text-align:right}
 
-/* GRID CHARTS */
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+/* ═══ INSIGHTS ESTRATÉGICOS ═══ */
+.insights-section{margin-bottom:14px}
+.insights-section h2{font-size:13px;font-weight:800;color:#c8daf0;text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px;padding:0 2px}
+.insights-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.ins-card{
+  border:1px solid var(--line);background:var(--panel);border-radius:16px;padding:14px 16px;
+  cursor:pointer;transition:transform .18s,border-color .18s,box-shadow .18s;position:relative;overflow:hidden;
+}
+.ins-card:before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--blue)}
+.ins-card.good:before{background:var(--green)}.ins-card.warn:before{background:var(--orange)}.ins-card.bad:before{background:var(--red)}.ins-card.neutral:before{background:var(--purple)}
+.ins-card:hover{transform:translateY(-2px);border-color:rgba(109,165,216,.45);box-shadow:0 14px 36px rgba(0,0,0,.3)}
+.ins-card.open{border-color:rgba(109,165,216,.6);background:#0e2038}
+.ins-tag{font:700 9px 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.ins-card.good .ins-tag{color:var(--green)}.ins-card.warn .ins-tag{color:var(--orange)}.ins-card.bad .ins-tag{color:var(--red)}.ins-card.neutral .ins-tag{color:var(--purple)}
+.ins-title{font-size:13px;font-weight:800;color:#fff;line-height:1.35;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ins-val{font-size:22px;font-weight:950;color:#fff;line-height:1}
+.ins-meta{font-size:11px;color:#a8b8cf;margin-top:4px}
+.ins-arrow{position:absolute;top:12px;right:14px;font-size:14px;color:var(--muted);transition:transform .2s}
+.ins-card.open .ins-arrow{transform:rotate(180deg);color:var(--blue)}
+
+/* EXPAND */
+.ins-expand{
+  display:none;overflow:hidden;
+  border:1px solid rgba(109,165,216,.3);border-radius:16px;
+  background:rgba(9,22,38,.97);margin-top:0;
+  box-shadow:0 18px 45px rgba(0,0,0,.3);
+}
+.ins-expand.open{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:0;animation:slideDown .22s ease both}
+@keyframes slideDown{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.exp-main{padding:18px 20px;border-right:1px solid var(--line)}
+.exp-main h3{font-size:15px;font-weight:800;color:#fff;margin-bottom:12px;line-height:1.35}
+.exp-narrative{color:#d4e3f5;font-size:13px;line-height:1.75}
+.exp-narrative b{color:#f2f6ff}
+.exp-chart{padding:14px 16px}
+.exp-chart canvas{max-height:180px}
+.exp-stats{padding:14px 16px;border-left:1px solid var(--line)}
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.stat-row:last-child{border:0}
+.stat-label{font-size:11px;color:var(--muted);font-weight:600}
+.stat-val{font-size:13px;font-weight:900;color:#fff}
+.stat-val.good{color:var(--green)}.stat-val.bad{color:var(--red)}.stat-val.warn{color:var(--orange)}
+
+/* EVOL SELETOR */
+.evol-select{padding:10px 16px 0}
+.evol-select select{width:100%;background:#0e2035;border:1px solid var(--line);border-radius:10px;color:#f2f6ff;font-weight:800;padding:8px 10px;outline:0;cursor:pointer;font-size:12px}
 
 /* FOOTER */
-.footer{margin-top:16px;padding:10px 4px;border-top:1px solid rgba(39,66,96,.5);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
-.footer-left{font-size:11px;color:#5a7a9a}
-.footer-right{font-size:11px;color:#4a6a88}
+.footer{margin-top:16px;padding:10px 4px;border-top:1px solid rgba(39,66,96,.45);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.footer span{font-size:11px;color:#4a6a88}
 
-@media(max-width:1450px){.layoutMain{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(3,1fr)}.controls{grid-template-columns:repeat(4,1fr)}}
-@media(max-width:760px){.header{flex-direction:column}.logo{border-right:0;padding-right:0}.kpis,.controls,.grid2{grid-template-columns:1fr}.highlightGrid{grid-template-columns:1fr}}
+/* RESPONSIVE */
+@media(max-width:1400px){
+  .layoutMain{grid-template-columns:1fr}
+  .insights-grid{grid-template-columns:repeat(2,1fr)}
+  .ins-expand.open{grid-template-columns:1fr 1fr}
+  .exp-stats{border-left:0;border-top:1px solid var(--line)}
+}
+@media(max-width:1100px){
+  .kpis{grid-template-columns:repeat(3,1fr)}
+  .controls{grid-template-columns:repeat(3,1fr)}
+  .grid2{grid-template-columns:1fr}
+}
+@media(max-width:700px){
+  .header{flex-direction:column;align-items:flex-start}
+  .logo{border-right:0;padding-right:0;width:180px}
+  .kpis,.controls,.insights-grid{grid-template-columns:1fr 1fr}
+  .ins-expand.open{grid-template-columns:1fr}
+  .exp-main{border-right:0;border-bottom:1px solid var(--line)}
+}
 </style>
 </head>
 <body>
@@ -125,51 +184,47 @@ select option{background:#0d1b2f;color:#fff}
   <div class="field"><label>Diretoria</label><select id="fDir"></select></div>
   <div class="field"><label>Sup./Coord.</label><select id="fSup"></select></div>
   <div class="field"><label>Indicador</label><select id="fInd"></select></div>
-  <div class="field"><label>Unidade</label><select id="fUnidade"></select></div>
-  <div class="field"><label>Sentido</label><select id="fSentido"></select></div>
   <div class="field"><label>Status</label><select id="fStatus"></select></div>
-  <button class="btn" id="btnClear">Limpar filtros</button>
+  <button class="btn-clear" id="btnClear">Limpar filtros</button>
 </section>
 
 <!-- KPIs -->
 <section class="kpis">
-  <div class="kpi">         <span>Total de Indicadores</span><strong id="kTotal">—</strong><small id="kTotalSub">—</small></div>
-  <div class="kpi green">  <span>Dentro da Meta</span>      <strong id="kMeta">—</strong> <small id="kMetaSub">—</small></div>
-  <div class="kpi red">    <span>Abaixo da Meta</span>      <strong id="kAbaixo">—</strong><small id="kAbaixoSub">—</small></div>
-  <div class="kpi orange"> <span>Taxa de Atingimento</span> <strong id="kTaxa">—</strong> <small id="kTaxaSub">—</small></div>
-  <div class="kpi yellow"> <span>Melhor Resultado</span>    <strong id="kMelhor">—</strong><small id="kMelhorSub">—</small></div>
-  <div class="kpi purple"> <span>Maior Desvio</span>        <strong id="kDesvio">—</strong><small id="kDesvioSub">—</small></div>
+  <div class="kpi">       <span>Total Indicadores</span><strong id="kTotal">—</strong><small id="kTotalSub">—</small></div>
+  <div class="kpi green"> <span>Dentro da Meta</span>  <strong id="kMeta">—</strong> <small id="kMetaSub">—</small></div>
+  <div class="kpi red">   <span>Abaixo da Meta</span>  <strong id="kAbaixo">—</strong><small id="kAbaixoSub">—</small></div>
+  <div class="kpi orange"><span>Taxa de Atingimento</span><strong id="kTaxa">—</strong><small id="kTaxaSub">—</small></div>
+  <div class="kpi yellow"><span>Com Tendencia de Piora</span><strong id="kPiora">—</strong><small id="kPioraSub">—</small></div>
 </section>
 
-<!-- CONTEUDO PRINCIPAL -->
-<section class="layoutMain">
+<!-- INSIGHTS ESTRATEGICOS -->
+<section class="insights-section">
+  <h2>Insights Estrategicos &mdash; Principais sinais do periodo</h2>
+  <div class="insights-grid" id="insightsGrid"></div>
+  <div id="insightExpand" style="margin-top:10px"></div>
+</section>
 
-  <!-- COLUNA ESQUERDA -->
+<!-- LAYOUT PRINCIPAL -->
+<section class="layoutMain">
   <div class="colMain">
 
     <!-- Evolucao mensal -->
     <section class="panel">
       <div class="panelHead">
-        <div>
-          <h2>Evolucao Mensal do Indicador</h2>
-          <div class="hint">Comparativo 2025 vs 2026 com linha de meta</div>
-        </div>
-        <span class="badge" id="evolBadge">selecione um indicador</span>
+        <div><h2>Evolucao Mensal do Indicador</h2><div class="hint">Comparativo 2025 vs 2026 com linha de meta</div></div>
+        <span class="badge" id="evolBadge">—</span>
       </div>
-      <div style="padding:10px 18px 0">
-        <select id="selInd" style="width:100%;background:#0e2035;border:1px solid var(--line);border-radius:10px;color:#f2f6ff;font-weight:800;padding:9px 12px;outline:0;cursor:pointer"></select>
-      </div>
+      <div class="evol-select"><select id="selInd"></select></div>
       <div class="chartWrap tall"><canvas id="lineChart"></canvas></div>
     </section>
 
-    <!-- Graficos lado a lado -->
     <div class="grid2">
       <section class="panel">
         <div class="panelHead"><div><h2>Status vs Meta</h2><div class="hint">Distribuicao por situacao</div></div></div>
         <div class="chartWrap"><canvas id="donutChart"></canvas></div>
       </section>
       <section class="panel">
-        <div class="panelHead"><div><h2>Comparativo 2025 vs 2026</h2><div class="hint">Acumulado por indicador</div></div></div>
+        <div class="panelHead"><div><h2>Comparativo 2025 vs 2026</h2><div class="hint">Acumulado por indicador (top 10)</div></div></div>
         <div class="chartWrap"><canvas id="barChart"></canvas></div>
       </section>
     </div>
@@ -179,23 +234,23 @@ select option{background:#0d1b2f;color:#fff}
   <!-- SIDEBAR -->
   <aside class="side">
 
-    <section class="panel insight">
-      <h3>Leitura Executiva</h3>
-      <p id="insightText">Carregando analise...</p>
+    <section class="panel">
+      <div class="panelHead"><h2>Leitura Executiva</h2><span class="badge" id="scopeBadge">—</span></div>
+      <div class="insight-box"><p id="insightText">Carregando...</p></div>
     </section>
 
     <section class="panel">
-      <div class="panelHead"><h2>Destaques do Periodo</h2><span class="badge">Analise rapida</span></div>
-      <div class="highlightGrid" id="execHighlights"></div>
+      <div class="panelHead"><h2>Destaques do Periodo</h2></div>
+      <div class="hl-grid" id="hlGrid"></div>
     </section>
 
     <section class="panel">
-      <div class="panelHead"><div><h2>Maiores Desvios da Meta</h2><div class="hint">Indicadores abaixo da referencia</div></div></div>
+      <div class="panelHead"><div><h2>Maiores Desvios</h2><div class="hint">Abaixo da referencia cadastrada</div></div></div>
       <div class="ranking" id="rankDesvio"></div>
     </section>
 
     <section class="panel">
-      <div class="panelHead"><div><h2>Melhores Desempenhos</h2><div class="hint">Indicadores dentro ou acima da meta</div></div></div>
+      <div class="panelHead"><div><h2>Melhores Desempenhos</h2><div class="hint">Dentro ou acima da meta</div></div></div>
       <div class="ranking" id="rankBom"></div>
     </section>
 
@@ -204,35 +259,87 @@ select option{background:#0d1b2f;color:#fff}
 
 <!-- FOOTER -->
 <footer class="footer">
-  <span class="footer-left">Gabinete da Presidencia / HUB COMLURB &bull; Nucleo de Inteligencia e Gestao Estrategica Operacional</span>
-  <span class="footer-right">Fonte: SARC &mdash; Aba PRE / Indicadores Avaliados</span>
+  <span>Gabinete da Presidencia / HUB COMLURB &bull; Nucleo de Inteligencia e Gestao Estrategica Operacional</span>
+  <span>Fonte: SARC &mdash; Aba Geral / Indicadores Avaliados</span>
 </footer>
 
-</div>
-
+</div><!-- /.app -->
 <script>
+/* ══════════════════════════════════════════════════════
+   HUB COMLURB · Painel PRE · Indicadores Avaliados
+   ══════════════════════════════════════════════════════ */
+
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQphrIIjiY4aWBONgByLezMnFk8YbyYpF-vtgxOLoV8-85_WUVAXH_f_Ahy8ymxmgnGXmQ_KiFSOkIK/pub?gid=1044100274&single=true&output=csv';
 const ANOS  = [2025, 2026];
 const MESES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+
+// Lista oficial de indicadores avaliados PRE
+const INDS_PRE = new Set([
+  'Absenteísmo - Gerenciável','Acidente de Trabalho – Típico','Acidente de Trabalho – Trajeto',
+  'Adicional Noturno Realizado','Cadastro de Grandes Geradores',
+  'Cadastro de Grandes Geradores com segregação de resíduos','Desvio Padrão - IPL Setorial',
+  'Ecopontos','Empregados Afastados','Hora Extra Realizada','Horas Domingos e Feriados Realizadas',
+  'Índice de Atendimento das Solicitações 1746','Índice de Conformidade - PGR',
+  'Índice de Eficiência da Arrecadação - Órgãos Públicos',
+  'Índice de Eficiência da Arrecadação - Receitas Diversas',
+  'Índice de Utilização da Frota de Coleta Domiciliar',
+  'Índice de Utilização da Frota de Remoção de Lixo Público',
+  'Índice do Coletado em Relação ao Potencial Reciclável',
+  'Índice Padrão de Limpeza - IPL','Índice Padrão de Roçada - IPR',
+  'Performance de Atendimento da Remoção Gratuita',
+  'Performance de Atendimento de Capina em Logradouro',
+  'Performance de Atendimento de Controle de Roedores e Caramujos',
+  'Performance de Atendimento de Poda de Árvore','Praças',
+  'Produção do Serviço de Manejo Arbóreo','Resíduos Coletados no RJ',
+  'Resíduos Desviados do Aterro','Resíduos Orgânicos (Biometanização)',
+  'Resíduos Recebidos nas ETRs','Resíduos Recebidos no CTR Gericinó',
+  'Solicitações 1746','Solicitações 1746 - Capina','Solicitações 1746 - Coleta',
+  'Solicitações 1746 - Destoca de Toco e Raiz','Solicitações 1746 - Limpeza',
+  'Solicitações 1746 - Limpeza de Ralos','Solicitações 1746 - Poda de Árvore',
+  'Solicitações 1746 - Praças','Solicitações 1746 - Remoção de Árvore',
+  'Solicitações 1746 - Remoção de Resíduos','Solicitações 1746 - Remoção Gratuita',
+  'Solicitações 1746 - Risco de Queda','Solicitações 1746 - Varrição',
+  'Solicitações 1746 - Vetores','Solicitações Ouvidoria',
+  'Solicitações Ouvidoria - Capina','Solicitações Ouvidoria - Coleta',
+  'Solicitações Ouvidoria - Destoca de Toco e Raiz',
+  'Solicitações Ouvidoria - Limpeza de Ralos','Solicitações Ouvidoria - Poda de Árvore',
+  'Solicitações Ouvidoria - Praças','Solicitações Ouvidoria - Remoção de Árvore',
+  'Solicitações Ouvidoria - Remoção de Resíduos','Solicitações Ouvidoria - Remoção Gratuita',
+  'Solicitações Ouvidoria - Risco de Queda','Solicitações Ouvidoria - Varrição',
+  'Solicitações Ouvidoria - Vetores','Taxa de Frequência de Acidentes',
+  'Taxa de Gravidade de Acidentes','Tempo Médio de Atendimento - Remoção Gratuita',
+  'Tempo Médio de Atendimento - Vetores','Treinamentos Realizados (NR)'
+]);
+
 const $ = id => document.getElementById(id);
-let DATA = [], CHARTS = {};
+let DATA = [], CHARTS = {}, openInsightIdx = null;
 
 /* ── utils ── */
-const norm  = s => String(s??'').trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
-const esc   = s => String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const norm = s => String(s??'').trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+const esc  = s => String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+
+// Correspondência normalizada para a lista PRE
+function matchInd(nome){
+  const n = nome.trim();
+  if(INDS_PRE.has(n)) return true;
+  // fallback normalizado
+  for(const i of INDS_PRE){ if(norm(i)===norm(n)) return true; }
+  return false;
+}
+
 function num(v){
-  if(v===null||v===undefined)return null;
+  if(v==null) return null;
   let s=String(v).trim().replace(/[^\d,.\-]/g,'');
-  if(!s||s==='-')return null;
-  if(s.includes(',')&&s.includes('.'))s=s.replace(/\./g,'').replace(',','.');
-  else if(s.includes(','))s=s.replace(',','.');
+  if(!s||s==='-') return null;
+  if(s.includes(',')&&s.includes('.')) s=s.replace(/\./g,'').replace(',','.');
+  else if(s.includes(',')) s=s.replace(',','.');
   const n=Number(s); return Number.isFinite(n)?n:null;
 }
 function fmt(v,u=''){
-  if(v===null||v===undefined||Number.isNaN(v))return'—';
-  if(String(u).includes('%'))return v.toLocaleString('pt-BR',{maximumFractionDigits:1})+'%';
-  if(Math.abs(v)>=1e6)return(v/1e6).toLocaleString('pt-BR',{maximumFractionDigits:1})+' mi';
-  if(Math.abs(v)>=1000)return v.toLocaleString('pt-BR',{maximumFractionDigits:0});
+  if(v==null||Number.isNaN(v)) return '—';
+  if(String(u).includes('%')) return v.toLocaleString('pt-BR',{maximumFractionDigits:1})+'%';
+  if(Math.abs(v)>=1e6) return (v/1e6).toLocaleString('pt-BR',{maximumFractionDigits:1})+' mi';
+  if(Math.abs(v)>=1000) return v.toLocaleString('pt-BR',{maximumFractionDigits:0});
   return v.toLocaleString('pt-BR',{maximumFractionDigits:1});
 }
 function getF(row,names){
@@ -243,78 +350,91 @@ function getF(row,names){
 
 /* ── transform ── */
 function transform(r){
-  const diretoria=String(getF(r,["Diretoria","DIRETORIA"])||"").trim();
-  const supRaw=String(getF(r,["Superintendência","Superintendencia","Sup./Coord."])||"").trim();
-  const sup=(!supRaw||supRaw==="-"||supRaw==="–"||supRaw==="—")?diretoria:supRaw;
+  const dir    = String(getF(r,['Diretoria','DIRETORIA'])||'').trim();
+  const supRaw = String(getF(r,['Superintendência','Superintendencia','Sup./Coord.'])||'').trim();
+  const sup    = (!supRaw||supRaw==='-'||supRaw==='–'||supRaw==='—') ? dir : supRaw;
   const d={
-    Ano      :num(getF(r,["Ano","ANO"])),
-    Indicador:String(getF(r,["Indicador","INDICADOR"])||"").trim(),
-    Diretoria:diretoria,
-    Superintendencia:sup||diretoria,
-    Unidade  :String(getF(r,["Unidade","UNIDADE"])||"").trim(),
-    Sentido  :String(getF(r,["Sentido","SENTIDO"])||"").trim(),
-    Acumulado:num(getF(r,["Acumulado","ACUMULADO","Resultado"])),
-    Meta     :num(getF(r,["Meta","META","Alvo"]))
+    Ano      : num(getF(r,['Ano','ANO'])),
+    Indicador: String(getF(r,['Indicador','INDICADOR'])||'').trim(),
+    Diretoria: dir, Superintendencia: sup||dir,
+    Unidade  : String(getF(r,['Unidade','UNIDADE'])||'').trim(),
+    Sentido  : String(getF(r,['Sentido','SENTIDO'])||'').trim(),
+    Acumulado: num(getF(r,['Acumulado','ACUMULADO','Resultado'])),
+    Meta     : num(getF(r,['Meta','META','Alvo']))
   };
   MESES.forEach(m=>{d[m]=num(getF(r,[m]));});
-  if(d.Acumulado===null){const v=MESES.map(m=>d[m]).filter(x=>x!==null);if(v.length)d.Acumulado=v.at(-1);}
+  if(d.Acumulado===null){const v=MESES.map(m=>d[m]).filter(x=>x!=null);if(v.length)d.Acumulado=v.at(-1);}
   return d;
 }
 
-/* ── status / tend ── */
+/* ── status / tendência ── */
 function statusOf(d){
-  if(d.Meta===null||d.Acumulado===null)return'Sem meta';
+  if(d.Meta==null||d.Acumulado==null) return 'Sem meta';
   const dn=d.Sentido.includes('↓');
-  return(dn?d.Acumulado<=d.Meta:d.Acumulado>=d.Meta)?'Dentro da meta':'Abaixo da meta';
+  return (dn?d.Acumulado<=d.Meta:d.Acumulado>=d.Meta)?'Dentro da meta':'Abaixo da meta';
 }
-function desvio(d){return(d.Meta===null||d.Acumulado===null)?null:d.Acumulado-d.Meta;}
+function desvio(d){ return (d.Meta==null||d.Acumulado==null)?null:d.Acumulado-d.Meta; }
 function tendClass(d){
-  const v=MESES.map(m=>d[m]).filter(x=>x!==null);
-  if(v.length<3)return'flat';
-  const ini=v.slice(0,3).reduce((a,b)=>a+b,0)/3;
+  const v=MESES.map(m=>d[m]).filter(x=>x!=null);
+  if(v.length<3) return 'flat';
+  const ini=v.slice(0,Math.min(3,v.length)).reduce((a,b)=>a+b,0)/Math.min(3,v.length);
   const fim=v.slice(-3).reduce((a,b)=>a+b,0)/3;
-  if(fim===ini)return'flat';
-  const up=fim>ini; const dn=d.Sentido.includes('↓');
-  // bom = sobe quando sentido up, ou desce quando sentido down
-  return((!dn&&up)||(dn&&!up))?'good':'bad';
+  if(Math.abs(fim-ini)<0.01*Math.abs(ini||1)) return 'flat';
+  const sobe=fim>ini; const dn=d.Sentido.includes('↓');
+  return ((!dn&&sobe)||(dn&&!sobe))?'good':'bad';
+}
+function tendLabel(d){
+  const t=tendClass(d);
+  return t==='good'?'Melhora':t==='bad'?'Piora':'Estavel';
 }
 
 /* ── filtros ── */
-function vf(id){return $(id)?.value||'';}
+const vf = id => $(id)?.value||'';
 function filtered(){
-  const a=vf('fAno'),dir=vf('fDir'),sup=vf('fSup'),ind=vf('fInd'),un=vf('fUnidade'),sent=vf('fSentido'),st=vf('fStatus');
+  const a=vf('fAno'),dir=vf('fDir'),sup=vf('fSup'),ind=vf('fInd'),st=vf('fStatus');
   return DATA.filter(d=>{
-    if(!ANOS.includes(d.Ano))return false;
-    if(a&&String(d.Ano)!==a)return false;
-    if(dir&&d.Diretoria!==dir)return false;
-    if(sup&&d.Superintendencia!==sup)return false;
-    if(ind&&d.Indicador!==ind)return false;
-    if(un&&d.Unidade!==un)return false;
-    if(sent&&d.Sentido!==sent)return false;
-    if(st&&statusOf(d)!==st)return false;
+    if(!ANOS.includes(d.Ano)) return false;
+    if(a   && String(d.Ano)!==a) return false;
+    if(dir && d.Diretoria!==dir) return false;
+    if(sup && d.Superintendencia!==sup) return false;
+    if(ind && d.Indicador!==ind) return false;
+    if(st  && statusOf(d)!==st) return false;
     return true;
   });
 }
-function uniq(arr){return[...new Set(arr.filter(x=>x!=null&&String(x).trim()))].sort((a,b)=>String(a).localeCompare(String(b),'pt-BR'));}
+function uniq(arr){ return [...new Set(arr.filter(x=>x!=null&&String(x).trim()))].sort((a,b)=>String(a).localeCompare(String(b),'pt-BR')); }
+
 function setOpts(id,vals,lbl){
-  const el=$(id);if(!el)return;const cur=el.value;
+  const el=$(id); if(!el) return; const cur=el.value;
   el.innerHTML=`<option value="">${lbl}</option>`+vals.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');
-  if(vals.map(String).includes(String(cur)))el.value=cur;
+  if(vals.map(String).includes(String(cur))) el.value=cur;
 }
-function populateFilters(){
+
+// Cascata: ao mudar Ano/Dir/Sup, restringe opções abaixo
+function cascadeFilters(){
+  const a=vf('fAno'),dir=vf('fDir'),sup=vf('fSup');
+  let base=DATA.filter(d=>ANOS.includes(d.Ano));
+  if(a)   base=base.filter(d=>String(d.Ano)===a);
+  setOpts('fDir', uniq(base.map(d=>d.Diretoria)),'Todas');
+  if(dir) base=base.filter(d=>d.Diretoria===dir);
+  setOpts('fSup', uniq(base.map(d=>d.Superintendencia)),'Todas');
+  if(sup) base=base.filter(d=>d.Superintendencia===sup);
+  setOpts('fInd', uniq(base.map(d=>d.Indicador)),'Todos');
+  setOpts('fStatus',uniq(base.map(d=>statusOf(d))),'Todos');
+  // Restaurar valores se ainda existirem
+  if(dir && [...$('fDir').options].some(o=>o.value===dir)) $('fDir').value=dir;
+  if(sup && [...$('fSup').options].some(o=>o.value===sup)) $('fSup').value=sup;
+}
+
+function populateAll(){
   const base=DATA.filter(d=>ANOS.includes(d.Ano));
-  setOpts('fAno',   uniq(base.map(d=>d.Ano)),             'Todos os anos');
-  setOpts('fDir',   uniq(base.map(d=>d.Diretoria)),       'Todas');
-  setOpts('fSup',   uniq(base.map(d=>d.Superintendencia)),'Todas');
-  setOpts('fInd',   uniq(base.map(d=>d.Indicador)),       'Todos');
-  setOpts('fUnidade',uniq(base.map(d=>d.Unidade)),        'Todas');
-  setOpts('fSentido',uniq(base.map(d=>d.Sentido)),        'Todos');
-  setOpts('fStatus', uniq(base.map(d=>statusOf(d))),      'Todos');
+  setOpts('fAno',  uniq(base.map(d=>d.Ano)),'Todos os anos');
+  cascadeFilters();
 }
 
 /* ── chart helper ── */
 function mkChart(id,type,labels,datasets,extra={}){
-  if(CHARTS[id])CHARTS[id].destroy();
+  if(CHARTS[id]) CHARTS[id].destroy();
   CHARTS[id]=new Chart($(id),{type,data:{labels,datasets},options:Object.assign({
     responsive:true,maintainAspectRatio:false,
     plugins:{legend:{labels:{color:'#c7d8ef',font:{size:11}}}},
@@ -327,189 +447,319 @@ function mkChart(id,type,labels,datasets,extra={}){
 
 /* ── KPIs ── */
 function renderKPIs(rows){
-  const cm=rows.filter(d=>d.Meta!==null&&d.Acumulado!==null);
+  const cm=rows.filter(d=>d.Meta!=null&&d.Acumulado!=null);
   const dentro=cm.filter(d=>statusOf(d)==='Dentro da meta');
   const abaixo=cm.filter(d=>statusOf(d)==='Abaixo da meta');
   const pct=cm.length?Math.round(dentro.length/cm.length*100):0;
-  let melhor=null,pior=null;
-  cm.forEach(d=>{
-    const dn=d.Sentido.includes('↓');
-    const r=d.Meta?((dn?(d.Meta-d.Acumulado):(d.Acumulado-d.Meta))/Math.abs(d.Meta)):0;
-    if(statusOf(d)==='Dentro da meta'&&(!melhor||r>melhor.r))melhor={d,r};
-    const dv=Math.abs(desvio(d)||0);
-    if(statusOf(d)==='Abaixo da meta'&&(!pior||dv>pior.dv))pior={d,dv};
-  });
+  const piora=rows.filter(d=>tendClass(d)==='bad').length;
   $('kTotal').textContent=rows.length;
   $('kTotalSub').textContent=uniq(rows.map(d=>d.Indicador)).length+' indicadores distintos';
   $('kMeta').textContent=dentro.length;
-  $('kMetaSub').textContent='de '+cm.length+' com meta cadastrada';
+  $('kMetaSub').textContent='de '+cm.length+' com meta';
   $('kAbaixo').textContent=abaixo.length;
-  $('kAbaixoSub').textContent=abaixo.length?'requerem atencao gerencial':'nenhum abaixo da meta';
+  $('kAbaixoSub').textContent=abaixo.length?'requerem atencao':'nenhum abaixo';
   $('kTaxa').textContent=pct+'%';
-  $('kTaxaSub').textContent=cm.length+' ind. com meta';
-  $('kMelhor').textContent=melhor?fmt(melhor.d.Acumulado,melhor.d.Unidade):'—';
-  $('kMelhorSub').textContent=melhor?melhor.d.Indicador.slice(0,30):'sem dado';
-  $('kDesvio').textContent=pior?fmt(pior.d.Acumulado,pior.d.Unidade):'—';
-  $('kDesvioSub').textContent=pior?pior.d.Indicador.slice(0,30):'sem desvio';
+  $('kTaxaSub').textContent=cm.length+' ind. com meta cadastrada';
+  $('kPiora').textContent=piora;
+  $('kPioraSub').textContent='requerem acompanhamento';
+  $('scopeBadge').textContent=rows.length+' registros';
 }
 
-/* ── evolucao ── */
+/* ── Evolução ── */
 function populateSelInd(rows){
   const inds=uniq(rows.map(d=>d.Indicador));
-  const sel=$('selInd');const cur=sel.value;
+  const sel=$('selInd'); const cur=sel.value;
   sel.innerHTML=inds.map(i=>`<option value="${esc(i)}">${esc(i)}</option>`).join('');
-  if(inds.includes(cur))sel.value=cur;
+  if(inds.includes(cur)) sel.value=cur;
 }
 function renderEvol(){
-  const ind=$('selInd').value;
-  if(!ind){$('evolBadge').textContent='selecione';return;}
-  $('evolBadge').textContent=ind.length>42?ind.slice(0,41)+'…':ind;
+  const ind=$('selInd').value; if(!ind) return;
+  $('evolBadge').textContent=ind.length>45?ind.slice(0,44)+'…':ind;
   const ds=[];
   ANOS.forEach((a,i)=>{
-    const row=DATA.find(d=>d.Ano===a&&d.Indicador===ind);
-    if(!row)return;
-    ds.push({label:String(a),data:MESES.map(m=>row[m]),
+    const row=DATA.find(d=>d.Ano===a&&d.Indicador===ind&&INDS_PRE.has(d.Indicador));
+    if(!row) return;
+    // Apenas meses com dados
+    const data=MESES.map(m=>row[m]);
+    ds.push({label:String(a),data,
       borderColor:i===0?'#6da5d8':'#e87535',
-      backgroundColor:(i===0?'#6da5d8':'#e87535')+'22',
-      tension:.35,borderWidth:2.5,pointRadius:4,fill:i===0});
+      backgroundColor:(i===0?'#6da5d8':'#e87535')+'1a',
+      tension:.35,borderWidth:2.5,pointRadius:4,pointHoverRadius:6,fill:i===0});
   });
-  const rm=[...ANOS].reverse().map(a=>DATA.find(d=>d.Ano===a&&d.Indicador===ind&&d.Meta!==null)).find(Boolean);
-  if(rm)ds.push({label:'Meta',data:MESES.map(()=>rm.Meta),borderColor:'#e8c335',borderDash:[6,4],borderWidth:1.5,pointRadius:0,fill:false});
-  if(!ds.length){$('evolBadge').textContent='sem dados';return;}
-  mkChart('lineChart','line',MESES,ds,{plugins:{legend:{labels:{color:'#c7d8ef'}}}});
+  const rm=[...ANOS].reverse().map(a=>DATA.find(d=>d.Ano===a&&d.Indicador===ind&&d.Meta!=null)).find(Boolean);
+  if(rm) ds.push({label:'Meta',data:MESES.map(()=>rm.Meta),borderColor:'#e8c335',borderDash:[6,4],borderWidth:1.5,pointRadius:0,fill:false});
+  if(ds.length) mkChart('lineChart','line',MESES,ds,{plugins:{legend:{labels:{color:'#c7d8ef'}}}});
 }
 
-/* ── donut ── */
+/* ── Donut ── */
 function renderDonut(rows){
   const s={'Dentro da meta':0,'Abaixo da meta':0,'Sem meta':0};
-  rows.forEach(d=>{const k=statusOf(d);s[k]=(s[k]||0)+1;});
+  rows.forEach(d=>{s[statusOf(d)]=(s[statusOf(d)]||0)+1;});
   mkChart('donutChart','doughnut',Object.keys(s),[{data:Object.values(s),backgroundColor:['#78aaa3','#ef6a5d','#274260'],borderWidth:0,hoverOffset:8}],
     {plugins:{legend:{position:'right',labels:{color:'#c7d8ef',font:{size:11}}}}});
 }
 
-/* ── bar comparativo ── */
+/* ── Bar ── */
 function renderBar(rows){
-  const i25=new Set(DATA.filter(d=>d.Ano===2025).map(d=>d.Indicador));
-  const i26=new Set(DATA.filter(d=>d.Ano===2026).map(d=>d.Indicador));
+  const i25=new Set(DATA.filter(d=>d.Ano===2025&&ANOS.includes(d.Ano)).map(d=>d.Indicador));
+  const i26=new Set(DATA.filter(d=>d.Ano===2026&&ANOS.includes(d.Ano)).map(d=>d.Indicador));
   const rec=new Set(rows.map(d=>d.Indicador));
   const top=[...i25].filter(i=>i26.has(i)&&rec.has(i)).slice(0,10);
   const d25=top.map(i=>{const r=DATA.find(d=>d.Ano===2025&&d.Indicador===i);return r?r.Acumulado:null;});
   const d26=top.map(i=>{const r=DATA.find(d=>d.Ano===2026&&d.Indicador===i);return r?r.Acumulado:null;});
-  mkChart('barChart','bar',top.map(l=>l.length>18?l.slice(0,17)+'…':l),[
-    {label:'2025',data:d25,backgroundColor:'#6da5d8cc',borderRadius:4,borderWidth:0},
-    {label:'2026',data:d26,backgroundColor:'#e87535cc',borderRadius:4,borderWidth:0}
+  mkChart('barChart','bar',top.map(l=>l.length>16?l.slice(0,15)+'…':l),[
+    {label:'2025',data:d25,backgroundColor:'#6da5d8bb',borderRadius:4,borderWidth:0},
+    {label:'2026',data:d26,backgroundColor:'#e87535bb',borderRadius:4,borderWidth:0}
   ],{plugins:{legend:{labels:{color:'#c7d8ef'}}}});
 }
 
-/* ── insight ── */
+/* ── Leitura executiva ── */
 function renderInsight(rows){
-  const cm=rows.filter(d=>d.Meta!==null&&d.Acumulado!==null);
+  const cm=rows.filter(d=>d.Meta!=null&&d.Acumulado!=null);
   const dentro=cm.filter(d=>statusOf(d)==='Dentro da meta');
   const abaixo=cm.filter(d=>statusOf(d)==='Abaixo da meta');
   const pct=cm.length?Math.round(dentro.length/cm.length*100):0;
-  const sem=rows.filter(d=>d.Meta===null||d.Acumulado===null);
+  const sem=rows.filter(d=>d.Meta==null||d.Acumulado==null);
   const pior=abaixo.length?[...abaixo].sort((a,b)=>Math.abs(desvio(b)||0)-Math.abs(desvio(a)||0))[0]:null;
-  const tendRuim=rows.filter(d=>tendClass(d)==='bad').length;
+  const piora=rows.filter(d=>tendClass(d)==='bad').length;
+  const melhora=rows.filter(d=>tendClass(d)==='good').length;
 
   let t=`No recorte atual, <b>${dentro.length} de ${cm.length}</b> indicadores com meta atingem a referencia &mdash; taxa de <b>${pct}%</b>.`;
-  if(pior) t+=` O maior desvio esta em <b>${esc(pior.Indicador)}</b>: acumulado ${fmt(pior.Acumulado,pior.Unidade)}, meta ${fmt(pior.Meta,pior.Unidade)}.`;
+  if(pior) t+=` O maior desvio esta em <b>${esc(pior.Indicador)}</b>: acumulado <b>${fmt(pior.Acumulado,pior.Unidade)}</b> contra meta de <b>${fmt(pior.Meta,pior.Unidade)}</b>.`;
   else if(cm.length) t+=' <b>Todos os indicadores com meta estao dentro da referencia.</b>';
-  if(tendRuim) t+=` <b>${tendRuim}</b> indicador${tendRuim>1?'es apresentam':'apresenta'} tendencia de piora nos ultimos meses.`;
-  if(sem.length) t+=` <b>${sem.length}</b> indicador${sem.length>1?'es nao possuem':'nao possui'} meta cadastrada.`;
+  if(piora) t+=` <b>${piora}</b> indicador${piora>1?'es apresentam':'apresenta'} tendencia de piora nos ultimos meses.`;
+  if(melhora) t+=` <b>${melhora}</b> indicador${melhora>1?'es mostram':'mostra'} evolucao positiva recente.`;
+  if(sem.length) t+=` <b>${sem.length}</b> sem meta cadastrada no periodo.`;
   $('insightText').innerHTML=t;
 }
 
-/* ── highlights ── */
-function renderHighlights(rows){
-  const cm=rows.filter(d=>d.Meta!==null&&d.Acumulado!==null);
+/* ── Highlights ── */
+function renderHL(rows){
+  const cm=rows.filter(d=>d.Meta!=null&&d.Acumulado!=null);
   const dentro=cm.filter(d=>statusOf(d)==='Dentro da meta');
   const abaixo=cm.filter(d=>statusOf(d)==='Abaixo da meta');
   const pct=cm.length?Math.round(dentro.length/cm.length*100):0;
   let melhor=null,pior=null;
   cm.forEach(d=>{
     const dn=d.Sentido.includes('↓');
-    const r=d.Meta?((dn?(d.Meta-d.Acumulado):(d.Acumulado-d.Meta))/Math.abs(d.Meta)):0;
-    if(statusOf(d)==='Dentro da meta'&&(!melhor||r>melhor.r))melhor={d,r};
+    const r=d.Meta?(dn?(d.Meta-d.Acumulado):(d.Acumulado-d.Meta))/Math.abs(d.Meta):0;
+    if(statusOf(d)==='Dentro da meta'&&(!melhor||r>melhor.r)) melhor={d,r};
     const dv=Math.abs(desvio(d)||0);
-    if(statusOf(d)==='Abaixo da meta'&&(!pior||dv>pior.dv))pior={d,dv};
+    if(statusOf(d)==='Abaixo da meta'&&(!pior||dv>pior.dv)) pior={d,dv};
   });
-  const tendBom=rows.filter(d=>tendClass(d)==='good').length;
-  const tendRuim=rows.filter(d=>tendClass(d)==='bad').length;
-
-  $('execHighlights').innerHTML=`
-    <div class="hl good">
-      <small>Taxa de atingimento</small><b>${pct}%</b>
-      <span>${dentro.length} de ${cm.length} indicadores</span>
-      <div class="mini"><i style="width:${Math.max(4,pct)}%"></i></div>
-    </div>
-    <div class="hl ${abaixo.length?'bad':'good'}">
-      <small>Atencao necessaria</small><b>${abaixo.length} indicador${abaixo.length!==1?'es':''}</b>
-      <span>abaixo da meta no periodo</span>
-      <div class="mini"><i class="${abaixo.length?'bad':''}" style="width:${cm.length?Math.max(4,abaixo.length/cm.length*100):4}%"></i></div>
-    </div>
-    <div class="hl good">
-      <small>Destaque positivo</small>
-      <b>${melhor?esc(melhor.d.Indicador.slice(0,24)):'—'}</b>
-      <span>${melhor?fmt(melhor.d.Acumulado,melhor.d.Unidade)+' / meta '+fmt(melhor.d.Meta,melhor.d.Unidade):'sem dado'}</span>
-      <div class="mini"><i style="width:${melhor?Math.min(100,Math.max(4,(1+melhor.r)*50)):4}%"></i></div>
-    </div>
-    <div class="hl warn">
-      <small>Maior desvio</small>
-      <b>${pior?esc(pior.d.Indicador.slice(0,24)):'—'}</b>
-      <span>${pior?fmt(pior.d.Acumulado,pior.d.Unidade)+' / meta '+fmt(pior.d.Meta,pior.d.Unidade):'sem desvio'}</span>
-      <div class="mini"><i class="bad" style="width:${pior?Math.min(100,Math.max(4,pior.dv/(Math.abs(pior.d.Meta)||1)*100)):4}%"></i></div>
-    </div>
-    <div class="hl good">
-      <small>Tendencia de melhora</small><b>${tendBom} indicador${tendBom!==1?'es':''}</b>
-      <span>evolucao positiva recente</span>
-      <div class="mini"><i style="width:${rows.length?Math.max(4,tendBom/rows.length*100):4}%"></i></div>
-    </div>
-    <div class="hl ${tendRuim?'bad':'good'}">
-      <small>Tendencia de piora</small><b>${tendRuim} indicador${tendRuim!==1?'es':''}</b>
-      <span>requerem acompanhamento</span>
-      <div class="mini"><i class="${tendRuim?'bad':''}" style="width:${rows.length?Math.max(4,tendRuim/rows.length*100):4}%"></i></div>
-    </div>`;
+  const tb=rows.filter(d=>tendClass(d)==='good').length;
+  const tr=rows.filter(d=>tendClass(d)==='bad').length;
+  $('hlGrid').innerHTML=`
+    <div class="hl good"><small>Taxa de atingimento</small><b>${pct}%</b><span>${dentro.length} de ${cm.length} indicadores</span><div class="mini"><i style="width:${Math.max(4,pct)}%"></i></div></div>
+    <div class="hl ${abaixo.length?'bad':'good'}"><small>Atencao necessaria</small><b>${abaixo.length} ind.</b><span>abaixo da meta</span><div class="mini"><i class="${abaixo.length?'bad':''}" style="width:${cm.length?Math.max(4,abaixo.length/cm.length*100):4}%"></i></div></div>
+    <div class="hl good"><small>Destaque</small><b>${melhor?esc(melhor.d.Indicador.slice(0,22)):'—'}</b><span>${melhor?fmt(melhor.d.Acumulado,melhor.d.Unidade)+' / meta '+fmt(melhor.d.Meta,melhor.d.Unidade):'—'}</span><div class="mini"><i style="width:${melhor?Math.min(100,Math.max(4,(1+melhor.r)*50)):4}%"></i></div></div>
+    <div class="hl warn"><small>Maior desvio</small><b>${pior?esc(pior.d.Indicador.slice(0,22)):'—'}</b><span>${pior?fmt(pior.d.Acumulado,pior.d.Unidade)+' / meta '+fmt(pior.d.Meta,pior.d.Unidade):'—'}</span><div class="mini"><i class="bad" style="width:${pior?Math.min(100,Math.max(4,pior.dv/(Math.abs(pior.d.Meta)||1)*100)):4}%"></i></div></div>
+    <div class="hl good"><small>Tendencia de melhora</small><b>${tb} ind.</b><span>evolucao positiva recente</span><div class="mini"><i style="width:${rows.length?Math.max(4,tb/rows.length*100):4}%"></i></div></div>
+    <div class="hl ${tr?'bad':'good'}"><small>Tendencia de piora</small><b>${tr} ind.</b><span>requerem acompanhamento</span><div class="mini"><i class="${tr?'bad':''}" style="width:${rows.length?Math.max(4,tr/rows.length*100):4}%"></i></div></div>`;
 }
 
-/* ── rankings ── */
+/* ── Rankings ── */
 function renderRankings(rows){
-  const abaixo=[...rows.filter(d=>statusOf(d)==='Abaixo da meta'&&d.Acumulado!==null&&d.Meta!==null)]
+  const abaixo=[...rows.filter(d=>statusOf(d)==='Abaixo da meta'&&d.Acumulado!=null&&d.Meta!=null)]
     .sort((a,b)=>Math.abs(desvio(b)||0)-Math.abs(desvio(a)||0)).slice(0,7);
   const maxDv=Math.max(...abaixo.map(d=>Math.abs(desvio(d)||0)),1);
   $('rankDesvio').innerHTML=abaixo.length?abaixo.map((d,i)=>{
     const dv=desvio(d);
-    return`<div class="rank">
-      <span class="rank-n">${i+1}</span>
-      <div class="rank-info">
-        <b title="${esc(d.Indicador)}">${esc(d.Indicador.length>34?d.Indicador.slice(0,33)+'…':d.Indicador)}</b>
-        <small>${d.Ano} &bull; meta ${fmt(d.Meta,d.Unidade)}</small>
-        <div class="rank-bar"><i class="bad" style="width:${Math.max(4,Math.abs(dv||0)/maxDv*100)}%"></i></div>
-      </div>
-      <span class="rank-val" style="color:var(--red)">${fmt(dv,d.Unidade)}</span>
-    </div>`;
-  }).join(''):`<div style="padding:14px 8px;color:var(--muted);font-size:12px">Nenhum indicador abaixo da meta.</div>`;
+    return`<div class="rank"><span class="rank-n">${i+1}</span><div class="rank-info"><b title="${esc(d.Indicador)}">${esc(d.Indicador.length>36?d.Indicador.slice(0,35)+'…':d.Indicador)}</b><small>${d.Ano} &bull; meta ${fmt(d.Meta,d.Unidade)}</small><div class="rank-bar"><i class="bad" style="width:${Math.max(4,Math.abs(dv||0)/maxDv*100)}%"></i></div></div><span class="rank-val" style="color:var(--red)">${fmt(dv,d.Unidade)}</span></div>`;
+  }).join(''):`<div style="padding:14px 8px;color:var(--muted);font-size:12px">Nenhum abaixo da meta.</div>`;
 
-  const bons=[...rows.filter(d=>statusOf(d)==='Dentro da meta'&&d.Acumulado!==null)]
-    .sort((a,b)=>{
-      const ra=a.Meta?Math.abs((a.Acumulado-a.Meta)/a.Meta):0;
-      const rb=b.Meta?Math.abs((b.Acumulado-b.Meta)/b.Meta):0;
-      return rb-ra;
-    }).slice(0,7);
+  const bons=[...rows.filter(d=>statusOf(d)==='Dentro da meta'&&d.Acumulado!=null)]
+    .sort((a,b)=>{const ra=a.Meta?Math.abs((a.Acumulado-a.Meta)/a.Meta):0;const rb=b.Meta?Math.abs((b.Acumulado-b.Meta)/b.Meta):0;return rb-ra;}).slice(0,7);
   const maxAc=Math.max(...bons.map(d=>d.Acumulado||0),1);
   $('rankBom').innerHTML=bons.length?bons.map((d,i)=>
-    `<div class="rank">
-      <span class="rank-n">${i+1}</span>
-      <div class="rank-info">
-        <b title="${esc(d.Indicador)}">${esc(d.Indicador.length>34?d.Indicador.slice(0,33)+'…':d.Indicador)}</b>
-        <small>${d.Ano} &bull; meta ${fmt(d.Meta,d.Unidade)}</small>
-        <div class="rank-bar"><i style="width:${Math.max(4,(d.Acumulado||0)/maxAc*100)}%"></i></div>
-      </div>
-      <span class="rank-val" style="color:var(--green)">${fmt(d.Acumulado,d.Unidade)}</span>
-    </div>`
-  ).join(''):`<div style="padding:14px 8px;color:var(--muted);font-size:12px">Sem indicadores dentro da meta no filtro.</div>`;
+    `<div class="rank"><span class="rank-n">${i+1}</span><div class="rank-info"><b title="${esc(d.Indicador)}">${esc(d.Indicador.length>36?d.Indicador.slice(0,35)+'…':d.Indicador)}</b><small>${d.Ano} &bull; meta ${fmt(d.Meta,d.Unidade)}</small><div class="rank-bar"><i style="width:${Math.max(4,(d.Acumulado||0)/maxAc*100)}%"></i></div></div><span class="rank-val" style="color:var(--green)">${fmt(d.Acumulado,d.Unidade)}</span></div>`
+  ).join(''):`<div style="padding:14px 8px;color:var(--muted);font-size:12px">Sem dados.</div>`;
 }
 
-/* ── render ── */
+/* ══════════════════════════════════════════
+   INSIGHTS ESTRATÉGICOS — CARDS EXPANSÍVEIS
+   ══════════════════════════════════════════ */
+function buildInsights(rows){
+  const cm=rows.filter(d=>d.Meta!=null&&d.Acumulado!=null);
+  const abaixo=cm.filter(d=>statusOf(d)==='Abaixo da meta');
+  const dentro=cm.filter(d=>statusOf(d)==='Dentro da meta');
+
+  // Gera lista de insights prioritários
+  const insights=[];
+
+  // 1. Maior desvio negativo
+  const piorDev=[...abaixo].sort((a,b)=>Math.abs(desvio(b)||0)-Math.abs(desvio(a)||0)).slice(0,2);
+  piorDev.forEach(d=>{
+    const dv=desvio(d); const pct=d.Meta?((dv/Math.abs(d.Meta))*100):0;
+    insights.push({
+      cls:'bad', tag:'Alerta critico',
+      title:d.Indicador,
+      val:fmt(d.Acumulado,d.Unidade),
+      meta:`Meta: ${fmt(d.Meta,d.Unidade)} &bull; Desvio: ${fmt(dv,d.Unidade)} (${Math.abs(pct).toFixed(1)}%)`,
+      narrativa:`O indicador <b>${esc(d.Indicador)}</b> registra acumulado de <b>${fmt(d.Acumulado,d.Unidade)}</b> frente a meta de <b>${fmt(d.Meta,d.Unidade)}</b>, representando desvio de <b>${fmt(dv,d.Unidade)}</b> (${Math.abs(pct).toFixed(1)}%). Sentido esperado: ${d.Sentido.includes('↓')?'reducao':'crescimento'}. Requer atencao gerencial imediata.`,
+      d, ano:d.Ano
+    });
+  });
+
+  // 2. Melhores superacoes de meta
+  const melhores=[...dentro].sort((a,b)=>{
+    const ra=a.Meta?Math.abs((a.Acumulado-a.Meta)/a.Meta):0;
+    const rb=b.Meta?Math.abs((b.Acumulado-b.Meta)/b.Meta):0;
+    return rb-ra;
+  }).slice(0,2);
+  melhores.forEach(d=>{
+    const dv=desvio(d); const pct=d.Meta?((dv/Math.abs(d.Meta))*100):0;
+    insights.push({
+      cls:'good', tag:'Destaque positivo',
+      title:d.Indicador,
+      val:fmt(d.Acumulado,d.Unidade),
+      meta:`Meta: ${fmt(d.Meta,d.Unidade)} &bull; Superacao: +${Math.abs(pct).toFixed(1)}%`,
+      narrativa:`O indicador <b>${esc(d.Indicador)}</b> apresenta desempenho acima da referencia, com acumulado de <b>${fmt(d.Acumulado,d.Unidade)}</b> frente a meta de <b>${fmt(d.Meta,d.Unidade)}</b>. Superacao de <b>${Math.abs(pct).toFixed(1)}%</b>. Resultado positivo que merece ser destacado e replicado.`,
+      d, ano:d.Ano
+    });
+  });
+
+  // 3. Tendencia de piora
+  const pioras=rows.filter(d=>tendClass(d)==='bad'&&d.Acumulado!=null)
+    .sort((a,b)=>(b.Acumulado||0)-(a.Acumulado||0)).slice(0,2);
+  pioras.forEach(d=>{
+    const v=MESES.map(m=>d[m]).filter(x=>x!=null);
+    const ini=v.length?v[0]:null; const fim=v.length?v.at(-1):null;
+    insights.push({
+      cls:'warn', tag:'Tendencia de piora',
+      title:d.Indicador,
+      val:fmt(d.Acumulado,d.Unidade),
+      meta:`Inicio: ${fmt(ini,d.Unidade)} &bull; Ultimo: ${fmt(fim,d.Unidade)}`,
+      narrativa:`A serie mensal de <b>${esc(d.Indicador)}</b> exibe tendencia de piora ao longo do periodo. O valor inicial foi <b>${fmt(ini,d.Unidade)}</b> e o mais recente <b>${fmt(fim,d.Unidade)}</b>. ${d.Sentido.includes('↓')?'Como o sentido esperado e reducao, o aumento e preocupante.':'Como o sentido esperado e crescimento, a reducao e preocupante.'} Acompanhamento proximo e recomendado.`,
+      d, ano:d.Ano
+    });
+  });
+
+  // 4. Sem meta (risco de transparencia)
+  const semMeta=rows.filter(d=>(d.Meta==null)&&d.Acumulado!=null).slice(0,2);
+  semMeta.forEach(d=>{
+    insights.push({
+      cls:'neutral', tag:'Sem meta cadastrada',
+      title:d.Indicador,
+      val:fmt(d.Acumulado,d.Unidade),
+      meta:`Acumulado disponivel &bull; Meta nao cadastrada`,
+      narrativa:`O indicador <b>${esc(d.Indicador)}</b> possui acumulado registrado de <b>${fmt(d.Acumulado,d.Unidade)}</b>, porem nao tem meta cadastrada no periodo. Sem referencia, nao e possivel avaliar se o resultado e satisfatorio. Recomenda-se o cadastro da meta para permitir avaliacao objetiva.`,
+      d, ano:d.Ano
+    });
+  });
+
+  return insights.slice(0,8);
+}
+
+let INSIGHT_CHARTS={};
+function renderInsightsGrid(rows){
+  const items=buildInsights(rows);
+  if(!items.length){ $('insightsGrid').innerHTML='<div style="color:var(--muted);font-size:13px;padding:8px">Sem dados suficientes para gerar insights.</div>'; return; }
+
+  $('insightsGrid').innerHTML=items.map((ins,i)=>`
+    <div class="ins-card ${ins.cls}" data-idx="${i}" onclick="toggleInsight(${i})">
+      <div class="ins-tag">${ins.tag}</div>
+      <div class="ins-title">${esc(ins.title)}</div>
+      <div class="ins-val">${ins.val}</div>
+      <div class="ins-meta">${ins.meta}</div>
+      <span class="ins-arrow">&#9660;</span>
+    </div>`).join('');
+
+  // guarda items para expand
+  window._insightItems=items;
+  window._insightRows=rows;
+  $('insightExpand').innerHTML='';
+  openInsightIdx=null;
+}
+
+function toggleInsight(idx){
+  const items=window._insightItems||[];
+  const rows=window._insightRows||[];
+  if(!items[idx]) return;
+
+  // fecha se ja aberto
+  if(openInsightIdx===idx){
+    openInsightIdx=null;
+    document.querySelectorAll('.ins-card').forEach(c=>c.classList.remove('open'));
+    $('insightExpand').innerHTML='';
+    return;
+  }
+  openInsightIdx=idx;
+  document.querySelectorAll('.ins-card').forEach(c=>c.classList.remove('open'));
+  document.querySelector(`.ins-card[data-idx="${idx}"]`).classList.add('open');
+
+  const ins=items[idx];
+  const d=ins.d;
+
+  // Monta estatisticas
+  const st=statusOf(d);
+  const dv=desvio(d);
+  const tc=tendClass(d);
+  const v=MESES.map(m=>d[m]).filter(x=>x!=null);
+  const maxV=v.length?Math.max(...v):null;
+  const minV=v.length?Math.min(...v):null;
+  const mediaV=v.length?(v.reduce((a,b)=>a+b,0)/v.length):null;
+  // Variacao YoY
+  const outro=DATA.find(x=>x.Indicador===d.Indicador&&x.Ano!==(d.Ano)&&INDS_PRE.has(x.Indicador));
+  const yoy=outro&&d.Acumulado!=null&&outro.Acumulado!=null&&outro.Acumulado!==0?((d.Acumulado-outro.Acumulado)/Math.abs(outro.Acumulado)*100):null;
+
+  const stCls=st==='Dentro da meta'?'good':st==='Abaixo da meta'?'bad':'';
+  const tcCls=tc==='good'?'good':tc==='bad'?'bad':'';
+
+  $('insightExpand').innerHTML=`
+    <div class="ins-expand open">
+      <div class="exp-main">
+        <h3>${esc(d.Indicador)} &mdash; ${d.Ano}</h3>
+        <div class="exp-narrative">${ins.narrativa}
+          ${yoy!=null?`<br><br>Variacao em relacao ao ano anterior: <b style="color:${yoy>=0?'var(--green)':'var(--red)'}">
+            ${yoy>=0?'+':''}${yoy.toFixed(1)}%</b> (${d.Ano-1}: ${outro?fmt(outro.Acumulado,d.Unidade):'—'} &rarr; ${d.Ano}: ${fmt(d.Acumulado,d.Unidade)}).`:''}
+        </div>
+      </div>
+      <div class="exp-chart">
+        <canvas id="expChart_${idx}" style="max-height:180px"></canvas>
+      </div>
+      <div class="exp-stats">
+        <div class="stat-row"><span class="stat-label">Status</span><span class="stat-val ${stCls}">${st}</span></div>
+        <div class="stat-row"><span class="stat-label">Acumulado</span><span class="stat-val">${fmt(d.Acumulado,d.Unidade)}</span></div>
+        <div class="stat-row"><span class="stat-label">Meta</span><span class="stat-val">${fmt(d.Meta,d.Unidade)}</span></div>
+        <div class="stat-row"><span class="stat-label">Desvio</span><span class="stat-val ${dv!=null&&dv<0?'bad':dv!=null&&dv>0?'good':''}">${dv!=null?fmt(dv,d.Unidade):'—'}</span></div>
+        <div class="stat-row"><span class="stat-label">Tendencia</span><span class="stat-val ${tcCls}">${tendLabel(d)}</span></div>
+        <div class="stat-row"><span class="stat-label">Maximo mensal</span><span class="stat-val">${fmt(maxV,d.Unidade)}</span></div>
+        <div class="stat-row"><span class="stat-label">Minimo mensal</span><span class="stat-val">${fmt(minV,d.Unidade)}</span></div>
+        <div class="stat-row"><span class="stat-label">Media mensal</span><span class="stat-val">${fmt(mediaV,d.Unidade)}</span></div>
+        ${yoy!=null?`<div class="stat-row"><span class="stat-label">Var. anual</span><span class="stat-val ${yoy>=0?'good':'bad'}">${yoy>=0?'+':''}${yoy.toFixed(1)}%</span></div>`:''}
+        <div class="stat-row"><span class="stat-label">Sentido</span><span class="stat-val">${d.Sentido||'—'}</span></div>
+        <div class="stat-row"><span class="stat-label">Diretoria</span><span class="stat-val">${d.Diretoria}</span></div>
+      </div>
+    </div>`;
+
+  // Grafico de evolução no expand
+  setTimeout(()=>{
+    const ctx=document.getElementById(`expChart_${idx}`);
+    if(!ctx) return;
+    if(INSIGHT_CHARTS[idx]) INSIGHT_CHARTS[idx].destroy();
+    const ds=[];
+    ANOS.forEach((a,i)=>{
+      const row=DATA.find(r=>r.Ano===a&&r.Indicador===d.Indicador);
+      if(!row) return;
+      ds.push({label:String(a),data:MESES.map(m=>row[m]),
+        borderColor:i===0?'#6da5d8':'#e87535',
+        backgroundColor:(i===0?'#6da5d8':'#e87535')+'15',
+        tension:.35,borderWidth:2,pointRadius:3,fill:i===0});
+    });
+    if(d.Meta!=null) ds.push({label:'Meta',data:MESES.map(()=>d.Meta),borderColor:'#e8c335',borderDash:[5,3],borderWidth:1.5,pointRadius:0,fill:false});
+    INSIGHT_CHARTS[idx]=new Chart(ctx,{type:'line',data:{labels:MESES,datasets:ds},options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:'#c7d8ef',font:{size:10}}}},
+      scales:{x:{ticks:{color:'#8a9db8',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}},
+              y:{ticks:{color:'#8a9db8',font:{size:9}},grid:{color:'rgba(255,255,255,.06)'}}}
+    }});
+    // Scroll suave até o expand
+    $('insightExpand').scrollIntoView({behavior:'smooth',block:'nearest'});
+  },60);
+}
+
+/* ── render geral ── */
 function render(){
   const rows=filtered();
   renderKPIs(rows);
@@ -518,19 +768,22 @@ function render(){
   renderDonut(rows);
   renderBar(rows);
   renderInsight(rows);
-  renderHighlights(rows);
+  renderHL(rows);
   renderRankings(rows);
+  renderInsightsGrid(rows);
 }
 
 /* ── eventos ── */
-['fAno','fDir','fSup','fInd','fUnidade','fSentido','fStatus'].forEach(id=>{
-  document.addEventListener('change',e=>{if(e.target?.id===id)render();});
+document.addEventListener('change',e=>{
+  const id=e.target?.id;
+  if(id==='fAno'||id==='fDir'||id==='fSup'){ cascadeFilters(); render(); }
+  else if(['fInd','fStatus'].includes(id)){ render(); }
+  else if(id==='selInd'){ renderEvol(); }
 });
-document.addEventListener('change',e=>{if(e.target?.id==='selInd')renderEvol();});
 document.addEventListener('click',e=>{
-  if(e.target?.id==='btnClear'){
-    ['fAno','fDir','fSup','fInd','fUnidade','fSentido','fStatus'].forEach(id=>$(id).value='');
-    render();
+  if(e.target?.id==='btnClear'||e.target?.closest?.('#btnClear')){
+    ['fAno','fDir','fSup','fInd','fStatus'].forEach(id=>$(id).value='');
+    cascadeFilters(); render();
   }
 });
 
@@ -538,8 +791,8 @@ document.addEventListener('click',e=>{
 Papa.parse(CSV_URL,{
   download:true,header:true,skipEmptyLines:true,
   complete:r=>{
-    DATA=r.data.map(transform).filter(d=>d.Ano&&d.Indicador);
-    populateFilters();
+    DATA=r.data.map(transform).filter(d=>d.Ano&&d.Indicador&&matchInd(d.Indicador));
+    populateAll();
     render();
   },
   error:e=>{console.error(e);$('kTotal').textContent='Erro';}
