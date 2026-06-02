@@ -1064,13 +1064,113 @@ function buildInsights(rows){
 
   return ins.slice(0,6);
 }
+function buildIndicatorMode(rows){
+  const inds = uniq(rows.map(d=>d.Indicador));
+  if(inds.length !== 1) return null;
+
+  const ind = inds[0];
+  const recs = rows.filter(d=>d.Indicador === ind).sort((a,b)=>(b.Ano||0)-(a.Ano||0));
+  const atual = recs[0];
+  const anterior = recs.find(d=>d.Ano !== atual.Ano);
+  if(!atual) return null;
+
+  const st = statusOf(atual);
+  const tc = tendClass(atual);
+  const cons = consistencia(atual);
+  const vals = MESES.map(m=>atual[m]).filter(x=>x != null);
+  const primeiro = vals.length ? vals[0] : null;
+  const ultimo = vals.length ? vals.at(-1) : null;
+  const deltaSerie = (primeiro != null && ultimo != null && primeiro !== 0) ? ((ultimo - primeiro) / Math.abs(primeiro) * 100) : null;
+  const yoy = (anterior && anterior.Acumulado != null && atual.Acumulado != null && anterior.Acumulado !== 0)
+    ? ((atual.Acumulado - anterior.Acumulado) / Math.abs(anterior.Acumulado) * 100)
+    : null;
+
+  const semMeta = atual.Meta == null || atual.Acumulado == null;
+  const eixo = atual.Eixo || eixoDe(atual.Indicador);
+  const gov = atual.Governabilidade || govClass(atual.Indicador);
+  const tipo = atual.Tipo || tipoIndicador(atual.Indicador);
+
+  const leituraStatus = semMeta
+    ? `O indicador possui valor realizado, mas não tem meta cadastrada no recorte. Ele pode ser monitorado, porém não deve ser tratado como bom ou ruim sem referência formal.`
+    : st === 'Dentro da meta'
+      ? `O indicador está dentro da referência cadastrada. A leitura executiva deve observar se esse resultado é consistente ou se depende de variação pontual.`
+      : `O indicador está abaixo da referência cadastrada. A leitura executiva deve verificar se o desvio é pontual, estrutural ou associado a fatores fora da governabilidade direta.`;
+
+  const leituraTend = tc === 'good'
+    ? `A trajetória recente é favorável em relação ao sentido esperado do indicador.`
+    : tc === 'bad'
+      ? `A trajetória recente é desfavorável em relação ao sentido esperado do indicador. Mesmo sem meta, isso indica perda de desempenho ou aumento de pressão.`
+      : `A série recente está estável, sem variação relevante no padrão mensal.`;
+
+  const leituraCons = cons === 'alta'
+    ? `A série tem baixa oscilação mensal, sugerindo comportamento operacional mais previsível.`
+    : cons === 'média'
+      ? `A série apresenta oscilação moderada. O resultado deve ser lido com cautela, especialmente se houver poucos meses preenchidos.`
+      : `A série apresenta variação elevada ou poucos dados mensais. O resultado pode refletir pico, sazonalidade ou preenchimento incompleto.`;
+
+  const pergunta = semMeta
+    ? `Definir meta ou referência de acompanhamento para permitir avaliação executiva.`
+    : st === 'Abaixo da meta'
+      ? `Identificar causa do desvio, responsável pelo plano de recuperação e prazo de correção.`
+      : tc === 'bad'
+        ? `Acompanhar preventivamente para evitar que a deterioração vire desvio formal no fechamento.`
+        : `Preservar o padrão atual e verificar se a prática pode ser replicada em áreas semelhantes.`;
+
+  return [
+    {
+      cls: semMeta ? 'neutral' : st === 'Dentro da meta' ? 'good' : 'bad',
+      tag:'Ficha do Indicador',
+      titulo:atual.Indicador,
+      val:fmt(atual.Acumulado,atual.Unidade),
+      sub: semMeta ? 'sem meta cadastrada' : `${st} · meta ${fmt(atual.Meta,atual.Unidade)}`,
+      d:atual,
+      narrativa:`<b>${esc(atual.Indicador)}</b> é um indicador do eixo <b>${esc(eixo)}</b>, classificado como <b>${esc(tipo)}</b> e com leitura de governabilidade <b>${esc(gov)}</b>.<br><br>${leituraStatus}`
+    },
+    {
+      cls: tc === 'good' ? 'good' : tc === 'bad' ? 'warn' : 'neutral',
+      tag:'Comportamento Recente',
+      titulo: tc === 'good' ? 'Trajetória favorável' : tc === 'bad' ? 'Trajetória desfavorável' : 'Trajetória estável',
+      val: deltaSerie == null ? '—' : `${deltaSerie >= 0 ? '+' : ''}${deltaSerie.toFixed(1)}%`,
+      sub: primeiro != null && ultimo != null ? `${fmt(primeiro,atual.Unidade)} → ${fmt(ultimo,atual.Unidade)}` : 'sem série mensal suficiente',
+      d:atual,
+      narrativa:`${leituraTend}<br><br>No período carregado, a série saiu de <b>${fmt(primeiro,atual.Unidade)}</b> para <b>${fmt(ultimo,atual.Unidade)}</b>. ${deltaSerie == null ? 'Não há dados mensais suficientes para calcular a variação.' : `A variação estimada foi de <b>${deltaSerie >= 0 ? '+' : ''}${deltaSerie.toFixed(1)}%</b>.`}`
+    },
+    {
+      cls: cons === 'alta' ? 'good' : cons === 'média' ? 'neutral' : 'warn',
+      tag:'Confiabilidade da Leitura',
+      titulo: cons === 'alta' ? 'Resultado mais estável' : cons === 'média' ? 'Oscilação moderada' : 'Leitura instável',
+      val:cons,
+      sub: yoy == null ? 'sem comparação anual' : `variação anual ${yoy >= 0 ? '+' : ''}${yoy.toFixed(1)}%`,
+      d:atual,
+      narrativa:`${leituraCons}${yoy == null ? '' : `<br><br>Na comparação com ${anterior.Ano}, o acumulado variou <b>${yoy >= 0 ? '+' : ''}${yoy.toFixed(1)}%</b>, saindo de <b>${fmt(anterior.Acumulado,atual.Unidade)}</b> para <b>${fmt(atual.Acumulado,atual.Unidade)}</b>.`}`
+    },
+    {
+      cls: semMeta || tc === 'bad' || st === 'Abaixo da meta' ? 'warn' : 'good',
+      tag:'Decisão Executiva',
+      titulo:'O que esse indicador pede',
+      val: semMeta ? 'definir meta' : st === 'Abaixo da meta' ? 'plano de ação' : tc === 'bad' ? 'monitorar' : 'manter padrão',
+      sub:'leitura para despacho',
+      d:atual,
+      narrativa:`A leitura executiva recomendada é: <b>${esc(pergunta)}</b><br><br>Esse card evita que o painel apenas mostre o número. Ele transforma o indicador selecionado em uma pauta objetiva para gestão.`
+    }
+  ];
+}
+
 function renderInsights(rows){
-  const items = buildInsights(rows);
+  const indicatorMode = buildIndicatorMode(rows);
+  const items = indicatorMode || buildInsights(rows);
+
   if(!items.length){
     $('insGrid').innerHTML = `<div style="color:var(--muted);font-size:13px;padding:8px">Sem dados suficientes para gerar insights.</div>`;
     $('insExpand').innerHTML = '';
     return;
   }
+
+  const label = document.querySelectorAll('.section-label')[4];
+  if(label){
+    label.childNodes[0].nodeValue = indicatorMode ? 'Ficha Executiva do Indicador ' : 'Insights Estratégicos ';
+  }
+
   window._insItems = items;
   $('insGrid').innerHTML = items.map((ins,i)=>`
     <div class="ins-card ${ins.cls}" data-idx="${i}" onclick="toggleIns(${i})">
@@ -1171,6 +1271,37 @@ function toggleIns(idx){
 
 /* leitura */
 function renderInsightText(rows){
+  const inds = uniq(rows.map(d=>d.Indicador));
+  if(inds.length === 1 && rows.length){
+    const recs = rows.slice().sort((a,b)=>(b.Ano||0)-(a.Ano||0));
+    const d = recs[0];
+    const st = statusOf(d);
+    const tc = tendClass(d);
+    const cons = consistencia(d);
+    const semMeta = d.Meta == null || d.Acumulado == null;
+
+    let t = `<b>${esc(d.Indicador)}</b> pertence ao eixo <b>${esc(d.Eixo)}</b>. `;
+    t += semMeta
+      ? `O indicador possui acumulado de <b>${fmt(d.Acumulado,d.Unidade)}</b>, mas está <b>sem meta cadastrada</b>. Portanto, o painel monitora o comportamento, mas não classifica o desempenho como bom ou ruim. `
+      : `O acumulado é <b>${fmt(d.Acumulado,d.Unidade)}</b> frente à meta de <b>${fmt(d.Meta,d.Unidade)}</b>, com status <b>${st}</b>. `;
+    t += tc === 'bad'
+      ? `A trajetória recente é desfavorável, então vale acompanhamento preventivo. `
+      : tc === 'good'
+        ? `A trajetória recente é favorável. `
+        : `A trajetória recente está estável. `;
+    t += `A consistência da série é <b>${cons}</b>. `;
+    t += semMeta
+      ? `A principal decisão é cadastrar uma referência de meta para permitir avaliação executiva.`
+      : st === 'Abaixo da meta'
+        ? `A principal decisão é identificar causa, responsável e prazo para recuperação.`
+        : tc === 'bad'
+          ? `A principal decisão é evitar deterioração antes do fechamento do período.`
+          : `A principal decisão é preservar o padrão atual.`;
+
+    $('insightText').innerHTML = t;
+    return;
+  }
+
   const cm = rows.filter(d=>d.Meta != null && d.Acumulado != null);
   const dentro = cm.filter(d=>statusOf(d)==='Dentro da meta');
   const abaixo = cm.filter(d=>statusOf(d)==='Abaixo da meta');
