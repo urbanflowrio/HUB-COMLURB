@@ -25,7 +25,7 @@ h1{margin:4px 0;font-size:clamp(22px,2vw,34px);line-height:1.05;color:#fff}
 .sub{color:#c5d5e8;font-size:14px}
 
 /* FILTROS */
-.controls{display:grid;grid-template-columns:140px 1fr 1fr 1fr 1fr 140px;gap:12px;margin:14px 0}
+.controls{display:grid;grid-template-columns:120px 1fr 1fr 1fr 1fr 1fr 1fr 130px;gap:10px;margin:14px 0}
 .field,.btn{border:1px solid var(--line);background:var(--panel);border-radius:16px;padding:11px 12px}
 label{display:block;color:#aebbd0;font-size:10px;letter-spacing:.13em;text-transform:uppercase;font-weight:900;margin-bottom:6px}
 select{width:100%;background:transparent;border:0;color:#f2f6ff;font-weight:800;outline:0;cursor:pointer}
@@ -102,7 +102,7 @@ select option{background:#0d1b2f;color:#fff}
 .footer-left{font-size:11px;color:#5a7a9a}
 .footer-right{font-size:11px;color:#4a6a88}
 
-@media(max-width:1350px){.layoutMain{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(3,1fr)}.controls{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:1450px){.layoutMain{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(3,1fr)}.controls{grid-template-columns:repeat(4,1fr)}}
 @media(max-width:760px){.header{flex-direction:column}.logo{border-right:0;padding-right:0}.kpis,.controls,.grid2{grid-template-columns:1fr}.highlightGrid{grid-template-columns:1fr}}
 </style>
 </head>
@@ -122,6 +122,8 @@ select option{background:#0d1b2f;color:#fff}
 <!-- FILTROS -->
 <section class="controls">
   <div class="field"><label>Ano</label><select id="fAno"></select></div>
+  <div class="field"><label>Diretoria</label><select id="fDir"></select></div>
+  <div class="field"><label>Sup./Coord.</label><select id="fSup"></select></div>
   <div class="field"><label>Indicador</label><select id="fInd"></select></div>
   <div class="field"><label>Unidade</label><select id="fUnidade"></select></div>
   <div class="field"><label>Sentido</label><select id="fSentido"></select></div>
@@ -209,7 +211,7 @@ select option{background:#0d1b2f;color:#fff}
 </div>
 
 <script>
-const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQphrIIjiY4aWBONgByLezMnFk8YbyYpF-vtgxOLoV8-85_WUVAXH_f_Ahy8ymxmgnGXmQ_KiFSOkIK/pub?gid=0&single=true&output=csv';
+const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQphrIIjiY4aWBONgByLezMnFk8YbyYpF-vtgxOLoV8-85_WUVAXH_f_Ahy8ymxmgnGXmQ_KiFSOkIK/pub?gid=1044100274&single=true&output=csv';
 const ANOS  = [2025, 2026];
 const MESES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
 const $ = id => document.getElementById(id);
@@ -241,13 +243,18 @@ function getF(row,names){
 
 /* ── transform ── */
 function transform(r){
+  const diretoria=String(getF(r,["Diretoria","DIRETORIA"])||"").trim();
+  const supRaw=String(getF(r,["Superintendência","Superintendencia","Sup./Coord."])||"").trim();
+  const sup=(!supRaw||supRaw==="-"||supRaw==="–"||supRaw==="—")?diretoria:supRaw;
   const d={
-    Ano      :num(getF(r,['Ano','ANO'])),
-    Indicador:String(getF(r,['Indicador','INDICADOR'])||'').trim(),
-    Unidade  :String(getF(r,['Unidade','UNIDADE'])||'').trim(),
-    Sentido  :String(getF(r,['Sentido','SENTIDO'])||'').trim(),
-    Acumulado:num(getF(r,['Acumulado','ACUMULADO','Resultado'])),
-    Meta     :num(getF(r,['Meta','META','Alvo']))
+    Ano      :num(getF(r,["Ano","ANO"])),
+    Indicador:String(getF(r,["Indicador","INDICADOR"])||"").trim(),
+    Diretoria:diretoria,
+    Superintendencia:sup||diretoria,
+    Unidade  :String(getF(r,["Unidade","UNIDADE"])||"").trim(),
+    Sentido  :String(getF(r,["Sentido","SENTIDO"])||"").trim(),
+    Acumulado:num(getF(r,["Acumulado","ACUMULADO","Resultado"])),
+    Meta     :num(getF(r,["Meta","META","Alvo"]))
   };
   MESES.forEach(m=>{d[m]=num(getF(r,[m]));});
   if(d.Acumulado===null){const v=MESES.map(m=>d[m]).filter(x=>x!==null);if(v.length)d.Acumulado=v.at(-1);}
@@ -275,10 +282,12 @@ function tendClass(d){
 /* ── filtros ── */
 function vf(id){return $(id)?.value||'';}
 function filtered(){
-  const a=vf('fAno'),ind=vf('fInd'),un=vf('fUnidade'),sent=vf('fSentido'),st=vf('fStatus');
+  const a=vf('fAno'),dir=vf('fDir'),sup=vf('fSup'),ind=vf('fInd'),un=vf('fUnidade'),sent=vf('fSentido'),st=vf('fStatus');
   return DATA.filter(d=>{
     if(!ANOS.includes(d.Ano))return false;
     if(a&&String(d.Ano)!==a)return false;
+    if(dir&&d.Diretoria!==dir)return false;
+    if(sup&&d.Superintendencia!==sup)return false;
     if(ind&&d.Indicador!==ind)return false;
     if(un&&d.Unidade!==un)return false;
     if(sent&&d.Sentido!==sent)return false;
@@ -294,11 +303,13 @@ function setOpts(id,vals,lbl){
 }
 function populateFilters(){
   const base=DATA.filter(d=>ANOS.includes(d.Ano));
-  setOpts('fAno',   uniq(base.map(d=>d.Ano)),       'Todos os anos');
-  setOpts('fInd',   uniq(base.map(d=>d.Indicador)), 'Todos');
-  setOpts('fUnidade',uniq(base.map(d=>d.Unidade)),  'Todas');
-  setOpts('fSentido',uniq(base.map(d=>d.Sentido)),  'Todos');
-  setOpts('fStatus', uniq(base.map(d=>statusOf(d))),'Todos');
+  setOpts('fAno',   uniq(base.map(d=>d.Ano)),             'Todos os anos');
+  setOpts('fDir',   uniq(base.map(d=>d.Diretoria)),       'Todas');
+  setOpts('fSup',   uniq(base.map(d=>d.Superintendencia)),'Todas');
+  setOpts('fInd',   uniq(base.map(d=>d.Indicador)),       'Todos');
+  setOpts('fUnidade',uniq(base.map(d=>d.Unidade)),        'Todas');
+  setOpts('fSentido',uniq(base.map(d=>d.Sentido)),        'Todos');
+  setOpts('fStatus', uniq(base.map(d=>statusOf(d))),      'Todos');
 }
 
 /* ── chart helper ── */
@@ -512,13 +523,13 @@ function render(){
 }
 
 /* ── eventos ── */
-['fAno','fInd','fUnidade','fSentido','fStatus'].forEach(id=>{
+['fAno','fDir','fSup','fInd','fUnidade','fSentido','fStatus'].forEach(id=>{
   document.addEventListener('change',e=>{if(e.target?.id===id)render();});
 });
 document.addEventListener('change',e=>{if(e.target?.id==='selInd')renderEvol();});
 document.addEventListener('click',e=>{
   if(e.target?.id==='btnClear'){
-    ['fAno','fInd','fUnidade','fSentido','fStatus'].forEach(id=>$(id).value='');
+    ['fAno','fDir','fSup','fInd','fUnidade','fSentido','fStatus'].forEach(id=>$(id).value='');
     render();
   }
 });
