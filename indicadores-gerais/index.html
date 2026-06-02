@@ -293,6 +293,30 @@ select option{background:#0d1b2f;color:#fff}
 .layoutBottom{display:grid;grid-template-columns:minmax(0,1fr) 370px;gap:14px}
 .colLeft,.colRight{display:flex;flex-direction:column;gap:14px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+.indicator-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.indicator-card{
+  background:rgba(13,27,47,.98);
+  border:1px solid var(--line);
+  border-radius:20px;
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+.indicator-card .body{padding:16px 18px;color:#d7e4f7;font-size:13px;line-height:1.7}
+.indicator-card .big{
+  display:block;
+  font-size:30px;
+  font-weight:950;
+  color:#fff;
+  margin:8px 0 4px;
+}
+.indicator-card .muted{color:#9fb0c7;font-size:11px}
+.indicator-kv{display:grid;grid-template-columns:1fr auto;gap:8px;border-top:1px solid rgba(255,255,255,.06);padding:8px 0}
+.indicator-kv:first-child{border-top:0}
+.indicator-kv span{color:#9fb0c7;font-size:11px;font-weight:800}
+.indicator-kv b{font-size:12px;color:#fff;text-align:right}
+@media(max-width:900px){.indicator-grid{grid-template-columns:1fr}}
+
 .panel{
   background:rgba(13,27,47,.98);
   border:1px solid var(--line);
@@ -448,14 +472,25 @@ select option{background:#0d1b2f;color:#fff}
       <div class="chartWrap tall"><canvas id="lineChart"></canvas></div>
     </section>
 
-    <div class="grid2">
+    <div class="grid2" id="generalCharts">
       <section class="panel">
-        <div class="panelHead"><div><h2>Status vs Meta</h2><div class="hint">Distribuição por situação</div></div></div>
+        <div class="panelHead"><div><h2>Status vs Meta</h2><div class="hint">Distribuição por situação no recorte filtrado</div></div></div>
         <div class="chartWrap"><canvas id="donutChart"></canvas></div>
       </section>
       <section class="panel">
         <div class="panelHead"><div><h2>Comparativo 2025 vs 2026</h2><div class="hint">Acumulado por indicador com dados nos dois anos</div></div></div>
         <div class="chartWrap"><canvas id="barChart"></canvas></div>
+      </section>
+    </div>
+
+    <div class="indicator-grid" id="indicatorAnalysis" style="display:none">
+      <section class="indicator-card">
+        <div class="panelHead"><div><h2>Leitura do Indicador</h2><div class="hint">Interpretação aplicada ao filtro selecionado</div></div></div>
+        <div class="body" id="indicatorReadBox">—</div>
+      </section>
+      <section class="indicator-card">
+        <div class="panelHead"><div><h2>Comparação Anual</h2><div class="hint">Mesmo indicador em 2025 e 2026</div></div></div>
+        <div class="body" id="indicatorCompareBox">—</div>
       </section>
     </div>
   </div>
@@ -1380,6 +1415,91 @@ function renderBar(rows){
   ]);
 }
 
+function isSingleIndicator(rows){
+  return uniq(rows.map(d=>d.Indicador)).length === 1;
+}
+
+function renderIndicatorAnalysis(rows){
+  const inds = uniq(rows.map(d=>d.Indicador));
+  if(inds.length !== 1){
+    $('indicatorAnalysis').style.display = 'none';
+    $('generalCharts').style.display = 'grid';
+    return;
+  }
+
+  $('indicatorAnalysis').style.display = 'grid';
+  $('generalCharts').style.display = 'none';
+
+  const ind = inds[0];
+  const recs = rows.filter(d=>d.Indicador === ind).sort((a,b)=>(b.Ano||0)-(a.Ano||0));
+  const atual = recs[0];
+  const r2025 = DATA.find(d=>d.Indicador === ind && d.Ano === 2025);
+  const r2026 = DATA.find(d=>d.Indicador === ind && d.Ano === 2026);
+
+  if(!atual){
+    $('indicatorReadBox').innerHTML = 'Sem dados para o indicador selecionado.';
+    $('indicatorCompareBox').innerHTML = 'Sem comparação disponível.';
+    return;
+  }
+
+  const st = statusOf(atual);
+  const tc = tendClass(atual);
+  const cons = consistencia(atual);
+  const semMeta = atual.Meta == null || atual.Acumulado == null;
+  const vals = MESES.map(m=>atual[m]).filter(x=>x != null);
+  const primeiro = vals.length ? vals[0] : null;
+  const ultimo = vals.length ? vals.at(-1) : null;
+  const deltaSerie = (primeiro != null && ultimo != null && primeiro !== 0) ? ((ultimo-primeiro)/Math.abs(primeiro)*100) : null;
+
+  let decisao = '';
+  if(semMeta) decisao = 'Cadastrar meta ou referência para permitir avaliação executiva.';
+  else if(st === 'Abaixo da meta') decisao = 'Apurar causa do desvio, responsável e prazo de recuperação.';
+  else if(tc === 'bad') decisao = 'Monitorar preventivamente para evitar perda de resultado no fechamento.';
+  else decisao = 'Manter padrão atual e avaliar replicação da prática.';
+
+  $('indicatorReadBox').innerHTML = `
+    <span class="big">${fmt(atual.Acumulado,atual.Unidade)}</span>
+    <div class="muted">${esc(atual.Indicador)} · ${esc(atual.Eixo)} · ${esc(atual.Tipo)} · ${esc(atual.Governabilidade)}</div>
+    <br>
+    ${semMeta
+      ? `O indicador possui valor realizado, mas está <b>sem meta cadastrada</b>. Ele não deve ser interpretado como bom ou ruim sem referência formal.`
+      : `O indicador está <b>${st}</b>, com acumulado de <b>${fmt(atual.Acumulado,atual.Unidade)}</b> frente à meta de <b>${fmt(atual.Meta,atual.Unidade)}</b>.`
+    }
+    <br><br>
+    A trajetória recente é <b>${tendLabel(atual)}</b> e a consistência da série é <b>${cons}</b>.
+    ${deltaSerie == null ? '' : ` A variação entre o primeiro e o último mês disponível foi de <b>${deltaSerie>=0?'+':''}${deltaSerie.toFixed(1)}%</b>.`}
+    <br><br>
+    <b>Decisão sugerida:</b> ${decisao}
+  `;
+
+  const yoy = (r2025 && r2026 && r2025.Acumulado != null && r2026.Acumulado != null && r2025.Acumulado !== 0)
+    ? ((r2026.Acumulado-r2025.Acumulado)/Math.abs(r2025.Acumulado)*100)
+    : null;
+
+  $('indicatorCompareBox').innerHTML = `
+    <div class="indicator-kv"><span>2025</span><b>${r2025 ? fmt(r2025.Acumulado,r2025.Unidade) : '—'}</b></div>
+    <div class="indicator-kv"><span>2026</span><b>${r2026 ? fmt(r2026.Acumulado,r2026.Unidade) : '—'}</b></div>
+    <div class="indicator-kv"><span>Variação anual</span><b style="color:${yoy==null?'#fff':yoy>=0?'var(--green)':'var(--red)'}">${yoy==null?'—':(yoy>=0?'+':'')+yoy.toFixed(1)+'%'}</b></div>
+    <div class="indicator-kv"><span>Status atual</span><b>${st}</b></div>
+    <div class="indicator-kv"><span>Meta atual</span><b>${fmt(atual.Meta,atual.Unidade)}</b></div>
+    <div class="indicator-kv"><span>Desvio atual</span><b>${desvio(atual)==null?'—':fmt(desvio(atual),atual.Unidade)}</b></div>
+    <br>
+    <span class="muted">Esta comparação usa apenas o indicador filtrado. O gráfico geral de barras fica oculto para evitar leitura misturada.</span>
+  `;
+}
+
+function renderBottomMode(rows){
+  if(isSingleIndicator(rows)){
+    renderIndicatorAnalysis(rows);
+    renderEvol();
+  }else{
+    $('indicatorAnalysis').style.display = 'none';
+    $('generalCharts').style.display = 'grid';
+    renderDonut(rows);
+    renderBar(rows);
+  }
+}
+
 /* rankings */
 function renderRankings(rows){
   const abaixo = rows.filter(d=>statusOf(d)==='Abaixo da meta' && d.Acumulado != null && d.Meta != null)
@@ -1425,9 +1545,7 @@ function render(){
   renderInsights(rows);
   renderInsightText(rows);
   populateSelInd(rows);
-  renderEvol();
-  renderDonut(rows);
-  renderBar(rows);
+  renderBottomMode(rows);
   renderRankings(rows);
 }
 
