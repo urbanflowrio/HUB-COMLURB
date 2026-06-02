@@ -4,142 +4,331 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>PRE · Sala de Situação · HUB COMLURB</title>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
 <style>
 :root{
-  --bg:#07111f;--ink:#f2f6ff;--muted:#9fb0c7;--panel:#0d1b2f;
-  --line:#274260;--blue:#6da5d8;--orange:#e87535;
-  --green:#78aaa3;--red:#ef6a5d;--yellow:#e8c335;--purple:#a78bfa;
+  --bg:#07111f;
+  --ink:#f2f6ff;
+  --muted:#9fb0c7;
+  --panel:#0d1b2f;
+  --panel2:#0b1a2e;
+  --line:#274260;
+  --blue:#6da5d8;
+  --orange:#e87535;
+  --green:#78aaa3;
+  --red:#ef6a5d;
+  --yellow:#e8c335;
+  --purple:#a78bfa;
   --shadow:0 18px 45px rgba(0,0,0,.28);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--ink);font-family:Inter,Segoe UI,Arial,sans-serif}
+body{
+  background:
+    radial-gradient(circle at top left,rgba(109,165,216,.10),transparent 32%),
+    radial-gradient(circle at top right,rgba(232,117,53,.08),transparent 26%),
+    var(--bg);
+  color:var(--ink);
+  font-family:Inter,Segoe UI,Arial,sans-serif;
+}
 .app{max-width:1880px;margin:0 auto;padding:18px}
-
-/* HEADER */
-.header{display:flex;align-items:center;gap:22px;padding:20px 22px;border:1px solid rgba(111,164,216,.25);border-radius:22px;background:#0b1a2e;box-shadow:var(--shadow);margin-bottom:14px}
-.logo{width:230px;max-height:58px;object-fit:contain;border-right:1px solid rgba(255,255,255,.35);padding-right:20px;flex-shrink:0}
-.eyebrow{font-size:11px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:#b9c9dc}
-h1{margin:4px 0;font-size:clamp(20px,2vw,32px);line-height:1.05;color:#fff}
+.header{
+  display:flex;align-items:center;gap:22px;
+  padding:20px 22px;
+  border:1px solid rgba(111,164,216,.25);
+  border-radius:22px;
+  background:rgba(11,26,46,.96);
+  box-shadow:var(--shadow);
+  margin-bottom:14px;
+}
+.logo{
+  width:230px;max-height:58px;object-fit:contain;
+  border-right:1px solid rgba(255,255,255,.35);
+  padding-right:20px;flex-shrink:0;
+}
+.eyebrow{
+  font-size:11px;font-weight:900;letter-spacing:.16em;
+  text-transform:uppercase;color:#b9c9dc
+}
+h1{margin:4px 0;font-size:clamp(22px,2vw,34px);line-height:1.05;color:#fff}
 .sub{color:#c5d5e8;font-size:13px;margin-top:2px}
 
-/* FILTROS */
-.controls{display:grid;grid-template-columns:110px 1fr 1fr 1fr 1fr 110px;gap:10px;margin:14px 0}
-.field{border:1px solid var(--line);background:var(--panel);border-radius:14px;padding:10px 12px}
-.btn-clear{border:1px solid rgba(232,117,53,.75);background:#14243b;border-radius:14px;padding:10px 12px;cursor:pointer;color:#fff;font-weight:950;font-size:13px;transition:.15s}
+/* filtros */
+.controls{
+  display:grid;grid-template-columns:110px 1fr 1fr 1fr 1fr 120px;
+  gap:10px;margin:14px 0;
+}
+.field{
+  border:1px solid var(--line);
+  background:rgba(13,27,47,.96);
+  border-radius:14px;
+  padding:10px 12px;
+}
+.btn-clear{
+  border:1px solid rgba(232,117,53,.75);
+  background:#14243b;border-radius:14px;
+  padding:10px 12px;cursor:pointer;color:#fff;
+  font-weight:950;font-size:13px;transition:.15s;
+}
 .btn-clear:hover{background:#1e3352}
-label{display:block;color:#aebbd0;font-size:10px;letter-spacing:.13em;text-transform:uppercase;font-weight:900;margin-bottom:5px}
-select{width:100%;background:transparent;border:0;color:#f2f6ff;font-weight:800;outline:0;cursor:pointer;font-size:13px}
+label{
+  display:block;color:#aebbd0;font-size:10px;
+  letter-spacing:.13em;text-transform:uppercase;
+  font-weight:900;margin-bottom:5px
+}
+select{
+  width:100%;background:transparent;border:0;color:#f2f6ff;
+  font-weight:800;outline:0;cursor:pointer;font-size:13px
+}
 select option{background:#0d1b2f;color:#fff}
 
-/* SECTION LABELS */
-.section-label{font:800 11px/1 Inter,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#5a7a9a;margin:20px 0 10px;padding-left:2px;display:flex;align-items:center;gap:10px}
-.section-label:after{content:"";flex:1;height:1px;background:rgba(39,66,96,.6)}
+/* títulos */
+.section-label{
+  font:800 11px/1 Inter,sans-serif;
+  letter-spacing:.16em;text-transform:uppercase;
+  color:#6f8aaa;margin:20px 0 10px;
+  padding-left:2px;display:flex;align-items:center;gap:10px;
+}
+.section-label:after{
+  content:"";flex:1;height:1px;background:rgba(39,66,96,.68)
+}
 
-/* ═══ BLOCO 1: ESTADO GERAL ═══ */
-.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:6px}
-.kpi{position:relative;overflow:hidden;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px 18px;box-shadow:var(--shadow)}
+/* diagnóstico */
+.diagnostic{
+  display:none;
+  grid-template-columns:repeat(5,1fr);
+  gap:10px;
+  margin-bottom:12px;
+}
+.diag-card{
+  background:#091728;border:1px dashed rgba(109,165,216,.45);
+  border-radius:14px;padding:12px 14px;
+}
+.diag-card span{
+  display:block;color:#8fa7c3;font-size:9px;font-weight:900;
+  letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px;
+}
+.diag-card b{font-size:21px;color:#fff}
+.diag-list{
+  grid-column:1/-1;
+  background:#091728;border:1px dashed rgba(109,165,216,.35);
+  border-radius:14px;padding:12px 14px;
+  color:#c7d8ef;font-size:11px;line-height:1.55;
+  max-height:150px;overflow:auto;
+}
+.diag-toggle{
+  border:1px solid rgba(109,165,216,.55);
+  background:#0b1a2e;color:#cfe2f8;
+  border-radius:999px;padding:6px 10px;
+  font-size:11px;font-weight:900;cursor:pointer;
+  margin-left:auto;
+}
+
+/* KPIs */
+.kpis{
+  display:grid;grid-template-columns:repeat(5,1fr);
+  gap:12px;margin-bottom:6px;
+}
+.kpi{
+  position:relative;overflow:hidden;
+  background:rgba(13,27,47,.98);
+  border:1px solid var(--line);
+  border-radius:18px;padding:16px 18px;
+  box-shadow:var(--shadow);
+}
 .kpi:before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:#4b7eac}
-.kpi.green:before{background:var(--green)}.kpi.red:before{background:var(--red)}
-.kpi.orange:before{background:var(--orange)}.kpi.yellow:before{background:var(--yellow)}
-.kpi span{display:block;color:#aebbd0;font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:950}
-.kpi strong{display:block;font-size:clamp(22px,1.9vw,32px);margin:8px 0 3px;font-weight:950;color:#fff}
+.kpi.green:before{background:var(--green)}
+.kpi.red:before{background:var(--red)}
+.kpi.orange:before{background:var(--orange)}
+.kpi.yellow:before{background:var(--yellow)}
+.kpi.purple:before{background:var(--purple)}
+.kpi span{
+  display:block;color:#aebbd0;font-size:10px;
+  letter-spacing:.12em;text-transform:uppercase;font-weight:950
+}
+.kpi strong{
+  display:block;font-size:clamp(22px,1.9vw,32px);
+  margin:8px 0 3px;font-weight:950;color:#fff
+}
 .kpi small{color:#a8b8cf;font-size:11px;line-height:1.4}
 
-/* ═══ BLOCO 2: MAPA DE CALOR ═══ */
-.heatmap-wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:6px}
-.heat-card{border:1px solid var(--line);background:var(--panel);border-radius:16px;padding:16px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:transform .15s,border-color .15s,box-shadow .15s;position:relative;overflow:hidden}
+/* Mapa calor */
+.heatmap-wrap{
+  display:grid;grid-template-columns:repeat(6,1fr);
+  gap:10px;margin-bottom:6px
+}
+.heat-card{
+  border:1px solid var(--line);
+  background:rgba(13,27,47,.98);
+  border-radius:16px;padding:16px 15px;
+  display:flex;align-items:center;gap:12px;
+  cursor:pointer;transition:.15s;position:relative;overflow:hidden;
+}
 .heat-card:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(0,0,0,.3)}
 .heat-card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px}
-.heat-card.verde:before{background:var(--green)}.heat-card.amarelo:before{background:var(--yellow)}.heat-card.vermelho:before{background:var(--red)}.heat-card.cinza:before{background:var(--muted)}
-.heat-dot{width:36px;height:36px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900}
-.heat-card.verde .heat-dot{background:rgba(120,170,163,.2);color:var(--green)}
-.heat-card.amarelo .heat-dot{background:rgba(232,195,53,.15);color:var(--yellow)}
+.heat-card.verde:before{background:var(--green)}
+.heat-card.amarelo:before{background:var(--yellow)}
+.heat-card.vermelho:before{background:var(--red)}
+.heat-card.cinza:before{background:#70839c}
+.heat-dot{
+  width:38px;height:38px;border-radius:50%;
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  font-size:15px;font-weight:950;
+}
+.heat-card.verde .heat-dot{background:rgba(120,170,163,.18);color:var(--green)}
+.heat-card.amarelo .heat-dot{background:rgba(232,195,53,.14);color:var(--yellow)}
 .heat-card.vermelho .heat-dot{background:rgba(239,106,93,.15);color:var(--red)}
-.heat-card.cinza .heat-dot{background:rgba(159,176,199,.1);color:var(--muted)}
-.heat-info{}
-.heat-eixo{font-size:11px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px}
-.heat-status{font-size:14px;font-weight:800;color:#fff}
-.heat-detalhe{font-size:11px;color:#a8b8cf;margin-top:2px}
+.heat-card.cinza .heat-dot{background:rgba(159,176,199,.1);color:#9fb0c7}
+.heat-eixo{
+  font-size:10px;font-weight:950;color:#9fb0c7;
+  text-transform:uppercase;letter-spacing:.10em;margin-bottom:4px
+}
+.heat-status{font-size:15px;font-weight:900;color:#fff}
+.heat-detalhe{font-size:11px;color:#a8b8cf;margin-top:3px}
 
-/* ═══ BLOCO 3: AGENDA ═══ */
+/* Agenda */
 .agenda-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.agenda-card{border:1px solid var(--line);background:var(--panel);border-radius:16px;padding:16px 18px;position:relative;overflow:hidden;transition:transform .15s,border-color .15s}
-.agenda-card:hover{transform:translateY(-2px);border-color:rgba(239,106,93,.4)}
+.agenda-card{
+  border:1px solid var(--line);
+  background:rgba(13,27,47,.98);
+  border-radius:16px;padding:16px 18px;
+  position:relative;overflow:hidden;transition:.15s;
+}
+.agenda-card:hover{transform:translateY(-2px);border-color:rgba(239,106,93,.45)}
 .agenda-card:before{content:"";position:absolute;top:0;left:0;right:0;height:3px}
-.agenda-card.p1:before{background:var(--red)}.agenda-card.p2:before{background:var(--orange)}.agenda-card.p3:before{background:var(--yellow)}
-.ag-num{font:900 10px 'IBM Plex Mono',monospace;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
-.ag-eixo{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px}
-.agenda-card.p1 .ag-eixo{color:var(--red)}.agenda-card.p2 .ag-eixo{color:var(--orange)}.agenda-card.p3 .ag-eixo{color:var(--yellow)}
-.ag-titulo{font-size:14px;font-weight:800;color:#fff;line-height:1.35;margin-bottom:6px}
+.agenda-card.p1:before{background:var(--red)}
+.agenda-card.p2:before{background:var(--orange)}
+.agenda-card.p3:before{background:var(--yellow)}
+.ag-num{
+  font:900 10px 'IBM Plex Mono',monospace;
+  color:#8fa7c3;letter-spacing:.1em;text-transform:uppercase;margin-bottom:7px
+}
+.ag-eixo{
+  font-size:10px;font-weight:950;text-transform:uppercase;
+  letter-spacing:.1em;margin-bottom:4px
+}
+.p1 .ag-eixo{color:var(--red)}
+.p2 .ag-eixo{color:var(--orange)}
+.p3 .ag-eixo{color:var(--yellow)}
+.ag-titulo{font-size:14px;font-weight:900;color:#fff;line-height:1.35;margin-bottom:6px}
 .ag-contexto{font-size:12px;color:#a8b8cf;line-height:1.55}
 .ag-indicadores{margin-top:10px;display:flex;flex-direction:column;gap:4px}
-.ag-ind{font-size:11px;color:#c8daf0;padding:4px 8px;background:rgba(255,255,255,.05);border-radius:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ag-ind{
+  font-size:11px;color:#c8daf0;padding:4px 8px;
+  background:rgba(255,255,255,.05);border-radius:6px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
 
-/* ═══ BLOCO 4: RADAR DIRETORIAS ═══ */
+/* Radar diretorias */
 .radar-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
-.radar-card{border:1px solid var(--line);background:var(--panel);border-radius:14px;padding:14px 16px}
-.radar-dir{font:900 10px 'IBM Plex Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px}
-.radar-taxa{font-size:26px;font-weight:950;color:#fff;line-height:1;margin-bottom:6px}
-.radar-bar{height:5px;background:#0e2035;border-radius:10px;overflow:hidden;margin-bottom:6px}
+.radar-card{
+  border:1px solid var(--line);
+  background:rgba(13,27,47,.98);
+  border-radius:14px;padding:14px 16px
+}
+.radar-dir{
+  font:900 10px 'IBM Plex Mono',monospace;
+  color:#9fb0c7;text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px
+}
+.radar-taxa{font-size:27px;font-weight:950;color:#fff;line-height:1;margin-bottom:7px}
+.radar-bar{height:5px;background:#0e2035;border-radius:10px;overflow:hidden;margin-bottom:7px}
 .radar-bar i{display:block;height:100%;border-radius:10px}
 .radar-stats{font-size:11px;color:#a8b8cf;line-height:1.6}
 
-/* ═══ BLOCO 5: INSIGHTS ═══ */
+/* insights */
 .ins-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.ins-card{border:1px solid var(--line);background:var(--panel);border-radius:16px;padding:15px 17px;cursor:pointer;transition:transform .15s,border-color .15s,box-shadow .15s;position:relative;overflow:hidden}
+.ins-card{
+  border:1px solid var(--line);
+  background:rgba(13,27,47,.98);
+  border-radius:16px;padding:15px 17px;
+  cursor:pointer;transition:.15s;position:relative;overflow:hidden;
+}
 .ins-card:before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--blue)}
-.ins-card.good:before{background:var(--green)}.ins-card.warn:before{background:var(--yellow)}.ins-card.bad:before{background:var(--red)}.ins-card.neutral:before{background:var(--purple)}
-.ins-card:hover{transform:translateY(-2px);border-color:rgba(109,165,216,.4);box-shadow:0 12px 30px rgba(0,0,0,.28)}
-.ins-card.open{border-color:rgba(109,165,216,.55);background:#0e2038}
-.ins-tag{font:700 9px 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px}
-.ins-card.good .ins-tag{color:var(--green)}.ins-card.warn .ins-tag{color:var(--yellow)}.ins-card.bad .ins-tag{color:var(--red)}.ins-card.neutral .ins-tag{color:var(--purple)}.ins-card .ins-tag{color:var(--blue)}
-.ins-titulo{font-size:13px;font-weight:800;color:#fff;line-height:1.35;margin-bottom:5px}
-.ins-val{font-size:20px;font-weight:950;color:#fff;line-height:1;margin-bottom:4px}
+.ins-card.good:before{background:var(--green)}
+.ins-card.warn:before{background:var(--yellow)}
+.ins-card.bad:before{background:var(--red)}
+.ins-card.neutral:before{background:var(--purple)}
+.ins-card:hover{transform:translateY(-2px);border-color:rgba(109,165,216,.45);box-shadow:0 12px 30px rgba(0,0,0,.28)}
+.ins-card.open{border-color:rgba(109,165,216,.65);background:#0e2038}
+.ins-tag{
+  font:700 9px 'IBM Plex Mono',monospace;
+  letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px
+}
+.ins-card.good .ins-tag{color:var(--green)}
+.ins-card.warn .ins-tag{color:var(--yellow)}
+.ins-card.bad .ins-tag{color:var(--red)}
+.ins-card.neutral .ins-tag{color:var(--purple)}
+.ins-card .ins-tag{color:var(--blue)}
+.ins-titulo{font-size:13px;font-weight:900;color:#fff;line-height:1.35;margin-bottom:5px}
+.ins-val{font-size:21px;font-weight:950;color:#fff;line-height:1;margin-bottom:4px}
 .ins-sub{font-size:11px;color:#a8b8cf;line-height:1.4}
-.ins-arrow{position:absolute;top:13px;right:14px;font-size:12px;color:var(--muted);transition:transform .2s}
+.ins-arrow{position:absolute;top:13px;right:14px;font-size:12px;color:#9fb0c7;transition:.2s}
 .ins-card.open .ins-arrow{transform:rotate(180deg);color:var(--blue)}
 
-/* EXPAND */
-.ins-expand{display:none;border:1px solid rgba(109,165,216,.25);border-radius:16px;background:rgba(9,22,38,.97);margin-top:2px;box-shadow:0 18px 45px rgba(0,0,0,.3)}
+.ins-expand{
+  display:none;border:1px solid rgba(109,165,216,.25);
+  border-radius:16px;background:rgba(9,22,38,.97);
+  margin-top:10px;box-shadow:0 18px 45px rgba(0,0,0,.3)
+}
 .ins-expand.open{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:0;animation:slideDown .22s ease both}
 @keyframes slideDown{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:none}}
 .exp-main{padding:20px 22px;border-right:1px solid var(--line)}
-.exp-main h3{font-size:15px;font-weight:800;color:#fff;margin-bottom:12px;line-height:1.35}
+.exp-main h3{font-size:15px;font-weight:900;color:#fff;margin-bottom:12px;line-height:1.35}
 .exp-narrative{color:#d4e3f5;font-size:13px;line-height:1.75}
-.exp-narrative b{color:#f2f6ff}
+.exp-narrative b{color:#fff}
 .exp-chart{padding:14px 16px}
 .exp-chart canvas{max-height:180px}
 .exp-stats{padding:14px 16px;border-left:1px solid var(--line)}
-.stat-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.06);gap:12px}
 .stat-row:last-child{border:0}
-.stat-label{font-size:11px;color:var(--muted);font-weight:600}
-.stat-val{font-size:12px;font-weight:900;color:#fff}
-.stat-val.good{color:var(--green)}.stat-val.bad{color:var(--red)}.stat-val.warn{color:var(--yellow)}
+.stat-label{font-size:11px;color:#9fb0c7;font-weight:700}
+.stat-val{font-size:12px;font-weight:900;color:#fff;text-align:right}
+.stat-val.good{color:var(--green)}
+.stat-val.bad{color:var(--red)}
+.stat-val.warn{color:var(--yellow)}
 
-/* ═══ BLOCO 6+7: EVOLUÇÕES E RANKINGS ═══ */
+/* inferiores */
 .layoutBottom{display:grid;grid-template-columns:minmax(0,1fr) 370px;gap:14px}
-.colLeft{display:flex;flex-direction:column;gap:14px}
-.colRight{display:flex;flex-direction:column;gap:14px}
+.colLeft,.colRight{display:flex;flex-direction:column;gap:14px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.panel{background:var(--panel);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);overflow:hidden}
-.panelHead{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:14px 18px;border-bottom:1px solid var(--line);background:#0b1a2e}
-.panel h2{margin:0;font-size:14px;color:#fff;font-weight:800}
+.panel{
+  background:rgba(13,27,47,.98);
+  border:1px solid var(--line);
+  border-radius:20px;box-shadow:var(--shadow);overflow:hidden
+}
+.panelHead{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:14px;
+  padding:14px 18px;border-bottom:1px solid var(--line);background:#0b1a2e
+}
+.panel h2{margin:0;font-size:14px;color:#fff;font-weight:900}
 .hint{font-size:11px;color:#a8b8cf;margin-top:3px}
-.badge{font-size:11px;color:#dceaff;border:1px solid var(--line);border-radius:999px;padding:5px 10px;background:#0d2037;white-space:nowrap;flex-shrink:0}
-.chartWrap{padding:14px 16px 18px}
-.chartWrap canvas{max-height:260px}
-.chartWrap.tall canvas{max-height:320px}
+.badge{
+  font-size:11px;color:#dceaff;border:1px solid var(--line);
+  border-radius:999px;padding:5px 10px;background:#0d2037;
+  white-space:nowrap;flex-shrink:0
+}
+.chartWrap{padding:14px 16px 18px;height:300px}
+.chartWrap.tall{height:360px}
+.chartWrap canvas{max-height:100%}
 .evol-select{padding:10px 16px 0}
-.evol-select select{width:100%;background:#0e2035;border:1px solid var(--line);border-radius:10px;color:#f2f6ff;font-weight:800;padding:8px 10px;outline:0;cursor:pointer;font-size:12px}
+.evol-select select{
+  width:100%;background:#0e2035;border:1px solid var(--line);
+  border-radius:10px;color:#f2f6ff;font-weight:800;
+  padding:8px 10px;outline:0;cursor:pointer;font-size:12px
+}
 .insight-box{padding:16px 18px}
 .insight-box p{color:#d7e4f7;line-height:1.7;font-size:13px;margin-top:8px}
+
 .ranking{padding:10px 14px}
-.rank{display:grid;grid-template-columns:20px minmax(0,1fr) 62px;gap:8px;align-items:center;padding:9px 6px;border-bottom:1px solid rgba(255,255,255,.06)}
+.rank{
+  display:grid;grid-template-columns:20px minmax(0,1fr) 64px;gap:8px;
+  align-items:center;padding:9px 6px;border-bottom:1px solid rgba(255,255,255,.06)
+}
 .rank:last-child{border-bottom:0}
 .rank:hover{background:rgba(109,165,216,.06);border-radius:8px}
-.rank-n{font-size:11px;font-weight:900;color:var(--muted);text-align:center}
+.rank-n{font-size:11px;font-weight:900;color:#9fb0c7;text-align:center}
 .rank-info b{display:block;font-size:12px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rank-info small{color:#a8b8cf;font-size:10px}
 .rank-bar{height:3px;background:#0e2035;border-radius:10px;overflow:hidden;margin-top:3px}
@@ -147,46 +336,63 @@ select option{background:#0d1b2f;color:#fff}
 .rank-bar i.bad{background:linear-gradient(90deg,var(--red),var(--orange))}
 .rank-val{font-size:12px;font-weight:900;text-align:right}
 
-/* FOOTER */
-.footer{margin-top:16px;padding:10px 4px;border-top:1px solid rgba(39,66,96,.45);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+/* loading */
+.loading{
+  border:1px solid rgba(109,165,216,.35);
+  background:#091728;border-radius:16px;padding:14px 16px;
+  color:#c7d8ef;font-size:13px;margin:10px 0;
+}
+.errorBox{
+  border:1px solid rgba(239,106,93,.55);
+  background:rgba(239,106,93,.08);
+  border-radius:16px;padding:14px 16px;
+  color:#ffd6d2;font-size:13px;margin:10px 0;line-height:1.55;
+}
+
+.footer{
+  margin-top:16px;padding:10px 4px;
+  border-top:1px solid rgba(39,66,96,.45);
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px
+}
 .footer span{font-size:11px;color:#4a6a88}
 
-/* RESPONSIVE */
-@media(max-width:1400px){
+@media(max-width:1500px){
+  .heatmap-wrap{grid-template-columns:repeat(3,1fr)}
   .layoutBottom{grid-template-columns:1fr}
-  .ins-grid{grid-template-columns:repeat(2,1fr)}
-  .ins-expand.open{grid-template-columns:1fr 1fr}
-  .exp-stats{border-left:0;border-top:1px solid var(--line)}
 }
 @media(max-width:1100px){
   .kpis{grid-template-columns:repeat(3,1fr)}
   .controls{grid-template-columns:repeat(3,1fr)}
-  .heatmap-wrap,.agenda-grid{grid-template-columns:repeat(2,1fr)}
+  .agenda-grid,.ins-grid{grid-template-columns:repeat(2,1fr)}
   .grid2{grid-template-columns:1fr}
+  .diagnostic{grid-template-columns:repeat(2,1fr)}
+  .diag-list{grid-column:1/-1}
 }
-@media(max-width:700px){
+@media(max-width:760px){
+  .app{padding:12px}
   .header{flex-direction:column;align-items:flex-start}
   .logo{border-right:0;padding-right:0;width:180px}
-  .kpis,.controls,.heatmap-wrap,.agenda-grid,.ins-grid,.radar-grid{grid-template-columns:1fr 1fr}
+  .kpis,.controls,.heatmap-wrap,.agenda-grid,.ins-grid,.radar-grid,.diagnostic{grid-template-columns:1fr}
   .ins-expand.open{grid-template-columns:1fr}
   .exp-main{border-right:0;border-bottom:1px solid var(--line)}
+  .exp-stats{border-left:0;border-top:1px solid var(--line)}
 }
 </style>
 </head>
+
 <body>
 <div class="app">
 
-<!-- HEADER -->
 <header class="header">
   <img class="logo" src="../assets/logos/RIOPREFEITURA Comlurb horizontal monocromatica branco.png" alt="COMLURB">
   <div>
-    <div class="eyebrow">Presidencia da COMLURB &bull; Sala de Situacao Estrategica</div>
+    <div class="eyebrow">Presidência da COMLURB &bull; Sala de Situação Estratégica</div>
     <h1>Painel PRE &mdash; Centro de Comando</h1>
     <div class="sub">Leitura executiva consolidada dos indicadores avaliados &mdash; 2025&ndash;2026</div>
   </div>
+  <button class="diag-toggle" id="btnDiag">Diagnóstico</button>
 </header>
 
-<!-- FILTROS -->
 <section class="controls">
   <div class="field"><label>Ano</label><select id="fAno"></select></div>
   <div class="field"><label>Diretoria</label><select id="fDir"></select></div>
@@ -196,479 +402,954 @@ select option{background:#0d1b2f;color:#fff}
   <button class="btn-clear" id="btnClear">Limpar filtros</button>
 </section>
 
-<!-- BLOCO 1: ESTADO GERAL -->
+<div id="loadBox" class="loading">Carregando dados do CSV publicado...</div>
+<div id="errBox" class="errorBox" style="display:none"></div>
+
+<section class="diagnostic" id="diagnostic">
+  <div class="diag-card"><span>Linhas CSV</span><b id="dRows">—</b></div>
+  <div class="diag-card"><span>Registros válidos</span><b id="dValid">—</b></div>
+  <div class="diag-card"><span>Indicadores únicos</span><b id="dInds">—</b></div>
+  <div class="diag-card"><span>Sem eixo</span><b id="dOutros">—</b></div>
+  <div class="diag-card"><span>Diretorias</span><b id="dDirs">—</b></div>
+  <div class="diag-list" id="dText">Aguardando leitura...</div>
+</section>
+
 <div class="section-label">Estado Geral da Companhia</div>
 <section class="kpis">
   <div class="kpi">        <span>Indicadores Avaliados</span><strong id="kTotal">—</strong><small id="kTotalSub">—</small></div>
-  <div class="kpi orange"> <span>Taxa de Atingimento</span>  <strong id="kTaxa">—</strong> <small id="kTaxaSub">—</small></div>
+  <div class="kpi orange"> <span>Taxa de Atingimento</span><strong id="kTaxa">—</strong><small id="kTaxaSub">—</small></div>
   <div class="kpi red">    <span>Riscos Institucionais</span><strong id="kRisco">—</strong><small id="kRiscoSub">abaixo da meta + piora</small></div>
-  <div class="kpi yellow"> <span>Alertas Preventivos</span>  <strong id="kAlerta">—</strong><small id="kAlertaSub">na meta mas deteriorando</small></div>
-  <div class="kpi green">  <span>Resultados Consolidados</span><strong id="kConsol">—</strong><small id="kConsolSub">meta + consistencia</small></div>
+  <div class="kpi yellow"> <span>Alertas Preventivos</span><strong id="kAlerta">—</strong><small id="kAlertaSub">na meta mas deteriorando</small></div>
+  <div class="kpi green">  <span>Resultados Consolidados</span><strong id="kConsol">—</strong><small id="kConsolSub">meta + consistência</small></div>
 </section>
 
-<!-- BLOCO 2: MAPA DE CALOR -->
-<div class="section-label">Mapa de Calor Estrategico</div>
+<div class="section-label">Mapa de Calor Estratégico</div>
 <section class="heatmap-wrap" id="heatmapWrap"></section>
 
-<!-- BLOCO 3: AGENDA -->
-<div class="section-label">Agenda da Presidencia</div>
+<div class="section-label">Agenda da Presidência</div>
 <section class="agenda-grid" id="agendaGrid"></section>
 
-<!-- BLOCO 4: RADAR DIRETORIAS -->
 <div class="section-label">Radar das Diretorias</div>
 <section class="radar-grid" id="radarGrid"></section>
 
-<!-- BLOCO 5: INSIGHTS -->
-<div class="section-label">Insights Estrategicos</div>
+<div class="section-label">Insights Estratégicos</div>
 <section class="ins-grid" id="insGrid"></section>
-<div id="insExpand" style="margin-top:10px"></div>
+<div id="insExpand"></div>
 
-<!-- BLOCO 6+7: EVOLUÇÕES E RANKINGS -->
-<div class="section-label">Evolucoes e Tendencias</div>
+<div class="section-label">Evoluções e Tendências</div>
 <section class="layoutBottom">
   <div class="colLeft">
     <section class="panel">
       <div class="panelHead">
-        <div><h2>Evolucao Mensal do Indicador</h2><div class="hint">Comparativo 2025 vs 2026 com linha de meta</div></div>
+        <div><h2>Evolução Mensal do Indicador</h2><div class="hint">Comparativo 2025 vs 2026 com linha de meta</div></div>
         <span class="badge" id="evolBadge">—</span>
       </div>
       <div class="evol-select"><select id="selInd"></select></div>
       <div class="chartWrap tall"><canvas id="lineChart"></canvas></div>
     </section>
+
     <div class="grid2">
       <section class="panel">
-        <div class="panelHead"><div><h2>Status vs Meta</h2><div class="hint">Distribuicao por situacao</div></div></div>
+        <div class="panelHead"><div><h2>Status vs Meta</h2><div class="hint">Distribuição por situação</div></div></div>
         <div class="chartWrap"><canvas id="donutChart"></canvas></div>
       </section>
       <section class="panel">
-        <div class="panelHead"><div><h2>Comparativo 2025 vs 2026</h2><div class="hint">Acumulado por indicador (top 10)</div></div></div>
+        <div class="panelHead"><div><h2>Comparativo 2025 vs 2026</h2><div class="hint">Acumulado por indicador com dados nos dois anos</div></div></div>
         <div class="chartWrap"><canvas id="barChart"></canvas></div>
       </section>
     </div>
   </div>
+
   <div class="colRight">
     <section class="panel">
       <div class="panelHead"><h2>Leitura Executiva</h2><span class="badge" id="scopeBadge">—</span></div>
       <div class="insight-box"><p id="insightText">Carregando...</p></div>
     </section>
+
     <section class="panel">
-      <div class="panelHead"><div><h2>Maiores Desvios</h2><div class="hint">Abaixo da referencia cadastrada</div></div></div>
+      <div class="panelHead"><div><h2>Maiores Desvios</h2><div class="hint">Indicadores abaixo da referência cadastrada</div></div></div>
       <div class="ranking" id="rankDesvio"></div>
     </section>
+
     <section class="panel">
-      <div class="panelHead"><div><h2>Resultados Consolidados</h2><div class="hint">Dentro da meta com consistencia</div></div></div>
+      <div class="panelHead"><div><h2>Resultados Consolidados</h2><div class="hint">Dentro da meta com consistência alta</div></div></div>
       <div class="ranking" id="rankBom"></div>
     </section>
   </div>
 </section>
 
-<!-- FOOTER -->
 <footer class="footer">
-  <span>Gabinete da Presidencia / HUB COMLURB &bull; Nucleo de Inteligencia e Gestao Estrategica Operacional</span>
+  <span>Gabinete da Presidência / HUB COMLURB &bull; Núcleo de Inteligência e Gestão Estratégica Operacional</span>
   <span>Fonte: SARC &mdash; Aba Geral / Indicadores Avaliados</span>
 </footer>
 </div>
 
 <script>
-const CSV_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vQphrIIjiY4aWBONgByLezMnFk8YbyYpF-vtgxOLoV8-85_WUVAXH_f_Ahy8ymxmgnGXmQ_KiFSOkIK/pub?gid=1044100274&single=true&output=csv';
-const ANOS=[2025,2026];
-const MESES=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+/* ══════════════════════════════════════════════════════
+   HUB COMLURB · Painel PRE · Sala de Situação
+   Versão robusta: carrega todos os dados, diagnostica colunas
+   e não descarta indicador sem classificação.
+   ══════════════════════════════════════════════════════ */
 
-// Lista oficial PRE
-const INDS_PRE=new Set(['Absenteísmo - Gerenciável','Acidente de Trabalho – Típico','Acidente de Trabalho – Trajeto','Adicional Noturno Realizado','Cadastro de Grandes Geradores','Cadastro de Grandes Geradores com segregação de resíduos','Desvio Padrão - IPL Setorial','Ecopontos','Empregados Afastados','Hora Extra Realizada','Horas Domingos e Feriados Realizadas','Índice de Atendimento das Solicitações 1746','Índice de Conformidade - PGR','Índice de Eficiência da Arrecadação - Órgãos Públicos','Índice de Eficiência da Arrecadação - Receitas Diversas','Índice de Utilização da Frota de Coleta Domiciliar','Índice de Utilização da Frota de Remoção de Lixo Público','Índice do Coletado em Relação ao Potencial Reciclável','Índice Padrão de Limpeza - IPL','Índice Padrão de Roçada - IPR','Performance de Atendimento da Remoção Gratuita','Performance de Atendimento de Capina em Logradouro','Performance de Atendimento de Controle de Roedores e Caramujos','Performance de Atendimento de Poda de Árvore','Praças','Produção do Serviço de Manejo Arbóreo','Resíduos Coletados no RJ','Resíduos Desviados do Aterro','Resíduos Orgânicos (Biometanização)','Resíduos Recebidos nas ETRs','Resíduos Recebidos no CTR Gericinó','Solicitações 1746','Solicitações 1746 - Capina','Solicitações 1746 - Coleta','Solicitações 1746 - Destoca de Toco e Raiz','Solicitações 1746 - Limpeza','Solicitações 1746 - Limpeza de Ralos','Solicitações 1746 - Poda de Árvore','Solicitações 1746 - Praças','Solicitações 1746 - Remoção de Árvore','Solicitações 1746 - Remoção de Resíduos','Solicitações 1746 - Remoção Gratuita','Solicitações 1746 - Risco de Queda','Solicitações 1746 - Varrição','Solicitações 1746 - Vetores','Solicitações Ouvidoria','Solicitações Ouvidoria - Capina','Solicitações Ouvidoria - Coleta','Solicitações Ouvidoria - Destoca de Toco e Raiz','Solicitações Ouvidoria - Limpeza de Ralos','Solicitações Ouvidoria - Poda de Árvore','Solicitações Ouvidoria - Praças','Solicitações Ouvidoria - Remoção de Árvore','Solicitações Ouvidoria - Remoção de Resíduos','Solicitações Ouvidoria - Remoção Gratuita','Solicitações Ouvidoria - Risco de Queda','Solicitações Ouvidoria - Varrição','Solicitações Ouvidoria - Vetores','Taxa de Frequência de Acidentes','Taxa de Gravidade de Acidentes','Tempo Médio de Atendimento - Remoção Gratuita','Tempo Médio de Atendimento - Vetores','Treinamentos Realizados (NR)']);
+const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQphrIIjiY4aWBONgByLezMnFk8YbyYpF-vtgxOLoV8-85_WUVAXH_f_Ahy8ymxmgnGXmQ_KiFSOkIK/pub?gid=1044100274&single=true&output=csv';
+const ANOS = [2025, 2026];
+const MESES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
 
-// Classificação temática
-const EIXOS={
-  'Pessoas':['Absenteísmo - Gerenciável','Empregados Afastados','Hora Extra Realizada','Adicional Noturno Realizado','Horas Domingos e Feriados Realizadas','Treinamentos Realizados (NR)'],
-  'Segurança':['Acidente de Trabalho – Típico','Acidente de Trabalho – Trajeto','Taxa de Frequência de Acidentes','Taxa de Gravidade de Acidentes'],
-  'Operação':['Índice Padrão de Limpeza - IPL','Índice Padrão de Roçada - IPR','Desvio Padrão - IPL Setorial','Índice de Utilização da Frota de Coleta Domiciliar','Índice de Utilização da Frota de Remoção de Lixo Público','Praças','Produção do Serviço de Manejo Arbóreo'],
-  'Atendimento':['Índice de Atendimento das Solicitações 1746','Performance de Atendimento da Remoção Gratuita','Performance de Atendimento de Capina em Logradouro','Performance de Atendimento de Controle de Roedores e Caramujos','Performance de Atendimento de Poda de Árvore','Tempo Médio de Atendimento - Remoção Gratuita','Tempo Médio de Atendimento - Vetores','Solicitações 1746','Solicitações 1746 - Capina','Solicitações 1746 - Coleta','Solicitações 1746 - Destoca de Toco e Raiz','Solicitações 1746 - Limpeza','Solicitações 1746 - Limpeza de Ralos','Solicitações 1746 - Poda de Árvore','Solicitações 1746 - Praças','Solicitações 1746 - Remoção de Árvore','Solicitações 1746 - Remoção de Resíduos','Solicitações 1746 - Remoção Gratuita','Solicitações 1746 - Risco de Queda','Solicitações 1746 - Varrição','Solicitações 1746 - Vetores','Solicitações Ouvidoria','Solicitações Ouvidoria - Capina','Solicitações Ouvidoria - Coleta','Solicitações Ouvidoria - Destoca de Toco e Raiz','Solicitações Ouvidoria - Limpeza de Ralos','Solicitações Ouvidoria - Poda de Árvore','Solicitações Ouvidoria - Praças','Solicitações Ouvidoria - Remoção de Árvore','Solicitações Ouvidoria - Remoção de Resíduos','Solicitações Ouvidoria - Remoção Gratuita','Solicitações Ouvidoria - Risco de Queda','Solicitações Ouvidoria - Varrição','Solicitações Ouvidoria - Vetores'],
-  'Sustentabilidade':['Resíduos Coletados no RJ','Resíduos Desviados do Aterro','Resíduos Orgânicos (Biometanização)','Resíduos Recebidos nas ETRs','Resíduos Recebidos no CTR Gericinó','Índice do Coletado em Relação ao Potencial Reciclável','Cadastro de Grandes Geradores','Cadastro de Grandes Geradores com segregação de resíduos','Ecopontos'],
-  'Receita':['Índice de Eficiência da Arrecadação - Órgãos Públicos','Índice de Eficiência da Arrecadação - Receitas Diversas','Índice de Conformidade - PGR']
+const EIXOS = {
+  'Pessoas': [
+    'Absenteísmo - Gerenciável','Empregados Afastados','Hora Extra Realizada',
+    'Adicional Noturno Realizado','Horas Domingos e Feriados Realizadas',
+    'Treinamentos Realizados (NR)'
+  ],
+  'Segurança': [
+    'Acidente de Trabalho – Típico','Acidente de Trabalho – Trajeto',
+    'Taxa de Frequência de Acidentes','Taxa de Gravidade de Acidentes'
+  ],
+  'Operação': [
+    'Índice Padrão de Limpeza - IPL','Índice Padrão de Roçada - IPR',
+    'Desvio Padrão - IPL Setorial','Índice de Utilização da Frota de Coleta Domiciliar',
+    'Índice de Utilização da Frota de Remoção de Lixo Público','Praças',
+    'Produção do Serviço de Manejo Arbóreo'
+  ],
+  'Atendimento': [
+    'Índice de Atendimento das Solicitações 1746','Performance de Atendimento da Remoção Gratuita',
+    'Performance de Atendimento de Capina em Logradouro','Performance de Atendimento de Controle de Roedores e Caramujos',
+    'Performance de Atendimento de Poda de Árvore','Tempo Médio de Atendimento - Remoção Gratuita',
+    'Tempo Médio de Atendimento - Vetores','Solicitações 1746','Solicitações 1746 - Capina',
+    'Solicitações 1746 - Coleta','Solicitações 1746 - Destoca de Toco e Raiz',
+    'Solicitações 1746 - Limpeza','Solicitações 1746 - Limpeza de Ralos',
+    'Solicitações 1746 - Poda de Árvore','Solicitações 1746 - Praças',
+    'Solicitações 1746 - Remoção de Árvore','Solicitações 1746 - Remoção de Resíduos',
+    'Solicitações 1746 - Remoção Gratuita','Solicitações 1746 - Risco de Queda',
+    'Solicitações 1746 - Varrição','Solicitações 1746 - Vetores',
+    'Solicitações Ouvidoria','Solicitações Ouvidoria - Capina',
+    'Solicitações Ouvidoria - Coleta','Solicitações Ouvidoria - Destoca de Toco e Raiz',
+    'Solicitações Ouvidoria - Limpeza de Ralos','Solicitações Ouvidoria - Poda de Árvore',
+    'Solicitações Ouvidoria - Praças','Solicitações Ouvidoria - Remoção de Árvore',
+    'Solicitações Ouvidoria - Remoção de Resíduos','Solicitações Ouvidoria - Remoção Gratuita',
+    'Solicitações Ouvidoria - Risco de Queda','Solicitações Ouvidoria - Varrição',
+    'Solicitações Ouvidoria - Vetores'
+  ],
+  'Sustentabilidade': [
+    'Resíduos Coletados no RJ','Resíduos Desviados do Aterro',
+    'Resíduos Orgânicos (Biometanização)','Resíduos Recebidos nas ETRs',
+    'Resíduos Recebidos no CTR Gericinó','Índice do Coletado em Relação ao Potencial Reciclável',
+    'Cadastro de Grandes Geradores','Cadastro de Grandes Geradores com segregação de resíduos',
+    'Ecopontos'
+  ],
+  'Receita': [
+    'Índice de Eficiência da Arrecadação - Órgãos Públicos',
+    'Índice de Eficiência da Arrecadação - Receitas Diversas',
+    'Índice de Conformidade - PGR'
+  ]
 };
-const EIXO_ICONE={'Pessoas':'P','Segurança':'S','Operação':'O','Atendimento':'A','Sustentabilidade':'E','Receita':'R'};
-function eixoDe(ind){for(const[e,lista]of Object.entries(EIXOS))if(lista.includes(ind))return e;return'Outros';}
-function govClass(ind){const n=norm(ind);if(n.includes('1746')||n.includes('ouvidoria')||n.includes('solicitac'))return'externo';return'direto';}
-function consistencia(d){
-  const v=MESES.map(m=>d[m]).filter(x=>x!=null);
-  if(v.length<4)return'baixa';
-  const media=v.reduce((a,b)=>a+b,0)/v.length;
-  if(media===0)return'baixa';
-  const cv=Math.sqrt(v.reduce((s,x)=>s+(x-media)**2,0)/v.length)/Math.abs(media);
-  return cv<0.08?'alta':cv<0.18?'media':'baixa';
+
+const EIXO_ICONE = {
+  'Pessoas':'P',
+  'Segurança':'S',
+  'Operação':'O',
+  'Atendimento':'A',
+  'Sustentabilidade':'E',
+  'Receita':'R',
+  'Outros':'?'
+};
+
+const $ = id => document.getElementById(id);
+let DATA = [];
+let RAW_ROWS = [];
+let RAW_COLUMNS = [];
+let CHARTS = {};
+let INSIGHT_CHARTS = {};
+let openIdx = null;
+
+/* Utils */
+function norm(s){
+  return String(s ?? '')
+    .trim()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g,'')
+    .replace(/[–—−]/g,'-')
+    .replace(/\s+/g,' ')
+    .toLowerCase();
+}
+function keyNorm(s){
+  return norm(s).replace(/[^a-z0-9]/g,'');
+}
+function esc(s){
+  return String(s ?? '').replace(/[&<>"']/g, m => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[m]));
+}
+function num(v){
+  if(v == null) return null;
+  let s = String(v).trim();
+  if(!s || s === '-' || s === '–' || s === '—') return null;
+  s = s.replace(/[^\d,.\-]/g,'');
+  if(!s) return null;
+  if(s.includes(',') && s.includes('.')) s = s.replace(/\./g,'').replace(',','.');
+  else if(s.includes(',')) s = s.replace(',','.');
+  const n = Number(s);
+  return Number.isFinite(n) ? n : null;
+}
+function fmt(v,u=''){
+  if(v == null || Number.isNaN(v)) return '—';
+  if(String(u).includes('%')) return v.toLocaleString('pt-BR',{maximumFractionDigits:1}) + '%';
+  if(Math.abs(v) >= 1e6) return (v/1e6).toLocaleString('pt-BR',{maximumFractionDigits:1}) + ' mi';
+  if(Math.abs(v) >= 1000) return v.toLocaleString('pt-BR',{maximumFractionDigits:0});
+  return v.toLocaleString('pt-BR',{maximumFractionDigits:1});
+}
+function uniq(arr){
+  return [...new Set(arr.filter(x => x != null && String(x).trim()))]
+    .sort((a,b)=>String(a).localeCompare(String(b),'pt-BR'));
 }
 
-const $=id=>document.getElementById(id);
-const norm=s=>String(s??'').trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
-const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-let DATA=[],CHARTS={},ICHARTS={},openIdx=null;
+/* Busca campo por variações e também por contains */
+function getF(row, names){
+  const keys = Object.keys(row || {});
+  const desired = names.map(keyNorm);
+  for(const k of keys){
+    if(desired.includes(keyNorm(k)) && String(row[k] ?? '').trim() !== '') return row[k];
+  }
+  for(const name of names){
+    const n = keyNorm(name);
+    const k = keys.find(x => keyNorm(x).includes(n) || n.includes(keyNorm(x)));
+    if(k && String(row[k] ?? '').trim() !== '') return row[k];
+  }
+  return '';
+}
 
-function num(v){if(v==null)return null;let s=String(v).trim().replace(/[^\d,.\-]/g,'');if(!s||s==='-')return null;if(s.includes(',')&&s.includes('.'))s=s.replace(/\./g,'').replace(',','.');else if(s.includes(','))s=s.replace(',','.');const n=Number(s);return Number.isFinite(n)?n:null;}
-function fmt(v,u=''){if(v==null||Number.isNaN(v))return'—';if(String(u).includes('%'))return v.toLocaleString('pt-BR',{maximumFractionDigits:1})+'%';if(Math.abs(v)>=1e6)return(v/1e6).toLocaleString('pt-BR',{maximumFractionDigits:1})+' mi';if(Math.abs(v)>=1000)return v.toLocaleString('pt-BR',{maximumFractionDigits:0});return v.toLocaleString('pt-BR',{maximumFractionDigits:1});}
-function getF(row,names){const ks=Object.keys(row);for(const n of names){const k=ks.find(x=>norm(x)===norm(n));if(k&&String(row[k]).trim())return row[k];}return'';}
-function matchInd(nome){if(INDS_PRE.has(nome.trim()))return true;for(const i of INDS_PRE)if(norm(i)===norm(nome))return true;return false;}
+/* Meses: aceita Jan, Janeiro, JAN etc */
+function getMes(row, mes){
+  const aliases = {
+    Jan:['Jan','Janeiro','JAN'],
+    Fev:['Fev','Fevereiro','FEV'],
+    Mar:['Mar','Março','Marco','MAR'],
+    Abr:['Abr','Abril','ABR'],
+    Mai:['Mai','Maio','MAI'],
+    Jun:['Jun','Junho','JUN'],
+    Jul:['Jul','Julho','JUL'],
+    Ago:['Ago','Agosto','AGO'],
+    Set:['Set','Setembro','SET'],
+    Out:['Out','Outubro','OUT'],
+    Nov:['Nov','Novembro','NOV'],
+    Dez:['Dez','Dezembro','DEZ']
+  };
+  return num(getF(row, aliases[mes] || [mes]));
+}
+
+function eixoDe(indicador){
+  const ni = norm(indicador);
+  for(const [eixo, lista] of Object.entries(EIXOS)){
+    for(const item of lista){
+      const nx = norm(item);
+      if(ni === nx || ni.includes(nx) || nx.includes(ni)) return eixo;
+    }
+  }
+
+  /* fallback por palavras-chave */
+  if(/absente|afastad|hora extra|adicional noturno|domingo|feriado|treinamento/.test(ni)) return 'Pessoas';
+  if(/acidente|frequencia de acidentes|gravidade/.test(ni)) return 'Segurança';
+  if(/ipl|ipr|limpeza|rocada|roçada|frota|pracas|praças|manejo arboreo/.test(ni) && !/solicit|1746|ouvidoria|performance|tempo medio/.test(ni)) return 'Operação';
+  if(/1746|ouvidoria|solicit|performance|tempo medio|remocao|remoção|capina|poda|vetores|ralos|roedores|caramujos|risco de queda/.test(ni)) return 'Atendimento';
+  if(/residu|aterro|biometanizacao|etr|gericino|reciclavel|grandes geradores|ecopontos/.test(ni)) return 'Sustentabilidade';
+  if(/arrecadacao|arrecadação|receitas|orgaos publicos|órgãos públicos|pgr/.test(ni)) return 'Receita';
+  return 'Outros';
+}
+
+function govClass(ind){
+  const n = norm(ind);
+  if(/1746|ouvidoria|solicit|poda|capina|risco de queda|vetores|roedores|caramujos|demanda/.test(n)) return 'dependencia externa';
+  return 'governável';
+}
+
+function tipoIndicador(ind){
+  const eixo = eixoDe(ind);
+  if(['Operação','Atendimento','Sustentabilidade'].includes(eixo)) return 'finalístico';
+  return 'suporte';
+}
 
 function transform(r){
-  const dir=String(getF(r,['Diretoria','DIRETORIA'])||'').trim();
-  const supRaw=String(getF(r,['Superintendência','Superintendencia','Sup./Coord.'])||'').trim();
-  const sup=(!supRaw||supRaw==='-'||supRaw==='–'||supRaw==='—')?dir:supRaw;
-  const d={Ano:num(getF(r,['Ano','ANO'])),Indicador:String(getF(r,['Indicador','INDICADOR'])||'').trim(),Diretoria:dir,Superintendencia:sup||dir,Unidade:String(getF(r,['Unidade','UNIDADE'])||'').trim(),Sentido:String(getF(r,['Sentido','SENTIDO'])||'').trim(),Acumulado:num(getF(r,['Acumulado','ACUMULADO','Resultado'])),Meta:num(getF(r,['Meta','META','Alvo']))};
-  MESES.forEach(m=>{d[m]=num(getF(r,[m]));});
-  if(d.Acumulado==null){const v=MESES.map(m=>d[m]).filter(x=>x!=null);if(v.length)d.Acumulado=v.at(-1);}
+  const dir = String(getF(r,['Diretoria','DIRETORIA','Dir']) || '').trim();
+  const supRaw = String(getF(r,['Superintendência','Superintendencia','Sup./Coord.','Superintendencia / Coordenacao','Coordenação','Coordenacao']) || '').trim();
+  const sup = (!supRaw || supRaw === '-' || supRaw === '–' || supRaw === '—') ? dir : supRaw;
+  const indicador = String(getF(r,['Indicador','INDICADOR','Indicadores','Nome do Indicador','Nome Indicador']) || '').trim();
+
+  const d = {
+    Ano: num(getF(r,['Ano','ANO','Ano Referência','Ano Referencia'])),
+    Indicador: indicador,
+    Diretoria: dir || 'Não informado',
+    Superintendencia: sup || dir || 'Não informado',
+    Unidade: String(getF(r,['Unidade','UNIDADE','Medida','Unid']) || '').trim(),
+    Sentido: String(getF(r,['Sentido','SENTIDO','Polaridade','Melhor']) || '').trim(),
+    Acumulado: num(getF(r,['Acumulado','ACUMULADO','Resultado','Valor Acumulado','Realizado','Resultado Acumulado'])),
+    Meta: num(getF(r,['Meta','META','Alvo','Referência','Referencia']))
+  };
+
+  MESES.forEach(m => d[m] = getMes(r,m));
+
+  if(d.Acumulado == null){
+    const vals = MESES.map(m=>d[m]).filter(x=>x != null);
+    if(vals.length) d.Acumulado = vals.at(-1);
+  }
+
+  d.Eixo = eixoDe(d.Indicador);
+  d.Governabilidade = govClass(d.Indicador);
+  d.Tipo = tipoIndicador(d.Indicador);
   return d;
 }
 
-function statusOf(d){if(d.Meta==null||d.Acumulado==null)return'Sem meta';const dn=d.Sentido.includes('↓');return(dn?d.Acumulado<=d.Meta:d.Acumulado>=d.Meta)?'Dentro da meta':'Abaixo da meta';}
-function desvio(d){return(d.Meta==null||d.Acumulado==null)?null:d.Acumulado-d.Meta;}
-function tendClass(d){const v=MESES.map(m=>d[m]).filter(x=>x!=null);if(v.length<3)return'flat';const ini=v.slice(0,3).reduce((a,b)=>a+b,0)/3;const fim=v.slice(-3).reduce((a,b)=>a+b,0)/3;if(Math.abs(fim-ini)<0.01*Math.abs(ini||1))return'flat';const sobe=fim>ini;const dn=d.Sentido.includes('↓');return((!dn&&sobe)||(dn&&!sobe))?'good':'bad';}
-function tendLabel(d){const t=tendClass(d);return t==='good'?'Melhora':t==='bad'?'Piora':'Estavel';}
-
-const vf=id=>$(id)?.value||'';
-function filtered(){const a=vf('fAno'),dir=vf('fDir'),sup=vf('fSup'),ind=vf('fInd'),st=vf('fStatus');return DATA.filter(d=>{if(!ANOS.includes(d.Ano))return false;if(a&&String(d.Ano)!==a)return false;if(dir&&d.Diretoria!==dir)return false;if(sup&&d.Superintendencia!==sup)return false;if(ind&&d.Indicador!==ind)return false;if(st&&statusOf(d)!==st)return false;return true;});}
-function uniq(arr){return[...new Set(arr.filter(x=>x!=null&&String(x).trim()))].sort((a,b)=>String(a).localeCompare(String(b),'pt-BR'));}
-function setOpts(id,vals,lbl){const el=$(id);if(!el)return;const cur=el.value;el.innerHTML=`<option value="">${lbl}</option>`+vals.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');if(vals.map(String).includes(String(cur)))el.value=cur;}
-function cascadeFilters(){const a=vf('fAno'),dir=vf('fDir'),sup=vf('fSup');let base=DATA.filter(d=>ANOS.includes(d.Ano));if(a)base=base.filter(d=>String(d.Ano)===a);setOpts('fDir',uniq(base.map(d=>d.Diretoria)),'Todas');if(dir)base=base.filter(d=>d.Diretoria===dir);setOpts('fSup',uniq(base.map(d=>d.Superintendencia)),'Todas');if(sup)base=base.filter(d=>d.Superintendencia===sup);setOpts('fInd',uniq(base.map(d=>d.Indicador)),'Todos');setOpts('fStatus',uniq(base.map(d=>statusOf(d))),'Todos');if(dir&&[...$('fDir').options].some(o=>o.value===dir))$('fDir').value=dir;if(sup&&[...$('fSup').options].some(o=>o.value===sup))$('fSup').value=sup;}
-function populateAll(){const base=DATA.filter(d=>ANOS.includes(d.Ano));setOpts('fAno',uniq(base.map(d=>d.Ano)),'Todos os anos');cascadeFilters();}
-
-function mkChart(id,type,labels,datasets,extra={}){if(CHARTS[id])CHARTS[id].destroy();CHARTS[id]=new Chart($(id),{type,data:{labels,datasets},options:Object.assign({responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#c7d8ef',font:{size:11}}}},scales:(type==='doughnut'||type==='pie')?{}:{x:{ticks:{color:'#8a9db8',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}},y:{ticks:{color:'#8a9db8',font:{size:10}},grid:{color:'rgba(255,255,255,.07)'}}}},extra)});}
-
-/* ── BLOCO 1: ESTADO GERAL ── */
-function renderKPIs(rows){
-  const cm=rows.filter(d=>d.Meta!=null&&d.Acumulado!=null);
-  const dentro=cm.filter(d=>statusOf(d)==='Dentro da meta');
-  const abaixo=cm.filter(d=>statusOf(d)==='Abaixo da meta');
-  const pct=cm.length?Math.round(dentro.length/cm.length*100):0;
-  const criticos=abaixo.filter(d=>tendClass(d)==='bad').length;
-  const alertas=dentro.filter(d=>tendClass(d)==='bad').length;
-  const consol=dentro.filter(d=>consistencia(d)==='alta').length;
-  $('kTotal').textContent=rows.length;$('kTotalSub').textContent=uniq(rows.map(d=>d.Indicador)).length+' distintos no recorte';
-  $('kTaxa').textContent=pct+'%';$('kTaxaSub').textContent=dentro.length+' de '+cm.length+' com meta';
-  $('kRisco').textContent=criticos;$('kRiscoSub').textContent=criticos?'abaixo da meta + piora':'nenhum risco critico';
-  $('kAlerta').textContent=alertas;$('kAlertaSub').textContent=alertas?'na meta mas deteriorando':'sem alertas preventivos';
-  $('kConsol').textContent=consol;$('kConsolSub').textContent='meta + consistencia alta';
-  $('scopeBadge').textContent=rows.length+' registros';
+/* status e tendências */
+function statusOf(d){
+  if(d.Meta == null || d.Acumulado == null) return 'Sem meta';
+  const sentido = norm(d.Sentido);
+  const menorMelhor = sentido.includes('↓') || sentido.includes('menor') || sentido.includes('redu');
+  return menorMelhor ? (d.Acumulado <= d.Meta ? 'Dentro da meta' : 'Abaixo da meta')
+                     : (d.Acumulado >= d.Meta ? 'Dentro da meta' : 'Abaixo da meta');
+}
+function desvio(d){
+  return (d.Meta == null || d.Acumulado == null) ? null : d.Acumulado - d.Meta;
+}
+function desvioPct(d){
+  if(d.Meta == null || d.Acumulado == null || d.Meta === 0) return null;
+  return (d.Acumulado - d.Meta) / Math.abs(d.Meta) * 100;
+}
+function tendClass(d){
+  const v = MESES.map(m=>d[m]).filter(x=>x != null);
+  if(v.length < 3) return 'flat';
+  const n = Math.min(3, v.length);
+  const ini = v.slice(0,n).reduce((a,b)=>a+b,0) / n;
+  const fim = v.slice(-n).reduce((a,b)=>a+b,0) / n;
+  if(Math.abs(fim - ini) < 0.01 * Math.abs(ini || 1)) return 'flat';
+  const sobe = fim > ini;
+  const sentido = norm(d.Sentido);
+  const menorMelhor = sentido.includes('↓') || sentido.includes('menor') || sentido.includes('redu');
+  return ((!menorMelhor && sobe) || (menorMelhor && !sobe)) ? 'good' : 'bad';
+}
+function tendLabel(d){
+  const t = tendClass(d);
+  return t === 'good' ? 'Melhora' : t === 'bad' ? 'Piora' : 'Estável';
+}
+function consistencia(d){
+  const v = MESES.map(m=>d[m]).filter(x=>x != null);
+  if(v.length < 4) return 'baixa';
+  const media = v.reduce((a,b)=>a+b,0)/v.length;
+  if(media === 0) return 'baixa';
+  const dp = Math.sqrt(v.reduce((s,x)=>s+(x-media)**2,0)/v.length);
+  const cv = dp / Math.abs(media);
+  return cv < 0.08 ? 'alta' : cv < 0.18 ? 'média' : 'baixa';
 }
 
-/* ── BLOCO 2: MAPA DE CALOR ── */
+/* filtros */
+const vf = id => $(id)?.value || '';
+function filtered(){
+  const a = vf('fAno'), dir = vf('fDir'), sup = vf('fSup'), ind = vf('fInd'), st = vf('fStatus');
+  return DATA.filter(d=>{
+    if(a && String(d.Ano) !== a) return false;
+    if(dir && d.Diretoria !== dir) return false;
+    if(sup && d.Superintendencia !== sup) return false;
+    if(ind && d.Indicador !== ind) return false;
+    if(st && statusOf(d) !== st) return false;
+    return true;
+  });
+}
+function setOpts(id, vals, lbl){
+  const el = $(id);
+  if(!el) return;
+  const cur = el.value;
+  el.innerHTML = `<option value="">${lbl}</option>` + vals.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');
+  if(vals.map(String).includes(String(cur))) el.value = cur;
+}
+function cascadeFilters(){
+  const a = vf('fAno'), dir = vf('fDir'), sup = vf('fSup');
+  let base = DATA.slice();
+
+  if(a) base = base.filter(d=>String(d.Ano) === a);
+  setOpts('fDir', uniq(base.map(d=>d.Diretoria)), 'Todas');
+
+  if(dir) base = base.filter(d=>d.Diretoria === dir);
+  setOpts('fSup', uniq(base.map(d=>d.Superintendencia)), 'Todas');
+
+  if(sup) base = base.filter(d=>d.Superintendencia === sup);
+  setOpts('fInd', uniq(base.map(d=>d.Indicador)), 'Todos');
+  setOpts('fStatus', uniq(base.map(d=>statusOf(d))), 'Todos');
+
+  if(dir && [...$('fDir').options].some(o=>o.value===dir)) $('fDir').value = dir;
+  if(sup && [...$('fSup').options].some(o=>o.value===sup)) $('fSup').value = sup;
+}
+function populateAll(){
+  setOpts('fAno', uniq(DATA.map(d=>d.Ano)), 'Todos os anos');
+  cascadeFilters();
+}
+
+/* diagnóstico */
+function renderDiagnostic(){
+  const inds = uniq(DATA.map(d=>d.Indicador));
+  const outros = uniq(DATA.filter(d=>d.Eixo === 'Outros').map(d=>d.Indicador));
+  const dirs = uniq(DATA.map(d=>d.Diretoria));
+  const porEixo = {};
+  for(const e of [...Object.keys(EIXOS),'Outros']){
+    porEixo[e] = uniq(DATA.filter(d=>d.Eixo === e).map(d=>d.Indicador)).length;
+  }
+
+  $('dRows').textContent = RAW_ROWS.length;
+  $('dValid').textContent = DATA.length;
+  $('dInds').textContent = inds.length;
+  $('dOutros').textContent = outros.length;
+  $('dDirs').textContent = dirs.length;
+
+  $('dText').innerHTML =
+    `<b>Colunas encontradas:</b> ${esc(RAW_COLUMNS.join(' | ') || '—')}<br>` +
+    `<b>Classificação por eixo:</b> ${Object.entries(porEixo).map(([k,v])=>`${esc(k)}: ${v}`).join(' · ')}<br>` +
+    `<b>Diretorias:</b> ${esc(dirs.join(' | ') || '—')}<br>` +
+    `<b>Indicadores sem eixo:</b> ${outros.length ? esc(outros.join(' | ')) : 'nenhum'}`;
+
+  console.log('Linhas lidas:', RAW_ROWS.length);
+  console.log('Colunas encontradas:', RAW_COLUMNS);
+  console.log('Registros válidos:', DATA.length);
+  console.log('Indicadores únicos:', inds);
+  console.log('Indicadores sem eixo:', outros);
+  console.log('Diretorias:', dirs);
+}
+
+/* gráficos */
+function mkChart(id,type,labels,datasets,extra={}){
+  if(CHARTS[id]) CHARTS[id].destroy();
+  const el = $(id);
+  if(!el) return;
+  CHARTS[id] = new Chart(el, {
+    type,
+    data:{labels,datasets},
+    options:Object.assign({
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{
+        legend:{labels:{color:'#c7d8ef',font:{size:11}}},
+        tooltip:{mode:'index',intersect:false}
+      },
+      scales:(type==='doughnut'||type==='pie') ? {} : {
+        x:{ticks:{color:'#8a9db8',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}},
+        y:{ticks:{color:'#8a9db8',font:{size:10}},grid:{color:'rgba(255,255,255,.07)'}}
+      }
+    }, extra)
+  });
+}
+
+/* BLOCO 1 */
+function renderKPIs(rows){
+  const cm = rows.filter(d=>d.Meta != null && d.Acumulado != null);
+  const dentro = cm.filter(d=>statusOf(d)==='Dentro da meta');
+  const abaixo = cm.filter(d=>statusOf(d)==='Abaixo da meta');
+  const pct = cm.length ? Math.round(dentro.length/cm.length*100) : 0;
+  const criticos = abaixo.filter(d=>tendClass(d)==='bad').length;
+  const alertas = dentro.filter(d=>tendClass(d)==='bad').length;
+  const consol = dentro.filter(d=>consistencia(d)==='alta').length;
+
+  $('kTotal').textContent = rows.length;
+  $('kTotalSub').textContent = `${uniq(rows.map(d=>d.Indicador)).length} indicadores distintos`;
+  $('kTaxa').textContent = pct + '%';
+  $('kTaxaSub').textContent = `${dentro.length} de ${cm.length} com meta`;
+  $('kRisco').textContent = criticos;
+  $('kRiscoSub').textContent = criticos ? 'abaixo da meta + piora' : 'nenhum risco crítico';
+  $('kAlerta').textContent = alertas;
+  $('kAlertaSub').textContent = alertas ? 'na meta mas deteriorando' : 'sem alertas preventivos';
+  $('kConsol').textContent = consol;
+  $('kConsolSub').textContent = 'meta + consistência alta';
+  $('scopeBadge').textContent = rows.length + ' registros';
+}
+
+/* BLOCO 2 */
 function renderHeatmap(rows){
-  const ordemEixos=['Pessoas','Segurança','Operação','Atendimento','Sustentabilidade','Receita'];
-  const html=ordemEixos.map(eixo=>{
-    const inds=rows.filter(d=>eixoDe(d.Indicador)===eixo);
-    if(!inds.length)return'';
-    const cm=inds.filter(d=>d.Meta!=null&&d.Acumulado!=null);
-    const dentro=cm.filter(d=>statusOf(d)==='Dentro da meta');
-    const abaixo=cm.filter(d=>statusOf(d)==='Abaixo da meta');
-    const criticos=abaixo.filter(d=>tendClass(d)==='bad').length;
-    const alertas=dentro.filter(d=>tendClass(d)==='bad').length;
-    const pct=cm.length?Math.round(dentro.length/cm.length*100):null;
-    let cls='cinza',statusTxt='Sem referencia',icone='?';
-    if(cm.length){
-      if(criticos>0){cls='vermelho';statusTxt='Critico';icone='!';}
-      else if(alertas>0||abaixo.length>0){cls='amarelo';statusTxt='Atencao';icone='~';}
-      else{cls='verde';statusTxt='Estavel';icone='+';}
+  const ordem = ['Pessoas','Segurança','Operação','Atendimento','Sustentabilidade','Receita'];
+  const html = ordem.map(eixo=>{
+    const inds = rows.filter(d=>d.Eixo === eixo);
+    if(!inds.length) {
+      return `<div class="heat-card cinza">
+        <div class="heat-dot">${EIXO_ICONE[eixo]}</div>
+        <div><div class="heat-eixo">${eixo}</div><div class="heat-status">Sem dados</div><div class="heat-detalhe">0 ind. no recorte</div></div>
+      </div>`;
     }
-    const detalhe=cm.length?`${pct}% na meta &bull; ${inds.length} ind.`:`${inds.length} ind. sem referencia`;
-    return`<div class="heat-card ${cls}" onclick="filtrarEixo('${esc(eixo)}')">
-      <div class="heat-dot">${EIXO_ICONE[eixo]||'?'}</div>
-      <div class="heat-info">
+
+    const cm = inds.filter(d=>d.Meta != null && d.Acumulado != null);
+    const dentro = cm.filter(d=>statusOf(d)==='Dentro da meta');
+    const abaixo = cm.filter(d=>statusOf(d)==='Abaixo da meta');
+    const criticos = abaixo.filter(d=>tendClass(d)==='bad').length;
+    const alertas = dentro.filter(d=>tendClass(d)==='bad').length;
+    const pct = cm.length ? Math.round(dentro.length/cm.length*100) : null;
+
+    let cls = 'cinza', statusTxt = 'Sem referência';
+    if(cm.length){
+      if(criticos > 0) { cls='vermelho'; statusTxt='Crítico'; }
+      else if(alertas > 0 || abaixo.length > 0) { cls='amarelo'; statusTxt='Atenção'; }
+      else { cls='verde'; statusTxt='Estável'; }
+    }
+    const detalhe = cm.length ? `${pct}% na meta · ${inds.length} ind.` : `${inds.length} ind. sem meta`;
+    return `<div class="heat-card ${cls}" title="${esc(eixo)}">
+      <div class="heat-dot">${EIXO_ICONE[eixo]}</div>
+      <div>
         <div class="heat-eixo">${esc(eixo)}</div>
         <div class="heat-status">${statusTxt}</div>
         <div class="heat-detalhe">${detalhe}</div>
       </div>
     </div>`;
   }).join('');
-  $('heatmapWrap').innerHTML=html||'<div style="color:var(--muted);font-size:13px">Sem dados no recorte.</div>';
+
+  $('heatmapWrap').innerHTML = html;
 }
-function filtrarEixo(eixo){/* futuro: filtrar por eixo */}
 
-/* ── BLOCO 3: AGENDA ── */
+/* BLOCO 3 */
 function renderAgenda(rows){
-  const cm=rows.filter(d=>d.Meta!=null&&d.Acumulado!=null);
-  const criticos=[...cm.filter(d=>statusOf(d)==='Abaixo da meta'&&tendClass(d)==='bad')]
-    .sort((a,b)=>Math.abs(desvio(b)||0)-Math.abs(desvio(a)||0));
-  const alertas=[...cm.filter(d=>statusOf(d)==='Dentro da meta'&&tendClass(d)==='bad')]
-    .sort((a,b)=>Math.abs(desvio(b)||0)-Math.abs(desvio(a)||0));
+  const cm = rows.filter(d=>d.Meta != null && d.Acumulado != null);
+  const criticos = cm.filter(d=>statusOf(d)==='Abaixo da meta' && tendClass(d)==='bad');
+  const abaixo = cm.filter(d=>statusOf(d)==='Abaixo da meta' && tendClass(d)!=='bad');
+  const alertas = cm.filter(d=>statusOf(d)==='Dentro da meta' && tendClass(d)==='bad');
 
-  // Agrupa por eixo para Agenda
-  const agendaEixos={};
-  criticos.forEach(d=>{const e=eixoDe(d.Indicador);agendaEixos[e]=agendaEixos[e]||{cls:'p1',prioridade:1,inds:[]};agendaEixos[e].inds.push(d);});
-  alertas.forEach(d=>{const e=eixoDe(d.Indicador);if(!agendaEixos[e]){agendaEixos[e]={cls:'p2',prioridade:2,inds:[]};agendaEixos[e].inds.push(d);}});
+  const todos = [
+    ...criticos.map(d=>({d, peso:3, tipo:'Risco crítico'})),
+    ...abaixo.map(d=>({d, peso:2, tipo:'Pressão sobre a meta'})),
+    ...alertas.map(d=>({d, peso:1, tipo:'Atenção preventiva'}))
+  ];
 
-  const itens=Object.entries(agendaEixos).sort((a,b)=>a[1].prioridade-b[1].prioridade).slice(0,3);
+  const grupos = {};
+  todos.forEach(x=>{
+    const e = x.d.Eixo || 'Outros';
+    if(!grupos[e]) grupos[e] = {eixo:e, peso:0, itens:[]};
+    grupos[e].peso += x.peso;
+    grupos[e].itens.push(x);
+  });
 
-  if(!itens.length){
-    $('agendaGrid').innerHTML=`<div style="grid-column:1/-1;color:var(--muted);font-size:13px;padding:4px">Nenhum tema critico ou de alerta no recorte atual.</div>`;return;
+  const agenda = Object.values(grupos)
+    .sort((a,b)=>b.peso-a.peso)
+    .slice(0,3);
+
+  if(!agenda.length){
+    $('agendaGrid').innerHTML = `<div style="grid-column:1/-1;color:var(--muted);font-size:13px;padding:8px">Nenhum tema crítico ou de alerta no recorte atual.</div>`;
+    return;
   }
 
-  const prioLabels=['p1','p2','p3'];
-  const prioTitulos={p1:'Risco a acompanhar',p2:'Sinal de atencao',p3:'Ponto de observacao'};
-
-  $('agendaGrid').innerHTML=itens.map(([eixo,dados],i)=>{
-    const cls=prioLabels[i]||'p3';
-    const indsUniq=[...new Map(dados.inds.map(d=>[d.Indicador,d])).values()].slice(0,3);
-    const piorInd=dados.inds[0];
-    const dv=piorInd?desvio(piorInd):null;
-    const impacto=dados.inds.length>1?`${dados.inds.length} indicadores com sinal desfavoravel neste eixo.`:`${esc(piorInd?.Indicador||'')} concentra o sinal mais relevante.`;
-    return`<div class="agenda-card ${cls}">
-      <div class="ag-num">${['01','02','03'][i]} &bull; ${prioTitulos[cls]}</div>
-      <div class="ag-eixo">${esc(eixo)}</div>
-      <div class="ag-titulo">${esc(eixo)} &mdash; ${dados.inds.length} indicador${dados.inds.length>1?'es':''}${dv!=null?` &bull; desvio ${fmt(dv,piorInd?.Unidade)}`:''}${tendClass(piorInd)==='bad'?' &bull; trajetoria desfavoravel':''}</div>
-      <div class="ag-contexto">${impacto}</div>
-      <div class="ag-indicadores">${indsUniq.map(d=>`<div class="ag-ind">${esc(d.Indicador)}</div>`).join('')}</div>
+  $('agendaGrid').innerHTML = agenda.map((g,i)=>{
+    const cls = i===0 ? 'p1' : i===1 ? 'p2' : 'p3';
+    const top = g.itens.sort((a,b)=>b.peso-a.peso || Math.abs(desvio(b.d)||0)-Math.abs(desvio(a.d)||0)).slice(0,3);
+    const principal = top[0];
+    const label = i===0 ? 'Prioridade máxima' : i===1 ? 'Atenção executiva' : 'Monitoramento';
+    return `<div class="agenda-card ${cls}">
+      <div class="ag-num">${String(i+1).padStart(2,'0')} · ${label}</div>
+      <div class="ag-eixo">${esc(g.eixo)}</div>
+      <div class="ag-titulo">${esc(g.eixo)} · ${top.length} sinal${top.length>1?'ais':' '} relevante${top.length>1?'s':''}</div>
+      <div class="ag-contexto">${principal.tipo}: ${esc(principal.d.Indicador)}. ${principal.d.Meta!=null ? `Acumulado ${fmt(principal.d.Acumulado,principal.d.Unidade)} contra meta ${fmt(principal.d.Meta,principal.d.Unidade)}.` : ''}</div>
+      <div class="ag-indicadores">${top.map(x=>`<div class="ag-ind">${esc(x.d.Indicador)}</div>`).join('')}</div>
     </div>`;
   }).join('');
 }
 
-/* ── BLOCO 4: RADAR DIRETORIAS ── */
+/* BLOCO 4 */
 function renderRadar(rows){
-  const dirs=uniq(rows.map(d=>d.Diretoria)).filter(Boolean);
-  if(!dirs.length){$('radarGrid').innerHTML='<div style="color:var(--muted);font-size:13px">Sem dados por diretoria no recorte.</div>';return;}
-  const info=dirs.map(dir=>{
-    const sub=rows.filter(d=>d.Diretoria===dir);
-    const cm=sub.filter(d=>d.Meta!=null&&d.Acumulado!=null);
-    const dentro=cm.filter(d=>statusOf(d)==='Dentro da meta');
-    const pct=cm.length?Math.round(dentro.length/cm.length*100):null;
-    const criticos=cm.filter(d=>statusOf(d)==='Abaixo da meta'&&tendClass(d)==='bad').length;
-    const alertas=cm.filter(d=>statusOf(d)==='Dentro da meta'&&tendClass(d)==='bad').length;
-    return{dir,pct,total:sub.length,cmLen:cm.length,dentro:dentro.length,criticos,alertas};
-  }).sort((a,b)=>(b.pct??-1)-(a.pct??-1));
+  const dirs = uniq(rows.map(d=>d.Diretoria)).filter(Boolean);
+  if(!dirs.length){
+    $('radarGrid').innerHTML = `<div style="color:var(--muted);font-size:13px">Sem diretorias identificadas no recorte.</div>`;
+    return;
+  }
 
-  const cores=['#78aaa3','#6da5d8','#e8c335','#e87535','#ef6a5d','#a78bfa'];
-  $('radarGrid').innerHTML=info.map((x,i)=>{
-    const cor=x.pct>=80?'#78aaa3':x.pct>=60?'#e8c335':'#ef6a5d';
-    const barW=x.pct!=null?Math.max(4,x.pct):0;
-    return`<div class="radar-card">
+  const info = dirs.map(dir=>{
+    const sub = rows.filter(d=>d.Diretoria === dir);
+    const cm = sub.filter(d=>d.Meta != null && d.Acumulado != null);
+    const dentro = cm.filter(d=>statusOf(d)==='Dentro da meta');
+    const pct = cm.length ? Math.round(dentro.length/cm.length*100) : null;
+    const riscos = cm.filter(d=>statusOf(d)==='Abaixo da meta' && tendClass(d)==='bad').length;
+    const alertas = cm.filter(d=>statusOf(d)==='Dentro da meta' && tendClass(d)==='bad').length;
+    return {dir, sub, cm, dentro, pct, riscos, alertas};
+  }).sort((a,b)=>(b.pct ?? -1)-(a.pct ?? -1));
+
+  $('radarGrid').innerHTML = info.map(x=>{
+    const cor = x.pct == null ? '#9fb0c7' : x.pct >= 80 ? '#78aaa3' : x.pct >= 60 ? '#e8c335' : '#ef6a5d';
+    const w = x.pct == null ? 0 : Math.max(4,x.pct);
+    return `<div class="radar-card">
       <div class="radar-dir">${esc(x.dir)}</div>
-      <div class="radar-taxa" style="color:${cor}">${x.pct!=null?x.pct+'%':'—'}</div>
-      <div class="radar-bar"><i style="width:${barW}%;background:${cor}"></i></div>
+      <div class="radar-taxa" style="color:${cor}">${x.pct == null ? '—' : x.pct + '%'}</div>
+      <div class="radar-bar"><i style="width:${w}%;background:${cor}"></i></div>
       <div class="radar-stats">
-        ${x.dentro} de ${x.cmLen} na meta<br>
-        ${x.criticos?`<span style="color:var(--red)">${x.criticos} risco${x.criticos>1?'s':''}</span> &bull; `:''}${x.alertas?`<span style="color:var(--yellow)">${x.alertas} alerta${x.alertas>1?'s':''}</span>`:x.criticos?'':'sem alertas'}
+        ${x.dentro.length} de ${x.cm.length} na meta<br>
+        ${x.riscos ? `<span style="color:var(--red)">${x.riscos} risco${x.riscos>1?'s':''}</span>` : 'sem risco crítico'}
+        ${x.alertas ? ` · <span style="color:var(--yellow)">${x.alertas} alerta${x.alertas>1?'s':''}</span>` : ''}
       </div>
     </div>`;
   }).join('');
 }
 
-/* ── BLOCO 5: INSIGHTS ── */
+/* BLOCO 5 */
 function buildInsights(rows){
-  const cm=rows.filter(d=>d.Meta!=null&&d.Acumulado!=null);
-  const abaixo=cm.filter(d=>statusOf(d)==='Abaixo da meta');
-  const dentro=cm.filter(d=>statusOf(d)==='Dentro da meta');
-  const ins=[];
+  const cm = rows.filter(d=>d.Meta != null && d.Acumulado != null);
+  const dentro = cm.filter(d=>statusOf(d)==='Dentro da meta');
+  const abaixo = cm.filter(d=>statusOf(d)==='Abaixo da meta');
+  const ins = [];
 
-  // 1. Risco institucional
-  const criticos=[...abaixo].filter(d=>tendClass(d)==='bad').sort((a,b)=>Math.abs(desvio(b)||0)-Math.abs(desvio(a)||0));
+  const criticos = abaixo.filter(d=>tendClass(d)==='bad').sort((a,b)=>Math.abs(desvio(b)||0)-Math.abs(desvio(a)||0));
   if(criticos.length){
-    const rep=criticos[0];const dv=desvio(rep);const pct=rep.Meta?(dv/Math.abs(rep.Meta)*100):0;
-    const pctDeTotal=Math.round(criticos.length/Math.max(rows.length,1)*100);
-    const outros=criticos.slice(1,3).map(d=>esc(d.Indicador));
-    ins.push({cls:'bad',tag:'Risco Institucional',titulo:`${criticos.length} indicador${criticos.length>1?'es':''} em zona critica`,val:criticos.length,sub:`${pctDeTotal}% do total avaliado no recorte`,
-      narrativa:`<b>${criticos.length}</b> indicador${criticos.length>1?'es combinam':'combina'} desvio negativo e trajetoria desfavoravel. Esse grupo concentra o sinal mais relevante para o acompanhamento da Presidencia neste ciclo, pois a tendencia de piora aumenta a distancia da meta a cada periodo.<br><br>Principal caso: <b>${esc(rep.Indicador)}</b> (${rep.Ano}) &mdash; acumulado <b>${fmt(rep.Acumulado,rep.Unidade)}</b> contra meta de <b>${fmt(rep.Meta,rep.Unidade)}</b>, desvio de <b>${Math.abs(pct).toFixed(1)}%</b>, eixo ${esc(eixoDe(rep.Indicador))}.${outros.length?`<br>Tambem nessa categoria: <b>${outros.join(', ')}</b>.`:''}`,
-      d:rep});
+    const rep = criticos[0];
+    ins.push({
+      cls:'bad', tag:'Risco Institucional',
+      titulo:`${criticos.length} indicador${criticos.length>1?'es':''} em zona crítica`,
+      val:criticos.length, sub:'desvio negativo + trajetória desfavorável',
+      d:rep,
+      narrativa:`<b>${criticos.length}</b> indicador${criticos.length>1?'es combinam':' combina'} resultado abaixo da meta e tendência de piora. Esse é o principal sinal para a Presidência, porque une distância da meta com trajetória desfavorável. O caso mais relevante é <b>${esc(rep.Indicador)}</b>, no eixo <b>${esc(rep.Eixo)}</b>, com acumulado de <b>${fmt(rep.Acumulado,rep.Unidade)}</b> frente à meta de <b>${fmt(rep.Meta,rep.Unidade)}</b>.`
+    });
   }
 
-  // 2. Atencao preventiva
-  const amarelos=[...dentro].filter(d=>tendClass(d)==='bad').sort((a,b)=>Math.abs(desvio(b)||0)-Math.abs(desvio(a)||0));
-  if(amarelos.length){
-    const rep=amarelos[0];const v=MESES.map(m=>rep[m]).filter(x=>x!=null);
-    const ini=v.length?v[0]:null;const fim=v.length?v.at(-1):null;
-    const pctDeTotal=Math.round(amarelos.length/Math.max(rows.length,1)*100);
-    ins.push({cls:'warn',tag:'Atencao Preventiva',titulo:`${amarelos.length} indicador${amarelos.length>1?'es':''} com sinal de alerta`,val:amarelos.length,sub:`${pctDeTotal}% do total ainda dentro da meta`,
-      narrativa:`Embora <b>${amarelos.length}</b> indicador${amarelos.length>1?'es ainda estejam':'ainda esteja'} dentro da referencia, a serie mensal ja aponta perda de desempenho. Esse e o momento de observacao &mdash; antes que o sinal se converta em desvio formal no fechamento do periodo.<br><br>Caso de maior atencao: <b>${esc(rep.Indicador)}</b> (${rep.Ano}), eixo ${esc(eixoDe(rep.Indicador))}, serie passou de <b>${fmt(ini,rep.Unidade)}</b> para <b>${fmt(fim,rep.Unidade)}</b>.`,
-      d:rep});
+  const alertas = dentro.filter(d=>tendClass(d)==='bad').sort((a,b)=>Math.abs(desvio(a)||0)-Math.abs(desvio(b)||0));
+  if(alertas.length){
+    const rep = alertas[0];
+    ins.push({
+      cls:'warn', tag:'Atenção Preventiva',
+      titulo:`${alertas.length} indicador${alertas.length>1?'es':''} ainda na meta, mas piorando`,
+      val:alertas.length, sub:'sinal antes do desvio formal',
+      d:rep,
+      narrativa:`Há <b>${alertas.length}</b> indicador${alertas.length>1?'es':' '} ainda dentro da referência, mas com perda recente de desempenho. Esse grupo deve ser observado antes do fechamento do período. O principal caso é <b>${esc(rep.Indicador)}</b>, no eixo <b>${esc(rep.Eixo)}</b>.`
+    });
   }
 
-  // 3. Boa pratica replicavel
-  const replicaveis=[...dentro].filter(d=>tendClass(d)==='good'&&consistencia(d)==='alta').sort((a,b)=>{const ra=a.Meta?Math.abs((a.Acumulado-a.Meta)/a.Meta):0;const rb=b.Meta?Math.abs((b.Acumulado-b.Meta)/b.Meta):0;return rb-ra;});
+  const replicaveis = dentro.filter(d=>tendClass(d)==='good' && consistencia(d)==='alta')
+    .sort((a,b)=>Math.abs(desvioPct(b)||0)-Math.abs(desvioPct(a)||0));
   if(replicaveis.length){
-    const rep=replicaveis[0];const dv=desvio(rep);const pct=rep.Meta?(dv/Math.abs(rep.Meta)*100):0;
-    ins.push({cls:'good',tag:'Boa Pratica Replicavel',titulo:`${replicaveis.length} indicador${replicaveis.length>1?'es com':'com'} consistencia alta`,val:replicaveis.length,sub:`meta + tendencia positiva + consistencia`,
-      narrativa:`<b>${replicaveis.length}</b> indicador${replicaveis.length>1?'es apresentam':'apresenta'} resultado acima da meta combinado a consistencia mensal elevada &mdash; nao apenas um pico isolado, mas desempenho sustentado ao longo do periodo.<br><br>Destaque: <b>${esc(rep.Indicador)}</b> (${rep.Ano}), eixo ${esc(eixoDe(rep.Indicador))}, acumulado <b>${fmt(rep.Acumulado,rep.Unidade)}</b>, superacao de <b>${Math.abs(pct).toFixed(1)}%</b> da meta. Resultados com essa consistencia merecem espaco na leitura executiva.`,
-      d:rep});
+    const rep = replicaveis[0];
+    ins.push({
+      cls:'good', tag:'Boa Prática Replicável',
+      titulo:`${replicaveis.length} resultado${replicaveis.length>1?'s':''} consolidado${replicaveis.length>1?'s':''}`,
+      val:replicaveis.length, sub:'meta + tendência positiva + consistência alta',
+      d:rep,
+      narrativa:`<b>${replicaveis.length}</b> indicador${replicaveis.length>1?'es apresentam':' apresenta'} resultado acima da meta com consistência alta. Isso diferencia desempenho estrutural de pico isolado. O destaque é <b>${esc(rep.Indicador)}</b>, no eixo <b>${esc(rep.Eixo)}</b>.`
+    });
   }
 
-  // 4. Governabilidade
-  const governaveis=rows.filter(d=>govClass(d.Indicador)==='direto'&&d.Acumulado!=null);
-  const govAbaixo=governaveis.filter(d=>statusOf(d)==='Abaixo da meta');
+  const governaveis = rows.filter(d=>d.Governabilidade === 'governável');
+  const govAbaixo = governaveis.filter(d=>statusOf(d)==='Abaixo da meta');
   if(governaveis.length){
-    const rep=govAbaixo.length?govAbaixo[0]:governaveis[0];
-    const pct=governaveis.length?Math.round(govAbaixo.length/governaveis.length*100):0;
-    ins.push({cls:'neutral',tag:'Governabilidade',titulo:`${governaveis.length} ind. sob controle operacional direto`,val:govAbaixo.length+' abaixo',sub:`${pct}% dos governaveis com desvio`,
-      narrativa:`O painel distingue indicadores que a COMLURB controla diretamente &mdash; como Absenteismo, Acidentes, Arrecadacao, IPL, IPR e Frota &mdash; daqueles influenciados por demanda cidada, clima ou terceiros.<br><br>Dos <b>${governaveis.length}</b> indicadores governaveis no recorte, <b>${govAbaixo.length}</b> estao abaixo da meta (${pct}%). Essa separacao qualifica a analise executiva e fortalece a defesa tecnica dos resultados perante orgaos de controle.`,
-      d:rep});
+    const rep = govAbaixo[0] || governaveis[0];
+    const pct = Math.round(govAbaixo.length / governaveis.length * 100);
+    ins.push({
+      cls:'neutral', tag:'Governabilidade',
+      titulo:`${governaveis.length} indicadores sob controle direto`,
+      val:`${govAbaixo.length} abaixo`,
+      sub:`${pct}% dos governáveis com desvio`,
+      d:rep,
+      narrativa:`O painel separa indicadores governáveis daqueles dependentes de demanda cidadã, clima, terceiros ou outros órgãos. Dos <b>${governaveis.length}</b> indicadores governáveis no recorte, <b>${govAbaixo.length}</b> estão abaixo da meta. Essa leitura evita comparar naturezas diferentes na mesma régua.`
+    });
   }
 
-  // 5. Consistencia operacional
-  const alta=rows.filter(d=>consistencia(d)==='alta').length;
-  const media=rows.filter(d=>consistencia(d)==='media').length;
-  const baixa=rows.filter(d=>consistencia(d)==='baixa').length;
-  const repCons=rows.filter(d=>consistencia(d)==='baixa'&&statusOf(d)==='Dentro da meta')[0]||rows[0];
+  const alta = rows.filter(d=>consistencia(d)==='alta').length;
+  const media = rows.filter(d=>consistencia(d)==='média').length;
+  const baixa = rows.filter(d=>consistencia(d)==='baixa').length;
   if(rows.length){
-    ins.push({cls:'neutral',tag:'Consistencia Operacional',titulo:`${alta} indicador${alta!==1?'es com':'com'} padrao estavel`,val:alta+' alta / '+media+' media',sub:`${baixa} com variacao elevada`,
-      narrativa:`A consistencia mensal diferencia resultado estrutural de resultado circunstancial. Um indicador com serie uniforme ao longo do ano reflete maturidade operacional; um com pico isolado pode esconder instabilidade.<br><br>No recorte: <b>${alta}</b> indicador${alta!==1?'es':''}  com consistencia alta (variacao &lt; 8%), <b>${media}</b> com consistencia media e <b>${baixa}</b> com variacao elevada. Indicadores dentro da meta mas com baixa consistencia merecem atencao mesmo sem desvio formal.`,
-      d:repCons});
+    const rep = rows.find(d=>consistencia(d)==='baixa' && statusOf(d)==='Dentro da meta') || rows[0];
+    ins.push({
+      cls:'neutral', tag:'Consistência Operacional',
+      titulo:`${alta} indicador${alta!==1?'es':''} com padrão estável`,
+      val:`${alta} alta / ${media} média`,
+      sub:`${baixa} com variação elevada`,
+      d:rep,
+      narrativa:`Consistência operacional diferencia resultado confiável de resultado circunstancial. No recorte, <b>${alta}</b> indicador${alta!==1?'es têm':' tem'} consistência alta, <b>${media}</b> consistência média e <b>${baixa}</b> variação elevada.`
+    });
   }
 
-  // 6. Meta sem referencia
-  const semMeta=rows.filter(d=>d.Meta==null||d.Acumulado==null);
+  const semMeta = rows.filter(d=>d.Meta == null || d.Acumulado == null);
   if(semMeta.length){
-    const rep=semMeta.find(d=>d.Acumulado!=null)||semMeta[0];
-    ins.push({cls:'neutral',tag:'Meta sem Referencia',titulo:`${semMeta.length} indicador${semMeta.length>1?'es':''}  sem leitura possivel`,val:semMeta.length,sub:`sem meta ou acumulado cadastrado`,
-      narrativa:`<b>${semMeta.length}</b> indicador${semMeta.length>1?'es nao possuem':'nao possui'} meta ou acumulado registrado no periodo. O painel apresenta o volume disponivel, mas nao consegue afirmar se o desempenho e bom, ruim ou aceitavel sem uma referencia de comparacao.<br><br>Sem meta, esses indicadores ficam fora da leitura de risco e nao contribuem para o calculo de atingimento da Presidencia.`,
-      d:rep});
+    const rep = semMeta.find(d=>d.Acumulado != null) || semMeta[0];
+    ins.push({
+      cls:'neutral', tag:'Meta sem Referência',
+      titulo:`${semMeta.length} indicador${semMeta.length>1?'es':''} sem leitura possível`,
+      val:semMeta.length,
+      sub:'sem meta ou acumulado',
+      d:rep,
+      narrativa:`<b>${semMeta.length}</b> indicador${semMeta.length>1?'es não possuem':' não possui'} meta ou acumulado no recorte. O painel pode exibir o volume, mas não consegue afirmar se o desempenho é bom, ruim ou aceitável sem uma referência.`
+    });
   }
 
   return ins.slice(0,6);
 }
-
-let GINS={};
 function renderInsights(rows){
-  const items=buildInsights(rows);
-  if(!items.length){$('insGrid').innerHTML='<div style="color:var(--muted);font-size:13px;padding:4px">Sem dados suficientes.</div>';return;}
-  window._insItems=items;
-  $('insGrid').innerHTML=items.map((ins,i)=>`
+  const items = buildInsights(rows);
+  if(!items.length){
+    $('insGrid').innerHTML = `<div style="color:var(--muted);font-size:13px;padding:8px">Sem dados suficientes para gerar insights.</div>`;
+    $('insExpand').innerHTML = '';
+    return;
+  }
+  window._insItems = items;
+  $('insGrid').innerHTML = items.map((ins,i)=>`
     <div class="ins-card ${ins.cls}" data-idx="${i}" onclick="toggleIns(${i})">
-      <div class="ins-tag">${ins.tag}</div>
+      <div class="ins-tag">${esc(ins.tag)}</div>
       <div class="ins-titulo">${esc(ins.titulo)}</div>
-      <div class="ins-val">${ins.val}</div>
-      <div class="ins-sub">${ins.sub}</div>
+      <div class="ins-val">${esc(ins.val)}</div>
+      <div class="ins-sub">${esc(ins.sub)}</div>
       <span class="ins-arrow">&#9660;</span>
-    </div>`).join('');
-  $('insExpand').innerHTML='';openIdx=null;
+    </div>
+  `).join('');
+  $('insExpand').innerHTML = '';
+  openIdx = null;
 }
-
 function toggleIns(idx){
-  const items=window._insItems||[];if(!items[idx])return;
-  if(openIdx===idx){openIdx=null;document.querySelectorAll('.ins-card').forEach(c=>c.classList.remove('open'));$('insExpand').innerHTML='';return;}
-  openIdx=idx;
-  document.querySelectorAll('.ins-card').forEach(c=>c.classList.remove('open'));
-  document.querySelector(`.ins-card[data-idx="${idx}"]`).classList.add('open');
-  const ins=items[idx];const d=ins.d;
-  const st=statusOf(d);const dv=desvio(d);const tc=tendClass(d);const cons=consistencia(d);
-  const v=MESES.map(m=>d[m]).filter(x=>x!=null);
-  const maxV=v.length?Math.max(...v):null;const minV=v.length?Math.min(...v):null;const mediaV=v.length?(v.reduce((a,b)=>a+b,0)/v.length):null;
-  const outro=DATA.find(x=>x.Indicador===d.Indicador&&x.Ano!==d.Ano);
-  const yoy=outro&&d.Acumulado!=null&&outro.Acumulado!=null&&outro.Acumulado!==0?((d.Acumulado-outro.Acumulado)/Math.abs(outro.Acumulado)*100):null;
-  const stC=st==='Dentro da meta'?'good':st==='Abaixo da meta'?'bad':'';
-  const tcC=tc==='good'?'good':tc==='bad'?'bad':'';
-  const consC=cons==='alta'?'good':cons==='baixa'?'warn':'';
+  const items = window._insItems || [];
+  if(!items[idx]) return;
 
-  $('insExpand').innerHTML=`
+  if(openIdx === idx){
+    openIdx = null;
+    document.querySelectorAll('.ins-card').forEach(c=>c.classList.remove('open'));
+    $('insExpand').innerHTML = '';
+    return;
+  }
+
+  openIdx = idx;
+  document.querySelectorAll('.ins-card').forEach(c=>c.classList.remove('open'));
+  const card = document.querySelector(`.ins-card[data-idx="${idx}"]`);
+  if(card) card.classList.add('open');
+
+  const ins = items[idx];
+  const d = ins.d || {};
+  const st = statusOf(d);
+  const dv = desvio(d);
+  const tc = tendClass(d);
+  const cons = consistencia(d);
+  const vals = MESES.map(m=>d[m]).filter(x=>x != null);
+  const maxV = vals.length ? Math.max(...vals) : null;
+  const minV = vals.length ? Math.min(...vals) : null;
+  const mediaV = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : null;
+
+  $('insExpand').innerHTML = `
     <div class="ins-expand open">
       <div class="exp-main">
         <h3>${esc(ins.tag)}</h3>
-        <div class="exp-narrative">${ins.narrativa}
-          ${yoy!=null?`<br><br>Variacao anual: <b style="color:${yoy>=0?'var(--green)':'var(--red)'}">
-          ${yoy>=0?'+':''}${yoy.toFixed(1)}%</b> &mdash; ${d.Ano-1}: ${outro?fmt(outro.Acumulado,d.Unidade):'—'} &rarr; ${d.Ano}: ${fmt(d.Acumulado,d.Unidade)}.`:''}
-        </div>
+        <div class="exp-narrative">${ins.narrativa}</div>
       </div>
       <div class="exp-chart"><canvas id="expC_${idx}" style="max-height:180px"></canvas></div>
       <div class="exp-stats">
-        <div class="stat-row"><span class="stat-label">Indicador</span><span class="stat-val" style="font-size:10px;white-space:normal;max-width:120px;text-align:right">${esc(d.Indicador)}</span></div>
-        <div class="stat-row"><span class="stat-label">Eixo</span><span class="stat-val">${esc(eixoDe(d.Indicador))}</span></div>
-        <div class="stat-row"><span class="stat-label">Status</span><span class="stat-val ${stC}">${st}</span></div>
+        <div class="stat-row"><span class="stat-label">Indicador</span><span class="stat-val" style="font-size:10px;white-space:normal;max-width:140px">${esc(d.Indicador || '—')}</span></div>
+        <div class="stat-row"><span class="stat-label">Eixo</span><span class="stat-val">${esc(d.Eixo || '—')}</span></div>
+        <div class="stat-row"><span class="stat-label">Status</span><span class="stat-val ${st==='Dentro da meta'?'good':st==='Abaixo da meta'?'bad':''}">${st}</span></div>
         <div class="stat-row"><span class="stat-label">Acumulado</span><span class="stat-val">${fmt(d.Acumulado,d.Unidade)}</span></div>
         <div class="stat-row"><span class="stat-label">Meta</span><span class="stat-val">${fmt(d.Meta,d.Unidade)}</span></div>
-        <div class="stat-row"><span class="stat-label">Desvio</span><span class="stat-val ${dv!=null&&dv<0?'bad':dv!=null&&dv>0?'good':''}">${dv!=null?fmt(dv,d.Unidade):'—'}</span></div>
-        <div class="stat-row"><span class="stat-label">Tendencia</span><span class="stat-val ${tcC}">${tendLabel(d)}</span></div>
-        <div class="stat-row"><span class="stat-label">Consistencia</span><span class="stat-val ${consC}">${cons}</span></div>
-        <div class="stat-row"><span class="stat-label">Max. mensal</span><span class="stat-val">${fmt(maxV,d.Unidade)}</span></div>
-        <div class="stat-row"><span class="stat-label">Min. mensal</span><span class="stat-val">${fmt(minV,d.Unidade)}</span></div>
-        <div class="stat-row"><span class="stat-label">Media mensal</span><span class="stat-val">${fmt(mediaV,d.Unidade)}</span></div>
-        ${yoy!=null?`<div class="stat-row"><span class="stat-label">Var. anual</span><span class="stat-val ${yoy>=0?'good':'bad'}">${yoy>=0?'+':''}${yoy.toFixed(1)}%</span></div>`:''}
+        <div class="stat-row"><span class="stat-label">Desvio</span><span class="stat-val ${dv!=null && dv<0?'bad':dv!=null && dv>0?'good':''}">${dv!=null?fmt(dv,d.Unidade):'—'}</span></div>
+        <div class="stat-row"><span class="stat-label">Tendência</span><span class="stat-val ${tc==='good'?'good':tc==='bad'?'bad':''}">${tendLabel(d)}</span></div>
+        <div class="stat-row"><span class="stat-label">Consistência</span><span class="stat-val ${cons==='alta'?'good':cons==='baixa'?'warn':''}">${cons}</span></div>
+        <div class="stat-row"><span class="stat-label">Máx. mensal</span><span class="stat-val">${fmt(maxV,d.Unidade)}</span></div>
+        <div class="stat-row"><span class="stat-label">Mín. mensal</span><span class="stat-val">${fmt(minV,d.Unidade)}</span></div>
+        <div class="stat-row"><span class="stat-label">Média mensal</span><span class="stat-val">${fmt(mediaV,d.Unidade)}</span></div>
       </div>
     </div>`;
+
   setTimeout(()=>{
-    const ctx=document.getElementById(`expC_${idx}`);if(!ctx)return;
-    if(GINS[idx])GINS[idx].destroy();
-    const ds=[];
-    ANOS.forEach((a,i)=>{const row=DATA.find(r=>r.Ano===a&&r.Indicador===d.Indicador);if(!row)return;ds.push({label:String(a),data:MESES.map(m=>row[m]),borderColor:i===0?'#6da5d8':'#e87535',backgroundColor:(i===0?'#6da5d8':'#e87535')+'15',tension:.35,borderWidth:2,pointRadius:3,fill:i===0});});
-    if(d.Meta!=null)ds.push({label:'Meta',data:MESES.map(()=>d.Meta),borderColor:'#e8c335',borderDash:[5,3],borderWidth:1.5,pointRadius:0,fill:false});
-    GINS[idx]=new Chart(ctx,{type:'line',data:{labels:MESES,datasets:ds},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#c7d8ef',font:{size:10}}}},scales:{x:{ticks:{color:'#8a9db8',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}},y:{ticks:{color:'#8a9db8',font:{size:9}},grid:{color:'rgba(255,255,255,.06)'}}}}}});
-    $('insExpand').scrollIntoView({behavior:'smooth',block:'nearest'});
+    const ctx = document.getElementById(`expC_${idx}`);
+    if(!ctx || !d.Indicador) return;
+    if(INSIGHT_CHARTS[idx]) INSIGHT_CHARTS[idx].destroy();
+
+    const datasets = [];
+    ANOS.forEach((a,i)=>{
+      const row = DATA.find(r=>r.Ano===a && norm(r.Indicador)===norm(d.Indicador));
+      if(!row) return;
+      datasets.push({
+        label:String(a),
+        data:MESES.map(m=>row[m]),
+        borderColor:i===0?'#6da5d8':'#e87535',
+        backgroundColor:(i===0?'#6da5d8':'#e87535')+'15',
+        tension:.35,borderWidth:2,pointRadius:3,fill:i===0
+      });
+    });
+    if(d.Meta != null){
+      datasets.push({label:'Meta',data:MESES.map(()=>d.Meta),borderColor:'#e8c335',borderDash:[5,3],borderWidth:1.5,pointRadius:0,fill:false});
+    }
+
+    INSIGHT_CHARTS[idx] = new Chart(ctx,{
+      type:'line',
+      data:{labels:MESES,datasets},
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{labels:{color:'#c7d8ef',font:{size:10}}}},
+        scales:{
+          x:{ticks:{color:'#8a9db8',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}},
+          y:{ticks:{color:'#8a9db8',font:{size:9}},grid:{color:'rgba(255,255,255,.06)'}}
+        }
+      }
+    });
   },60);
 }
 
-/* ── LEITURA EXECUTIVA ── */
+/* leitura */
 function renderInsightText(rows){
-  const cm=rows.filter(d=>d.Meta!=null&&d.Acumulado!=null);
-  const dentro=cm.filter(d=>statusOf(d)==='Dentro da meta');
-  const abaixo=cm.filter(d=>statusOf(d)==='Abaixo da meta');
-  const pct=cm.length?Math.round(dentro.length/cm.length*100):0;
-  const criticos=abaixo.filter(d=>tendClass(d)==='bad');
-  const amarelos=dentro.filter(d=>tendClass(d)==='bad');
-  const consol=dentro.filter(d=>consistencia(d)==='alta');
-  const pior=criticos.length?[...criticos].sort((a,b)=>Math.abs(desvio(b)||0)-Math.abs(desvio(a)||0))[0]:null;
+  const cm = rows.filter(d=>d.Meta != null && d.Acumulado != null);
+  const dentro = cm.filter(d=>statusOf(d)==='Dentro da meta');
+  const abaixo = cm.filter(d=>statusOf(d)==='Abaixo da meta');
+  const pct = cm.length ? Math.round(dentro.length/cm.length*100) : 0;
+  const criticos = abaixo.filter(d=>tendClass(d)==='bad');
+  const alertas = dentro.filter(d=>tendClass(d)==='bad');
+  const consol = dentro.filter(d=>consistencia(d)==='alta');
+  const semMeta = rows.filter(d=>d.Meta == null || d.Acumulado == null);
+  const pior = criticos.length ? [...criticos].sort((a,b)=>Math.abs(desvio(b)||0)-Math.abs(desvio(a)||0))[0] : null;
 
-  let t=`No recorte selecionado, o painel mostra nao apenas o percentual de indicadores dentro da meta, mas a qualidade do resultado: quais entregas estao consolidadas, quais estao em deterioracao e quais merecem observacao.`;
-  t+=` De <b>${cm.length}</b> indicadores com meta, <b>${dentro.length}</b> (${pct}%) estao dentro da referencia.`;
-  if(criticos.length){t+=` <b>${criticos.length}</b> indicador${criticos.length>1?'es concentram':'concentra'} o sinal mais critico: desvio negativo com trajetoria desfavoravel`;if(pior)t+=` &mdash; destaque para <b>${esc(pior.Indicador)}</b>`;t+='.';}
-  if(amarelos.length)t+=` Outros <b>${amarelos.length}</b> ainda estao na meta, mas ja mostram perda de desempenho.`;
-  if(consol.length)t+=` <b>${consol.length}</b> indicador${consol.length>1?'es apresentam':'apresenta'} consistencia alta, indicando resultado estrutural e nao circunstancial.`;
-  $('insightText').innerHTML=t;
+  let t = `No recorte selecionado, o painel mostra não apenas o percentual de indicadores dentro da meta, mas a qualidade do resultado: entregas consolidadas, sinais de deterioração e pontos que exigem observação executiva.`;
+  t += ` De <b>${cm.length}</b> indicadores com meta, <b>${dentro.length}</b> estão dentro da referência, resultando em <b>${pct}%</b> de atingimento.`;
+  if(criticos.length){
+    t += ` <b>${criticos.length}</b> indicador${criticos.length>1?'es concentram':' concentra'} o sinal mais crítico: desvio negativo com trajetória desfavorável`;
+    if(pior) t += `, com destaque para <b>${esc(pior.Indicador)}</b>`;
+    t += `.`;
+  }
+  if(alertas.length) t += ` Outros <b>${alertas.length}</b> ainda estão na meta, mas já mostram perda de desempenho.`;
+  if(consol.length) t += ` <b>${consol.length}</b> indicador${consol.length>1?'es apresentam':' apresenta'} consistência alta, sinalizando resultado estrutural.`;
+  if(semMeta.length) t += ` <b>${semMeta.length}</b> indicador${semMeta.length>1?'es estão':' está'} sem meta ou acumulado, limitando a leitura executiva.`;
+
+  $('insightText').innerHTML = t;
 }
 
-/* ── EVOLUÇÕES ── */
-function populateSelInd(rows){const inds=uniq(rows.map(d=>d.Indicador));const sel=$('selInd');const cur=sel.value;sel.innerHTML=inds.map(i=>`<option value="${esc(i)}">${esc(i)}</option>`).join('');if(inds.includes(cur))sel.value=cur;}
+/* gráficos inferiores */
+function populateSelInd(rows){
+  const inds = uniq(rows.map(d=>d.Indicador));
+  const sel = $('selInd');
+  const cur = sel.value;
+  sel.innerHTML = inds.map(i=>`<option value="${esc(i)}">${esc(i)}</option>`).join('');
+  if(inds.includes(cur)) sel.value = cur;
+}
 function renderEvol(){
-  const ind=$('selInd').value;if(!ind)return;
-  $('evolBadge').textContent=ind.length>45?ind.slice(0,44)+'…':ind;
-  const ds=[];
-  ANOS.forEach((a,i)=>{const row=DATA.find(d=>d.Ano===a&&d.Indicador===ind);if(!row)return;ds.push({label:String(a),data:MESES.map(m=>row[m]),borderColor:i===0?'#6da5d8':'#e87535',backgroundColor:(i===0?'#6da5d8':'#e87535')+'1a',tension:.35,borderWidth:2.5,pointRadius:4,fill:i===0});});
-  const rm=[...ANOS].reverse().map(a=>DATA.find(d=>d.Ano===a&&d.Indicador===ind&&d.Meta!=null)).find(Boolean);
-  if(rm)ds.push({label:'Meta',data:MESES.map(()=>rm.Meta),borderColor:'#e8c335',borderDash:[6,4],borderWidth:1.5,pointRadius:0,fill:false});
-  if(ds.length)mkChart('lineChart','line',MESES,ds,{plugins:{legend:{labels:{color:'#c7d8ef'}}}});
-}
-function renderDonut(rows){const s={'Dentro da meta':0,'Abaixo da meta':0,'Sem meta':0};rows.forEach(d=>{s[statusOf(d)]=(s[statusOf(d)]||0)+1;});mkChart('donutChart','doughnut',Object.keys(s),[{data:Object.values(s),backgroundColor:['#78aaa3','#ef6a5d','#274260'],borderWidth:0,hoverOffset:8}],{plugins:{legend:{position:'right',labels:{color:'#c7d8ef',font:{size:11}}}}});}
-function renderBar(rows){const i25=new Set(DATA.filter(d=>d.Ano===2025).map(d=>d.Indicador));const i26=new Set(DATA.filter(d=>d.Ano===2026).map(d=>d.Indicador));const rec=new Set(rows.map(d=>d.Indicador));const top=[...i25].filter(i=>i26.has(i)&&rec.has(i)).slice(0,10);const d25=top.map(i=>{const r=DATA.find(d=>d.Ano===2025&&d.Indicador===i);return r?r.Acumulado:null;});const d26=top.map(i=>{const r=DATA.find(d=>d.Ano===2026&&d.Indicador===i);return r?r.Acumulado:null;});mkChart('barChart','bar',top.map(l=>l.length>16?l.slice(0,15)+'…':l),[{label:'2025',data:d25,backgroundColor:'#6da5d8cc',borderRadius:4,borderWidth:0},{label:'2026',data:d26,backgroundColor:'#e87535cc',borderRadius:4,borderWidth:0}],{plugins:{legend:{labels:{color:'#c7d8ef'}}}});}
+  const ind = $('selInd').value;
+  if(!ind) return;
+  $('evolBadge').textContent = ind.length > 45 ? ind.slice(0,44)+'…' : ind;
 
-/* ── RANKINGS ── */
+  const datasets = [];
+  ANOS.forEach((a,i)=>{
+    const row = DATA.find(d=>d.Ano === a && d.Indicador === ind);
+    if(!row) return;
+    datasets.push({
+      label:String(a),
+      data:MESES.map(m=>row[m]),
+      borderColor:i===0?'#6da5d8':'#e87535',
+      backgroundColor:(i===0?'#6da5d8':'#e87535')+'1a',
+      tension:.35,borderWidth:2.5,pointRadius:4,fill:i===0
+    });
+  });
+  const rm = [...ANOS].reverse().map(a=>DATA.find(d=>d.Ano===a && d.Indicador===ind && d.Meta!=null)).find(Boolean);
+  if(rm) datasets.push({label:'Meta',data:MESES.map(()=>rm.Meta),borderColor:'#e8c335',borderDash:[6,4],borderWidth:1.5,pointRadius:0,fill:false});
+
+  if(datasets.length) mkChart('lineChart','line',MESES,datasets);
+}
+function renderDonut(rows){
+  const s = {'Dentro da meta':0,'Abaixo da meta':0,'Sem meta':0};
+  rows.forEach(d=>s[statusOf(d)] = (s[statusOf(d)] || 0) + 1);
+  mkChart('donutChart','doughnut',Object.keys(s),[{
+    data:Object.values(s),
+    backgroundColor:['#78aaa3','#ef6a5d','#274260'],
+    borderWidth:0,hoverOffset:8
+  }],{plugins:{legend:{position:'right',labels:{color:'#c7d8ef',font:{size:11}}}}});
+}
+function renderBar(rows){
+  const rec = new Set(rows.map(d=>d.Indicador));
+  const i25 = new Set(DATA.filter(d=>d.Ano===2025).map(d=>d.Indicador));
+  const i26 = new Set(DATA.filter(d=>d.Ano===2026).map(d=>d.Indicador));
+  const top = [...i25].filter(i=>i26.has(i) && rec.has(i)).slice(0,10);
+
+  const d25 = top.map(i=>(DATA.find(d=>d.Ano===2025 && d.Indicador===i)||{}).Acumulado ?? null);
+  const d26 = top.map(i=>(DATA.find(d=>d.Ano===2026 && d.Indicador===i)||{}).Acumulado ?? null);
+
+  mkChart('barChart','bar',top.map(l=>l.length>18?l.slice(0,17)+'…':l),[
+    {label:'2025',data:d25,backgroundColor:'#6da5d8cc',borderRadius:4,borderWidth:0},
+    {label:'2026',data:d26,backgroundColor:'#e87535cc',borderRadius:4,borderWidth:0}
+  ]);
+}
+
+/* rankings */
 function renderRankings(rows){
-  const abaixo=[...rows.filter(d=>statusOf(d)==='Abaixo da meta'&&d.Acumulado!=null&&d.Meta!=null)].sort((a,b)=>Math.abs(desvio(b)||0)-Math.abs(desvio(a)||0)).slice(0,7);
-  const maxDv=Math.max(...abaixo.map(d=>Math.abs(desvio(d)||0)),1);
-  $('rankDesvio').innerHTML=abaixo.length?abaixo.map((d,i)=>{const dv=desvio(d);return`<div class="rank"><span class="rank-n">${i+1}</span><div class="rank-info"><b title="${esc(d.Indicador)}">${esc(d.Indicador.length>34?d.Indicador.slice(0,33)+'…':d.Indicador)}</b><small>${d.Ano} &bull; ${esc(eixoDe(d.Indicador))} &bull; meta ${fmt(d.Meta,d.Unidade)}</small><div class="rank-bar"><i class="bad" style="width:${Math.max(4,Math.abs(dv||0)/maxDv*100)}%"></i></div></div><span class="rank-val" style="color:var(--red)">${fmt(dv,d.Unidade)}</span></div>`;}).join(''):'<div style="padding:14px 8px;color:var(--muted);font-size:12px">Nenhum abaixo da meta.</div>';
-  const bons=[...rows.filter(d=>statusOf(d)==='Dentro da meta'&&d.Acumulado!=null&&consistencia(d)==='alta')].sort((a,b)=>{const ra=a.Meta?Math.abs((a.Acumulado-a.Meta)/a.Meta):0;const rb=b.Meta?Math.abs((b.Acumulado-b.Meta)/b.Meta):0;return rb-ra;}).slice(0,7);
-  const maxAc=Math.max(...bons.map(d=>d.Acumulado||0),1);
-  $('rankBom').innerHTML=bons.length?bons.map((d,i)=>`<div class="rank"><span class="rank-n">${i+1}</span><div class="rank-info"><b title="${esc(d.Indicador)}">${esc(d.Indicador.length>34?d.Indicador.slice(0,33)+'…':d.Indicador)}</b><small>${d.Ano} &bull; ${esc(eixoDe(d.Indicador))} &bull; consistencia alta</small><div class="rank-bar"><i style="width:${Math.max(4,(d.Acumulado||0)/maxAc*100)}%"></i></div></div><span class="rank-val" style="color:var(--green)">${fmt(d.Acumulado,d.Unidade)}</span></div>`).join(''):'<div style="padding:14px 8px;color:var(--muted);font-size:12px">Sem dados com consistencia alta no filtro.</div>';
+  const abaixo = rows.filter(d=>statusOf(d)==='Abaixo da meta' && d.Acumulado != null && d.Meta != null)
+    .sort((a,b)=>Math.abs(desvio(b)||0)-Math.abs(desvio(a)||0)).slice(0,7);
+  const maxDv = Math.max(...abaixo.map(d=>Math.abs(desvio(d)||0)),1);
+
+  $('rankDesvio').innerHTML = abaixo.length ? abaixo.map((d,i)=>{
+    const dv = desvio(d);
+    return `<div class="rank">
+      <span class="rank-n">${i+1}</span>
+      <div class="rank-info">
+        <b title="${esc(d.Indicador)}">${esc(d.Indicador.length>34?d.Indicador.slice(0,33)+'…':d.Indicador)}</b>
+        <small>${d.Ano} · ${esc(d.Eixo)} · meta ${fmt(d.Meta,d.Unidade)}</small>
+        <div class="rank-bar"><i class="bad" style="width:${Math.max(4,Math.abs(dv||0)/maxDv*100)}%"></i></div>
+      </div>
+      <span class="rank-val" style="color:var(--red)">${fmt(dv,d.Unidade)}</span>
+    </div>`;
+  }).join('') : `<div style="padding:14px 8px;color:var(--muted);font-size:12px">Nenhum abaixo da meta.</div>`;
+
+  const bons = rows.filter(d=>statusOf(d)==='Dentro da meta' && d.Acumulado != null && consistencia(d)==='alta')
+    .sort((a,b)=>Math.abs(desvioPct(b)||0)-Math.abs(desvioPct(a)||0)).slice(0,7);
+  const maxAc = Math.max(...bons.map(d=>d.Acumulado || 0),1);
+
+  $('rankBom').innerHTML = bons.length ? bons.map((d,i)=>`
+    <div class="rank">
+      <span class="rank-n">${i+1}</span>
+      <div class="rank-info">
+        <b title="${esc(d.Indicador)}">${esc(d.Indicador.length>34?d.Indicador.slice(0,33)+'…':d.Indicador)}</b>
+        <small>${d.Ano} · ${esc(d.Eixo)} · consistência alta</small>
+        <div class="rank-bar"><i style="width:${Math.max(4,(d.Acumulado||0)/maxAc*100)}%"></i></div>
+      </div>
+      <span class="rank-val" style="color:var(--green)">${fmt(d.Acumulado,d.Unidade)}</span>
+    </div>
+  `).join('') : `<div style="padding:14px 8px;color:var(--muted);font-size:12px">Sem resultados consolidados no filtro.</div>`;
 }
 
-/* ── RENDER GERAL ── */
 function render(){
-  const rows=filtered();
+  const rows = filtered();
   renderKPIs(rows);
   renderHeatmap(rows);
   renderAgenda(rows);
   renderRadar(rows);
   renderInsights(rows);
+  renderInsightText(rows);
   populateSelInd(rows);
   renderEvol();
   renderDonut(rows);
   renderBar(rows);
-  renderInsightText(rows);
   renderRankings(rows);
 }
 
-/* ── EVENTOS ── */
-document.addEventListener('change',e=>{
-  const id=e.target?.id;
-  if(id==='fAno'||id==='fDir'||id==='fSup'){cascadeFilters();render();}
-  else if(['fInd','fStatus'].includes(id)){render();}
-  else if(id==='selInd'){renderEvol();}
+/* eventos */
+document.addEventListener('change', e=>{
+  const id = e.target?.id;
+  if(['fAno','fDir','fSup'].includes(id)){ cascadeFilters(); render(); }
+  else if(['fInd','fStatus'].includes(id)){ render(); }
+  else if(id === 'selInd'){ renderEvol(); }
 });
-document.addEventListener('click',e=>{
-  if(e.target?.id==='btnClear'||e.target?.closest?.('#btnClear')){
+document.addEventListener('click', e=>{
+  if(e.target?.id === 'btnClear' || e.target?.closest?.('#btnClear')){
     ['fAno','fDir','fSup','fInd','fStatus'].forEach(id=>$(id).value='');
-    cascadeFilters();render();
+    cascadeFilters();
+    render();
+  }
+  if(e.target?.id === 'btnDiag'){
+    const el = $('diagnostic');
+    el.style.display = el.style.display === 'grid' ? 'none' : 'grid';
   }
 });
 
-/* ── BOOT ── */
-Papa.parse(CSV_URL,{download:true,header:true,skipEmptyLines:true,
-  complete:r=>{
-    DATA=r.data.map(transform).filter(d=>d.Ano&&d.Indicador&&matchInd(d.Indicador));
-    populateAll();render();
+/* boot */
+Papa.parse(CSV_URL,{
+  download:true,
+  header:true,
+  skipEmptyLines:true,
+  complete: res=>{
+    RAW_ROWS = res.data || [];
+    RAW_COLUMNS = Object.keys(RAW_ROWS[0] || {});
+
+    DATA = RAW_ROWS
+      .map(transform)
+      .filter(d=>d.Ano && d.Indicador);
+
+    $('loadBox').style.display = 'none';
+
+    if(!DATA.length){
+      $('errBox').style.display = 'block';
+      $('errBox').innerHTML = `O CSV foi lido, mas nenhum registro válido foi encontrado. Verifique se existem colunas de Ano e Indicador. Use o botão Diagnóstico para ver as colunas encontradas.`;
+      $('diagnostic').style.display = 'grid';
+    }
+
+    renderDiagnostic();
+    populateAll();
+    render();
   },
-  error:e=>{console.error(e);$('kTotal').textContent='Erro';}
+  error: err=>{
+    $('loadBox').style.display = 'none';
+    $('errBox').style.display = 'block';
+    $('errBox').innerHTML = `Erro ao carregar o CSV publicado. Verifique se a planilha está publicada na web e se o link CSV está acessível.<br><br>${esc(err?.message || err)}`;
+    console.error(err);
+  }
 });
 </script>
 </body>
