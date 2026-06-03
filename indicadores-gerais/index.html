@@ -3,1424 +3,318 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-
 <title>Radar de Indicadores Gerais | HUB COMLURB</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
 <style>
-
 :root{
-  --bg:#07111f;
-  --panel:#0d1b2f;
-  --panel2:#0b1a2e;
-  --line:#274260;
-  --ink:#f6f8ff;
-  --muted:#a8b8cf;
-  --blue:#6da5d8;
-  --orange:#e87535;
-  --green:#78aaa3;
-  --red:#ee6b6e;
-  --yellow:#e7c56b;
-  --shadow:0 18px 45px rgba(0,0,0,.28);
+  --bg:#06111f;--bg2:#081a2e;--panel:#0b1d33;--panel2:#0d243d;
+  --line:#24415f;--line2:#315475;--ink:#f4f7fb;--muted:#98acc4;
+  --blue:#6da5d8;--cyan:#00c2a8;--orange:#e87535;--red:#ef5b68;
+  --green:#2dd48f;--yellow:#e9b84e;--shadow:0 22px 60px rgba(0,0,0,.35);
 }
-
-*{
-  box-sizing:border-box;
-}
-
+*{box-sizing:border-box}
 body{
-  margin:0;
+  margin:0;color:var(--ink);font-family:Inter,Segoe UI,Arial,sans-serif;
   background:
-  radial-gradient(circle at top right,#123759 0,#07111f 34%,#07111f 100%);
-  color:var(--ink);
-  font-family:Inter,Segoe UI,Arial,sans-serif;
-  overflow-x:hidden;
+    linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),
+    radial-gradient(circle at top right,#123b60 0,#06111f 38%,#050c17 100%);
+  background-size:100% 3px,100% 100%;
 }
-
-.app{
-  max-width:1880px;
-  margin:0 auto;
-  padding:12px 30px 22px;
+.app{max-width:1880px;margin:auto;padding:22px}
+.top{
+  display:grid;grid-template-columns:280px 1fr 260px;gap:20px;align-items:center;
+  border:1px solid var(--line);border-radius:18px;padding:16px 18px;
+  background:linear-gradient(135deg,rgba(9,25,44,.98),rgba(4,12,24,.96));
+  box-shadow:var(--shadow)
 }
-
-.header{
-  display:flex;
-  align-items:center;
-  gap:22px;
-  padding:19px 22px;
-  border:1px solid var(--line);
-  border-radius:22px;
-  background:
-  linear-gradient(135deg,#0d1b2f,#0b1a2e 68%,#102c49);
-  box-shadow:var(--shadow);
+.logo{width:250px;max-height:70px;object-fit:contain}
+.kicker{font:700 12px/1.2 IBM Plex Mono,Consolas,monospace;letter-spacing:.16em;color:#a9b8cc;text-transform:uppercase}
+h1{margin:6px 0 4px;font-size:34px;letter-spacing:.08em;text-transform:uppercase}
+.sub{color:#c7d4e5;font-size:14px}
+.status{text-align:right;font:600 12px/1.7 IBM Plex Mono,Consolas,monospace;color:#c8d6e8}
+.pill{display:inline-block;border:1px solid var(--line);border-radius:9px;padding:7px 10px;background:#0d223a;margin-top:6px}
+.nav{display:flex;gap:10px;margin:14px 0}
+.tab{
+  border:1px solid var(--line);background:#0b1d33;color:#dce9f8;border-radius:12px;
+  padding:10px 14px;font-weight:900;cursor:pointer
 }
-
-.logo{
-  width:280px;
-  max-height:72px;
-  object-fit:contain;
-  padding-right:20px;
-  border-right:1px solid rgba(255,255,255,.18);
+.tab.active{border-color:var(--orange);background:#102842;color:#fff}
+.filters{
+  display:grid;grid-template-columns:.6fr 1fr 1.1fr 1fr 1.4fr 150px;gap:12px;
+  border:1px solid var(--line);border-radius:16px;padding:12px;margin-bottom:12px;background:rgba(8,23,40,.92)
 }
-
-.eyebrow{
-  font-size:11px;
-  font-weight:950;
-  letter-spacing:.18em;
-  text-transform:uppercase;
-  color:#b9c9dc;
+.field,.btn{background:#10243d;border:1px solid #203b58;border-radius:10px;padding:9px 11px}
+label{display:block;font-size:11px;color:#a9b8cc;margin-bottom:6px}
+select{width:100%;background:transparent;border:0;color:#fff;font-weight:800;outline:0}
+select option{background:#0b1d33;color:#fff}
+.btn{color:#fff;font-weight:900;cursor:pointer;border-color:#3d5f82}
+.insights{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:14px}
+.card{
+  min-height:250px;border:1px solid var(--line);border-radius:14px;padding:22px 22px 18px;
+  background:linear-gradient(145deg,rgba(13,35,58,.98),rgba(5,18,33,.98));
+  box-shadow:0 18px 45px rgba(0,0,0,.22);position:relative;overflow:hidden
 }
-
-h1{
-  margin:4px 0 3px;
-  font-size:clamp(27px,2.2vw,42px);
-  line-height:1.04;
-  color:#fff;
-  text-shadow:2px 2px 0 rgba(232,117,53,.22);
+.card:after{content:"";position:absolute;inset:0;border-radius:14px;background:radial-gradient(circle at top right,rgba(109,165,216,.12),transparent 38%);pointer-events:none}
+.ico{
+  width:44px;height:44px;border-radius:10px;background:rgba(0,194,168,.16);
+  display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:28px;color:var(--cyan)
 }
-
-.sub{
-  color:#c5d5e8;
-  font-size:14px;
-  max-width:980px;
-}
-
-.rightTop{
-  margin-left:auto;
-  text-align:right;
-  color:#b9c9dc;
-  font-size:12px;
-  line-height:1.5;
-}
-
-.pill{
-  display:inline-block;
-  border:1px solid rgba(232,117,53,.65);
-  border-radius:999px;
-  padding:7px 10px;
-  margin-top:4px;
-  color:#fff;
-  background:#10243d;
-  font-weight:900;
-}
-
-.controls{
-  display:grid;
-  grid-template-columns:
-  .65fr .8fr .9fr 1fr 1.55fr 150px;
-  gap:12px;
-  margin:14px 0;
-}
-
-.field,
-.btn{
-  border:1px solid var(--line);
-  background:rgba(13,27,47,.96);
-  border-radius:16px;
-  padding:11px 12px;
-  box-shadow:0 8px 20px rgba(0,0,0,.14);
-}
-
-label{
-  display:block;
-  color:#aebbd0;
-  font-size:10px;
-  letter-spacing:.13em;
-  text-transform:uppercase;
-  font-weight:950;
-  margin-bottom:6px;
-}
-
-select,
-input{
-  width:100%;
-  background:transparent;
-  border:0;
-  color:#fff;
-  font-weight:900;
-  outline:0;
-}
-
-select option{
-  background:#0d1b2f;
-  color:#fff;
-}
-
-.btn{
-  cursor:pointer;
-  color:#fff;
-  font-weight:950;
-  border-color:rgba(232,117,53,.65);
-  background:#10243d;
-}
-
-.kpis{
-  display:grid;
-  grid-template-columns:repeat(6,1fr);
-  gap:12px;
-  margin-bottom:12px;
-}
-
-.kpi{
-  position:relative;
-  overflow:hidden;
-  min-height:108px;
-  background:rgba(13,27,47,.98);
-  border:1px solid var(--line);
-  border-radius:18px;
-  padding:15px 16px;
-  box-shadow:var(--shadow);
-}
-
-.kpi:before{
-  content:"";
-  position:absolute;
-  top:0;
-  left:0;
-  right:0;
-  height:4px;
-  background:var(--blue);
-}
-
-.kpi.orange:before{background:var(--orange)}
-.kpi.green:before{background:var(--green)}
-.kpi.red:before{background:var(--red)}
-.kpi.yellow:before{background:var(--yellow)}
-
-.kpi span{
-  display:block;
-  color:#aebbd0;
-  font-size:10px;
-  letter-spacing:.13em;
-  text-transform:uppercase;
-  font-weight:950;
-}
-
-.kpi strong{
-  display:block;
-  font-size:clamp(21px,1.6vw,32px);
-  margin:9px 0 4px;
-  font-weight:950;
-  color:#fff;
-}
-
-.kpi small{
-  color:#a8b8cf;
-}
-
-.main{
-  display:grid;
-  grid-template-columns:minmax(720px,1fr) 430px;
-  gap:14px;
-  align-items:start;
-}
-
+.card.warn .ico{background:rgba(239,91,104,.16);color:var(--red)}
+.card.orange .ico{background:rgba(232,117,53,.15);color:var(--orange)}
+.card b{display:block;font:800 12px/1.2 IBM Plex Mono,Consolas,monospace;color:#aebbd0;text-transform:uppercase;letter-spacing:.14em;margin-bottom:12px}
+.card strong{display:block;font-size:38px;letter-spacing:.02em;margin-bottom:10px}
+.card p{margin:0;color:#d4e1f1;font-size:14px;line-height:1.55;font-weight:600}
+.tag{display:inline-flex;gap:7px;margin-top:18px;border-radius:7px;padding:6px 9px;background:rgba(0,194,168,.13);color:var(--cyan);font:800 12px IBM Plex Mono,Consolas,monospace}
+.warn .tag{background:rgba(239,91,104,.13);color:#ff7f89}
+.orange .tag{background:rgba(232,117,53,.13);color:#ffa56f}
+.grid{display:grid;grid-template-columns:1.2fr .9fr .9fr;gap:14px}
 .panel{
-  background:rgba(13,27,47,.98);
-  border:1px solid var(--line);
-  border-radius:18px;
-  box-shadow:var(--shadow);
-  overflow:hidden;
+  border:1px solid var(--line);border-radius:14px;background:rgba(7,21,37,.94);
+  box-shadow:0 18px 45px rgba(0,0,0,.2);overflow:hidden
 }
-
-.panelHead{
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:12px;
-  padding:14px 16px;
-  border-bottom:1px solid var(--line);
-  background:rgba(11,26,46,.98);
-}
-
-.panel h2,
-.panel h3{
-  margin:0;
-  font-size:16px;
-  color:#fff;
-}
-
-.hint{
-  font-size:12px;
-  color:#a8b8cf;
-  margin-top:4px;
-}
-
-.badge{
-  font-size:12px;
-  color:#dceaff;
-  border:1px solid var(--line);
-  border-radius:999px;
-  padding:7px 10px;
-  background:#0d2037;
-  white-space:nowrap;
-  font-weight:900;
-}
-
-.chartBox{
-  height:355px;
-  padding:12px 16px 18px;
-}
-
-canvas{
-  width:100%!important;
-  height:100%!important;
-}
-
-.right{
-  display:grid;
-  gap:14px;
-}
-
-.insight{
-  padding:16px;
-}
-
-.insight p{
-  margin:10px 0 0;
-  color:#d7e4f7;
-  line-height:1.5;
-  font-size:14px;
-}
-
-.chips{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  margin-top:12px;
-}
-
-.chip{
-  border:1px solid rgba(255,255,255,.16);
-  background:rgba(255,255,255,.06);
-  border-radius:999px;
-  padding:7px 10px;
-  font-size:12px;
-  font-weight:900;
-}
-
-.cards2{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  padding:12px;
-}
-
-.mini{
-  border:1px solid rgba(255,255,255,.10);
-  background:#0b1a2e;
-  border-radius:14px;
-  padding:12px;
-  min-height:86px;
-  position:relative;
-  overflow:hidden;
-}
-
-.mini:before{
-  content:"";
-  position:absolute;
-  left:0;
-  top:0;
-  bottom:0;
-  width:4px;
-  background:var(--blue);
-}
-
-.mini small{
-  display:block;
-  color:#9fb0c7;
-  font-weight:950;
-  text-transform:uppercase;
-  letter-spacing:.1em;
-  font-size:9px;
-  margin-bottom:7px;
-}
-
-.mini b{
-  display:block;
-  color:#fff;
-  font-size:16px;
-  line-height:1.18;
-}
-
-.mini span{
-  display:block;
-  color:#c2d1e6;
-  font-size:12px;
-  margin-top:5px;
-}
-
-.bottom{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:14px;
-  margin-top:14px;
-}
-
-.rankList{
-  padding:10px 14px 14px;
-  max-height:285px;
-  overflow:auto;
-}
-
-.rank{
-  display:grid;
-  grid-template-columns:minmax(0,1fr) auto;
-  gap:8px;
-  padding:10px 0;
-  border-bottom:1px solid rgba(255,255,255,.08);
-}
-
-.rank:last-child{
-  border-bottom:0;
-}
-
-.rank b{
-  font-size:13px;
-}
-
-.rank small{
-  color:#a8b8cf;
-}
-
-.bar{
-  grid-column:1/3;
-  height:5px;
-  border-radius:99px;
-  background:rgba(255,255,255,.08);
-  overflow:hidden;
-}
-
-.bar i{
-  display:block;
-  height:100%;
-  border-radius:99px;
-  background:
-  linear-gradient(90deg,var(--blue),var(--orange));
-}
-
-.tableWrap{
-  max-height:390px;
-  overflow:auto;
-}
-
-table{
-  width:100%;
-  border-collapse:separate;
-  border-spacing:0;
-  font-size:12px;
-  min-width:1120px;
-}
-
-th,
-td{
-  padding:9px 10px;
-  border-bottom:1px solid rgba(255,255,255,.08);
-}
-
-th{
-  position:sticky;
-  top:0;
-  background:#10243d;
-  color:#c7d8ef;
-  text-align:left;
-  font-size:10px;
-  text-transform:uppercase;
-  letter-spacing:.1em;
-  z-index:2;
-}
-
-td.num,
-th.num{
-  text-align:right;
-}
-
-.footer{
-  color:#8fa2bd;
-  font-size:11px;
-  margin-top:14px;
-  text-align:right;
-}
-
-@media(max-width:1450px){
-
-  .kpis{
-    grid-template-columns:repeat(3,1fr);
-  }
-
-  .main,
-  .bottom{
-    grid-template-columns:1fr;
-  }
-
-  .controls{
-    grid-template-columns:repeat(3,1fr);
-  }
-
-}
-
-@media(max-width:760px){
-
-  .app{
-    padding:10px;
-  }
-
-  .header{
-    flex-direction:column;
-    align-items:flex-start;
-  }
-
-  .logo{
-    width:220px;
-    border-right:0;
-    padding-right:0;
-  }
-
-  .rightTop{
-    margin-left:0;
-    text-align:left;
-  }
-
-  .controls,
-  .kpis,
-  .cards2{
-    grid-template-columns:1fr;
-  }
-
-}
-
+.head{padding:15px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px}
+.head h2{margin:0;font-size:13px;text-transform:uppercase;letter-spacing:.12em}
+.hint{font-size:12px;color:#9fb0c7;margin-top:4px}
+.chart{height:330px;padding:12px 18px 18px}
+.execText{padding:18px;color:#dce8f8;line-height:1.7;font-size:14px}
+.chips{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:0 18px 18px}
+.chip{background:#10243d;border:1px solid var(--line);border-radius:10px;padding:11px;text-align:center}
+.chip strong{display:block;font-size:22px;color:#fff}.chip span{font-size:11px;color:#a9b8cc}
+.rankwrap{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+.rank{padding:14px 18px}
+.row{display:grid;grid-template-columns:24px 1fr 90px 45px;gap:10px;align-items:center;margin:12px 0;color:#dce8f8;font-size:13px}
+.bar{height:8px;background:#10243d;border-radius:10px;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--orange))}
+.tableWrap{max-height:420px;overflow:auto}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:1100px}
+th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,.08)}
+th{position:sticky;top:0;background:#10243d;color:#c8d6e8;text-align:left;text-transform:uppercase;font-size:10px;letter-spacing:.1em}
+td.num,th.num{text-align:right}
+.page{display:none}.page.active{display:block}
+.footer{margin-top:14px;color:#9fb0c7;font-size:11px;text-align:right}
+@media(max-width:1350px){.insights{grid-template-columns:repeat(3,1fr)}.grid,.rankwrap{grid-template-columns:1fr}.filters{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:760px){.top{grid-template-columns:1fr}.status{text-align:left}.insights,.filters{grid-template-columns:1fr}.card{min-height:auto}}
 </style>
 </head>
 
 <body>
-
 <div class="app">
 
-<header class="header">
-
-<img
-class="logo"
-src="../assets/logos/RIOPREFEITURA Comlurb horizontal branco.png"
-alt="COMLURB"
-/>
-
-<div>
-<div class="eyebrow">
-HUB COMLURB • Inteligência Operacional
-</div>
-
-<h1>
-Radar de Indicadores Gerais
-</h1>
-
-<div class="sub">
-Monitoramento executivo consolidado dos principais indicadores operacionais, administrativos, financeiros e estratégicos da COMLURB.
-</div>
-</div>
-
-<div class="rightTop">
-<b id="refreshLabel">
-Atualização dinâmica
-</b>
-<br>
-
-<span class="pill" id="scopeLabel">
-Carregando dados...
-</span>
-</div>
-
+<header class="top">
+  <img class="logo" src="../assets/logos/RIOPREFEITURA Comlurb horizontal branco.png" alt="COMLURB">
+  <div>
+    <div class="kicker">Dashboard Executivo • Indicadores de Desempenho</div>
+    <h1>Radar de Indicadores Gerais</h1>
+    <div class="sub">Visão consolidada dos principais indicadores operacionais, administrativos e estratégicos da COMLURB</div>
+  </div>
+  <div class="status">
+    <div id="updated">Atualizando...</div>
+    <span class="pill" id="scope">Carregando base</span>
+  </div>
 </header>
 
-<section class="controls">
-
-<div class="field">
-<label>Ano</label>
-<select id="fAno"></select>
+<div class="nav">
+  <button class="tab active" onclick="showPage('exec',this)">Executivo</button>
+  <button class="tab" onclick="showPage('analitico',this)">Analítico</button>
 </div>
 
-<div class="field">
-<label>Diretoria</label>
-<select id="fDir"></select>
-</div>
-
-<div class="field">
-<label>Sup./Coord.</label>
-<select id="fSup"></select>
-</div>
-
-<div class="field">
-<label>Eixo</label>
-<select id="fEixo"></select>
-</div>
-
-<div class="field">
-<label>Indicador</label>
-<select id="fInd"></select>
-</div>
-
-<button class="btn" onclick="resetFilters()">
-Limpar filtros
-</button>
-
+<section class="filters">
+  <div class="field"><label>Ano</label><select id="fAno"></select></div>
+  <div class="field"><label>Diretoria</label><select id="fDir"></select></div>
+  <div class="field"><label>Sup./Coord.</label><select id="fSup"></select></div>
+  <div class="field"><label>Eixo</label><select id="fEixo"></select></div>
+  <div class="field"><label>Indicador</label><select id="fInd"></select></div>
+  <button class="btn" onclick="resetFilters()">Limpar filtros</button>
 </section>
 
-<section class="kpis" id="kpiGrid"></section>
+<main id="exec" class="page active">
+  <section class="insights" id="insights"></section>
 
-<section class="main">
+  <section class="grid">
+    <div class="panel">
+      <div class="head">
+        <div><h2>Evolução mensal do indicador selecionado</h2><div class="hint" id="chartHint">Comparativo mensal</div></div>
+      </div>
+      <div class="chart"><canvas id="lineChart"></canvas></div>
+    </div>
 
-<div class="panel">
+    <div class="panel">
+      <div class="head"><div><h2>Leitura Executiva</h2><div class="hint">Síntese automática do recorte atual</div></div></div>
+      <div class="execText" id="execText"></div>
+      <div class="chips" id="chips"></div>
+    </div>
 
-<div class="panelHead">
+    <div class="panel">
+      <div class="head"><div><h2>Resumo por eixo</h2><div class="hint">Composição da carteira monitorada</div></div></div>
+      <div class="chart"><canvas id="donutChart"></canvas></div>
+    </div>
+  </section>
 
-<div>
-<h2 id="chartTitle">
-Evolução mensal
-</h2>
+  <section class="rankwrap">
+    <div class="panel">
+      <div class="head"><div><h2>Ranking 1746</h2><div class="hint">Principais demandas</div></div></div>
+      <div class="rank" id="rank1746"></div>
+    </div>
+    <div class="panel">
+      <div class="head"><div><h2>Ranking Ouvidoria</h2><div class="hint">Principais categorias</div></div></div>
+      <div class="rank" id="rankOuvidoria"></div>
+    </div>
+  </section>
+</main>
 
-<div class="hint">
-Comparativo histórico do indicador selecionado
-</div>
-</div>
+<main id="analitico" class="page">
+  <section class="grid" style="grid-template-columns:1fr 1fr">
+    <div class="panel">
+      <div class="head"><div><h2>Indicadores por status</h2><div class="hint">Dentro da meta, abaixo da meta e sem meta</div></div></div>
+      <div class="chart"><canvas id="statusChart"></canvas></div>
+    </div>
+    <div class="panel">
+      <div class="head"><div><h2>Indicadores por diretoria</h2><div class="hint">Volume de indicadores no recorte atual</div></div></div>
+      <div class="chart"><canvas id="dirChart"></canvas></div>
+    </div>
+  </section>
 
-<span class="badge" id="selectedBadge">
-—
-</span>
+  <section class="panel" style="margin-top:14px">
+    <div class="head">
+      <div><h2>Base analítica</h2><div class="hint">Registros carregados da planilha publicada</div></div>
+      <div class="pill" id="tableCount">—</div>
+    </div>
+    <div class="tableWrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Ano</th><th>Diretoria</th><th>Sup./Coord.</th><th>Eixo</th><th>Indicador</th>
+            <th class="num">Acumulado</th><th>Unidade</th><th class="num">Meta</th><th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </section>
+</main>
 
-</div>
-
-<div class="chartBox">
-<canvas id="lineChart"></canvas>
-</div>
-
-</div>
-
-<div class="right">
-
-<div class="panel insight">
-
-<h3>
-Leitura executiva
-</h3>
-
-<p id="executiveText">
-Carregando leitura estratégica...
-</p>
-
-<div class="chips" id="chips"></div>
-
-</div>
-
-<div class="panel">
-
-<div class="panelHead">
-
-<div>
-<h3>
-Resumo por eixo
-</h3>
-
-<div class="hint">
-Distribuição de indicadores
-</div>
-</div>
-
-</div>
-
-<div class="cards2" id="axisCards"></div>
-
-</div>
-
-</div>
-
-</section>
-
-<section class="bottom">
-
-<div class="panel">
-
-<div class="panelHead">
-
-<div>
-<h2>Ranking 1746</h2>
-
-<div class="hint">
-Categorias com maior volume
-</div>
-</div>
-
-</div>
-
-<div class="rankList" id="rank1746"></div>
-
-</div>
-
-<div class="panel">
-
-<div class="panelHead">
-
-<div>
-<h2>Ranking Ouvidoria</h2>
-
-<div class="hint">
-Categorias com maior volume
-</div>
-</div>
-
-</div>
-
-<div class="rankList" id="rankOuvidoria"></div>
-
-</div>
-
-</section>
-
-<section class="panel" style="margin-top:14px">
-
-<div class="panelHead">
-
-<div>
-
-<h2>
-Base analítica
-</h2>
-
-<div class="hint">
-Registros carregados da base oficial
-</div>
-
-</div>
-
-<span class="badge" id="tableCount">
-—
-</span>
-
-</div>
-
-<div class="tableWrap">
-
-<table>
-
-<thead>
-
-<tr>
-<th>Ano</th>
-<th>Diretoria</th>
-<th>Sup./Coord.</th>
-<th>Eixo</th>
-<th>Indicador</th>
-<th class="num">Acumulado</th>
-<th>Unidade</th>
-<th class="num">Meta</th>
-<th>Status</th>
-</tr>
-
-</thead>
-
-<tbody id="tableBody"></tbody>
-
-</table>
-
-</div>
-
-</section>
-
-<div class="footer">
-COMLURB • HUB COMLURB • Monitoramento Estratégico
-</div>
-
+<div class="footer">Fonte: Planilha oficial publicada • HUB COMLURB</div>
 </div>
 
 <script>
+const CSV_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vQphrIIjiY4aWBONgByLezMnFk8YbyYpF-vtgxOLoV8-85_WUVAXH_f_Ahy8ymxmgnGXmQ_KiFSOkIK/pub?output=csv';
 
-const CSV_URL =
-'https://docs.google.com/spreadsheets/d/e/2PACX-1vQphrIIjiY4aWBONgByLezMnFk8YbyYpF-vtgxOLoV8-85_WUVAXH_f_Ahy8ymxmgnGXmQ_KiFSOkIK/pub?output=csv';
+let DATA=[], charts={};
+const MONTHS=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 
-let DATA = [];
-let charts = {};
-
-const MONTHS = [
-'Janeiro',
-'Fevereiro',
-'Março',
-'Abril',
-'Maio',
-'Junho',
-'Julho',
-'Agosto',
-'Setembro',
-'Outubro',
-'Novembro',
-'Dezembro'
-];
-
-function norm(s){
-return String(s ?? '')
-.trim()
-.normalize('NFD')
-.replace(/[\u0300-\u036f]/g,'')
-.toLowerCase();
+function norm(s){return String(s??'').trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase()}
+function getField(row,names){const ks=Object.keys(row);for(const n of names){const k=ks.find(x=>norm(x)===norm(n));if(k)return row[k]}return''}
+function num(v){if(v===null||v===undefined||v==='')return null;let s=String(v).trim().replace(/[^\d,.\-]/g,'');if(s.includes(',')&&s.includes('.'))s=s.replace(/\./g,'').replace(',','.');else if(s.includes(','))s=s.replace(',','.');const n=Number(s);return Number.isFinite(n)?n:null}
+function fmt(v,u=''){if(v===null||v===undefined||Number.isNaN(v))return'—';if(String(u).includes('%'))return v.toLocaleString('pt-BR',{maximumFractionDigits:1})+'%';if(Math.abs(v)>=1000000)return(v/1000000).toLocaleString('pt-BR',{maximumFractionDigits:1})+' mi';return v.toLocaleString('pt-BR',{maximumFractionDigits:1})}
+function transform(r){
+  const d={
+    Ano:num(getField(r,['Ano','ANO'])),
+    Diretoria:getField(r,['Diretoria','DIRETORIA'])||'COMLURB',
+    Superintendencia:getField(r,['Superintendência','Superintendencia','Sup./Coord.','Coordenação','Coordenacao'])||'Geral',
+    Eixo:getField(r,['Eixo','Tema','Área','Area'])||'Geral',
+    Indicador:getField(r,['Indicador','Nome do Indicador'])||'Indicador',
+    Unidade:getField(r,['Unidade','Medida'])||'',
+    Acumulado:num(getField(r,['Acumulado','Resultado','Valor','Realizado'])),
+    Meta:num(getField(r,['Meta','Alvo'])),
+    StatusManual:getField(r,['Status','Situação','Situacao'])
+  };
+  MONTHS.forEach(m=>d[m]=num(getField(r,[m,m.slice(0,3)])));
+  if(d.Acumulado===null){const vals=MONTHS.map(m=>d[m]).filter(x=>x!==null);if(vals.length)d.Acumulado=vals.at(-1)}
+  return d;
 }
-
-function getField(row,names){
-
-const keys = Object.keys(row);
-
-for(const wanted of names){
-
-const found = keys.find(k => norm(k) === norm(wanted));
-
-if(found) return row[found];
-
-}
-
-return '';
-
-}
-
-function num(v){
-
-if(v === null || v === undefined || v === '')
-return null;
-
-let s = String(v)
-.trim()
-.replace(/[^\d,.\-]/g,'');
-
-if(s.includes(',') && s.includes('.')){
-s = s.replace(/\./g,'').replace(',','.');
-}
-else if(s.includes(',')){
-s = s.replace(',','.');
-}
-
-const n = Number(s);
-
-return Number.isFinite(n) ? n : null;
-
-}
-
-function fmt(v,unidade=''){
-
-if(v === null || v === undefined || Number.isNaN(v))
-return '—';
-
-const u = String(unidade || '').toLowerCase();
-
-if(u.includes('%')){
-return v.toLocaleString('pt-BR',{
-maximumFractionDigits:1
-}) + '%';
-}
-
-if(Math.abs(v) >= 1000000){
-return (v/1000000).toLocaleString('pt-BR',{
-maximumFractionDigits:1
-}) + ' mi';
-}
-
-return v.toLocaleString('pt-BR',{
-maximumFractionDigits:0
-});
-
-}
-
-function transform(row){
-
-const item = {
-
-Ano:
-num(getField(row,['Ano'])),
-
-Diretoria:
-getField(row,['Diretoria']) || 'COMLURB',
-
-Superintendencia:
-getField(row,['Superintendência','Superintendencia','Sup./Coord.']) || 'Geral',
-
-Eixo:
-getField(row,['Eixo']) || 'Geral',
-
-Indicador:
-getField(row,['Indicador']) || 'Indicador',
-
-Unidade:
-getField(row,['Unidade']) || '',
-
-Acumulado:
-num(getField(row,['Acumulado','Resultado','Valor'])),
-
-Meta:
-num(getField(row,['Meta'])),
-
-StatusManual:
-getField(row,['Status'])
-
-};
-
-MONTHS.forEach(m => {
-item[m] = num(getField(row,[m]));
-});
-
-return item;
-
-}
-
-function statusOf(d){
-
-if(d.StatusManual)
-return d.StatusManual;
-
-if(d.Meta === null || d.Acumulado === null)
-return 'Sem meta';
-
-if(d.Acumulado >= d.Meta)
-return 'Dentro da meta';
-
-return 'Abaixo da meta';
-
-}
-
-function val(id){
-return document.getElementById(id).value;
-}
-
+function statusOf(d){if(d.StatusManual)return d.StatusManual;if(d.Meta===null||d.Acumulado===null)return'Sem meta';return d.Acumulado>=d.Meta?'Dentro da meta':'Abaixo da meta'}
+function val(id){return document.getElementById(id).value}
 function setOptions(id,arr,label,current){
-
-const el = document.getElementById(id);
-
-const old = current ?? el.value;
-
-const vals = [...new Set(
-arr.filter(v =>
-v !== null &&
-v !== undefined &&
-String(v).trim() !== ''
-)
-)].sort((a,b)=>
-String(a).localeCompare(String(b),'pt-BR')
-);
-
-el.innerHTML =
-`<option value="">${label}</option>` +
-vals.map(v =>
-`<option value="${v}">${v}</option>`
-).join('');
-
-if(vals.map(String).includes(String(old))){
-el.value = old;
+  const el=document.getElementById(id),old=current??el.value;
+  const vals=[...new Set(arr.filter(x=>x!==null&&x!==undefined&&String(x).trim()!==''))].sort((a,b)=>String(a).localeCompare(String(b),'pt-BR'));
+  el.innerHTML=`<option value="">${label}</option>`+vals.map(v=>`<option value="${String(v).replaceAll('"','&quot;')}">${v}</option>`).join('');
+  if(vals.map(String).includes(String(old)))el.value=old;
 }
-
-}
-
 function filtered(ignore=''){
-
-const fa = val('fAno');
-const fd = val('fDir');
-const fs = val('fSup');
-const fe = val('fEixo');
-const fi = val('fInd');
-
-return DATA.filter(d =>
-
-(ignore === 'ano' || !fa || String(d.Ano) === String(fa)) &&
-(ignore === 'dir' || !fd || d.Diretoria === fd) &&
-(ignore === 'sup' || !fs || d.Superintendencia === fs) &&
-(ignore === 'eixo' || !fe || d.Eixo === fe) &&
-(ignore === 'ind' || !fi || d.Indicador === fi)
-
-);
-
+  const a=val('fAno'),d=val('fDir'),s=val('fSup'),e=val('fEixo'),i=val('fInd');
+  return DATA.filter(x=>(ignore==='ano'||!a||String(x.Ano)===String(a))&&(ignore==='dir'||!d||x.Diretoria===d)&&(ignore==='sup'||!s||x.Superintendencia===s)&&(ignore==='eixo'||!e||x.Eixo===e)&&(ignore==='ind'||!i||x.Indicador===i));
 }
-
-function updateOptions(){
-
-setOptions(
-'fDir',
-filtered('dir').map(d => d.Diretoria),
-'Todas'
-);
-
-setOptions(
-'fSup',
-filtered('sup').map(d => d.Superintendencia),
-'Todas'
-);
-
-setOptions(
-'fEixo',
-filtered('eixo').map(d => d.Eixo),
-'Todos'
-);
-
-setOptions(
-'fInd',
-filtered('ind').map(d => d.Indicador),
-'Todos'
-);
-
+function updateOptions(){setOptions('fDir',filtered('dir').map(d=>d.Diretoria),'Todas');setOptions('fSup',filtered('sup').map(d=>d.Superintendencia),'Todas');setOptions('fEixo',filtered('eixo').map(d=>d.Eixo),'Todos');setOptions('fInd',filtered('ind').map(d=>d.Indicador),'Todos')}
+function resetFilters(){['fDir','fSup','fEixo','fInd'].forEach(id=>document.getElementById(id).value='');const ys=DATA.map(d=>d.Ano).filter(Boolean);document.getElementById('fAno').value=ys.length?Math.max(...ys):'';updateOptions();render()}
+function chart(id,type,labels,datasets,extra={}){
+  if(charts[id])charts[id].destroy();
+  charts[id]=new Chart(document.getElementById(id),{type,data:{labels,datasets},options:Object.assign({responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#dce8f8'}}},scales:type==='doughnut'?{}:{x:{ticks:{color:'#9fb0c7'},grid:{color:'rgba(255,255,255,.05)'}},y:{ticks:{color:'#9fb0c7'},grid:{color:'rgba(255,255,255,.08)'}}}},extra)});
 }
+function findByName(rows,terms){return rows.find(d=>terms.some(t=>norm(d.Indicador).includes(norm(t))))}
+function deltaText(d){return d&&d.Meta!==null&&d.Acumulado!==null?`${fmt(d.Acumulado-d.Meta,d.Unidade)} vs meta`:''}
 
-function resetFilters(){
-
-const years = DATA
-.map(d => d.Ano)
-.filter(Boolean);
-
-const latest = years.length
-? Math.max(...years)
-: '';
-
-['fDir','fSup','fEixo','fInd']
-.forEach(id =>
-document.getElementById(id).value = ''
-);
-
-document.getElementById('fAno').value = latest;
-
-updateOptions();
-
-render();
-
+function renderInsights(rows){
+  const items=[
+    {t:'Destaque positivo',icon:'↑',cls:'',d:findByName(rows,['IPL','Índice Padrão de Limpeza']),txt:d=>`${d.Indicador} está entre os principais indicadores de acompanhamento executivo no recorte atual.`,tag:d=>deltaText(d)},
+    {t:'Alerta crítico',icon:'⚠',cls:'warn',d:rows.filter(x=>x.Meta!==null&&x.Acumulado!==null&&x.Acumulado<x.Meta).sort((a,b)=>(a.Acumulado-a.Meta)-(b.Acumulado-b.Meta))[0],txt:d=>`${d.Indicador} está abaixo da referência cadastrada e pede acompanhamento gerencial.`,tag:d=>'abaixo da meta'},
+    {t:'Pressão crescente',icon:'▧',cls:'orange',d:findByName(rows,['1746','Capina','Solicitações']),txt:d=>`${d.Indicador} concentra sinal de pressão operacional ou demanda cidadã no período.`,tag:d=>'demanda'},
+    {t:'Excelência operacional',icon:'✓',cls:'',d:rows.filter(x=>x.Meta!==null&&x.Acumulado!==null&&x.Acumulado>=x.Meta).sort((a,b)=>(b.Acumulado-b.Meta)-(a.Acumulado-a.Meta))[0],txt:d=>`${d.Indicador} supera a referência cadastrada e aparece como bom resultado no recorte.`,tag:d=>'acima da meta'},
+    {t:'Ganho em segurança',icon:'♢',cls:'',d:findByName(rows,['Acidente','Segurança']),txt:d=>`${d.Indicador} deve ser acompanhado como sinal de segurança operacional e condição de trabalho.`,tag:d=>'segurança'},
+    {t:'Eficiência de frota',icon:'▣',cls:'',d:findByName(rows,['Frota','Coleta Domiciliar']),txt:d=>`${d.Indicador} resume a utilização de recurso crítico para sustentação da operação diária.`,tag:d=>'frota'}
+  ];
+  document.getElementById('insights').innerHTML=items.map(x=>{
+    const d=x.d;
+    return `<article class="card ${x.cls}">
+      <div class="ico">${x.icon}</div>
+      <b>${x.t}</b>
+      <strong>${d?fmt(d.Acumulado,d.Unidade):'—'}</strong>
+      <p>${d?x.txt(d):'Indicador não encontrado no filtro atual. Ajuste o recorte para visualizar.'}</p>
+      <span class="tag">${d?(x.tag(d)||d.Eixo):'sem dado'}</span>
+    </article>`;
+  }).join('');
 }
-
-function renderKpis(rows){
-
-const preferred = [
-
-['Índice Padrão de Limpeza - IPL','IPL','green'],
-['Índice Padrão de Roçada - IPR','IPR','green'],
-['Índice de Utilização da Frota de Coleta Domiciliar','Frota','orange'],
-['Solicitações 1746','1746','yellow'],
-['Absenteísmo - Gerenciável','Absenteísmo','red'],
-['Acidente de Trabalho – Típico','Acidente','red']
-
-];
-
-const cards = preferred.map(([ind,t,cls]) => {
-
-const d =
-rows.find(x => x.Indicador === ind);
-
-return {d,t,cls};
-
-});
-
-document.getElementById('kpiGrid').innerHTML =
-cards.map(({d,t,cls}) => `
-
-<div class="kpi ${cls}">
-
-<span>${t}</span>
-
-<strong>
-${d ? fmt(d.Acumulado,d.Unidade) : '—'}
-</strong>
-
-<small>
-${d ? d.Diretoria : 'Sem registro'}
-</small>
-
-</div>
-
-`).join('');
-
-}
-
-function destroy(id){
-
-if(charts[id]){
-
-charts[id].destroy();
-charts[id] = null;
-
-}
-
-}
-
-function makeChart(id,type,labels,datasets){
-
-destroy(id);
-
-charts[id] = new Chart(
-document.getElementById(id),
-{
-type,
-data:{
-labels,
-datasets
-},
-options:{
-responsive:true,
-maintainAspectRatio:false,
-plugins:{
-legend:{
-labels:{
-color:'#d8e7fb'
-}
-}
-},
-scales:{
-x:{
-ticks:{color:'#a8b8cf'},
-grid:{color:'rgba(255,255,255,.05)'}
-},
-y:{
-ticks:{color:'#a8b8cf'},
-grid:{color:'rgba(255,255,255,.08)'}
-}
-}
-}
-}
-);
-
-}
-
-function renderExecutiveText(rows,ind){
-
-const total = rows.length;
-
-const metas =
-rows.filter(d =>
-d.Meta !== null &&
-d.Acumulado !== null
-);
-
-const dentro =
-metas.filter(d =>
-d.Acumulado >= d.Meta
-);
-
-const abaixo =
-metas.filter(d =>
-d.Acumulado < d.Meta
-);
-
-const eixos = {};
-
-rows.forEach(d => {
-
-if(!eixos[d.Eixo]){
-eixos[d.Eixo] = {
-total:0,
-abaixo:0
-};
-}
-
-eixos[d.Eixo].total++;
-
-if(
-d.Meta !== null &&
-d.Acumulado !== null &&
-d.Acumulado < d.Meta
-){
-eixos[d.Eixo].abaixo++;
-}
-
-});
-
-const eixoCritico =
-Object.entries(eixos)
-.sort((a,b)=>
-b[1].abaixo - a[1].abaixo
-)[0];
-
-let text = '';
-
-if(total === 0){
-
-text =
-'Não há dados para o filtro selecionado.';
-
-}
-else{
-
-const percDentro =
-metas.length
-? (dentro.length / metas.length) * 100
-: 0;
-
-text =
-`${dentro.length} de ${metas.length} indicadores com meta estão dentro da referência cadastrada.`;
-
-if(abaixo.length > 0){
-
-text +=
-` O painel aponta ${abaixo.length} indicadores abaixo da meta no recorte atual.`;
-
-}
-
-if(eixoCritico && eixoCritico[1].abaixo > 0){
-
-text +=
-` O eixo com maior concentração de atenção é "${eixoCritico[0]}".`;
-
-}
-
-text +=
-` O desempenho consolidado atual representa ${percDentro.toLocaleString('pt-BR',{maximumFractionDigits:1})}% de aderência às metas monitoradas.`;
-
-}
-
-document.getElementById('executiveText')
-.textContent = text;
-
-document.getElementById('chips').innerHTML = [
-
-`${total} indicadores`,
-`${metas.length} com meta`,
-`${dentro.length} dentro da meta`,
-`${abaixo.length} abaixo da meta`
-
-].map(x =>
-`<span class="chip">${x}</span>`
-).join('');
-
-}
-
 function renderLine(rows){
-
-const ind =
-val('fInd') ||
-rows[0]?.Indicador;
-
-document.getElementById('chartTitle')
-.textContent = ind || 'Evolução mensal';
-
-const d =
-rows.find(x =>
-x.Indicador === ind
-);
-
-if(!d){
-return;
+  const ind=val('fInd')||findByName(rows,['IPL'])?.Indicador||rows[0]?.Indicador;
+  document.getElementById('chartHint').textContent=ind||'Indicador selecionado';
+  const base=DATA.filter(d=>d.Indicador===ind&&(!val('fDir')||d.Diretoria===val('fDir')));
+  const years=[...new Set(base.map(d=>d.Ano).filter(Boolean))].sort();
+  const sets=years.map(y=>{const d=base.find(x=>x.Ano===y);return{label:String(y),data:MONTHS.map(m=>d?d[m]:null),tension:.35,borderWidth:3,pointRadius:3}});
+  chart('lineChart','line',MONTHS,sets.length?sets:[{label:'Sem dados',data:MONTHS.map(()=>null)}]);
 }
-
-makeChart(
-'lineChart',
-'line',
-MONTHS,
-[{
-label:ind,
-data:MONTHS.map(m => d[m]),
-tension:.35,
-borderWidth:3,
-pointRadius:3
-}]
-);
-
+function renderDonut(rows){
+  const g={};rows.forEach(d=>g[d.Eixo]=(g[d.Eixo]||0)+1);
+  chart('donutChart','doughnut',Object.keys(g),[{data:Object.values(g),borderWidth:0}],{plugins:{legend:{position:'right',labels:{color:'#dce8f8'}}}});
 }
-
-function renderRanks(rows,prefix,id){
-
-const r = rows
-.filter(d =>
-norm(d.Indicador)
-.includes(norm(prefix))
-&& d.Acumulado !== null
-)
-.sort((a,b)=>
-b.Acumulado - a.Acumulado
-)
-.slice(0,8);
-
-document.getElementById(id).innerHTML =
-r.length
-? r.map(d => `
-
-<div class="rank">
-
-<b>
-${d.Indicador}
-</b>
-
-<small>
-${fmt(d.Acumulado,d.Unidade)}
-</small>
-
-<div class="bar">
-<i style="width:75%"></i>
-</div>
-
-</div>
-
-`).join('')
-:
-'<div class="rank">Sem registros.</div>';
-
+function renderExecText(rows){
+  const metas=rows.filter(d=>d.Meta!==null&&d.Acumulado!==null), dentro=metas.filter(d=>d.Acumulado>=d.Meta), abaixo=metas.filter(d=>d.Acumulado<d.Meta);
+  const eixo={};abaixo.forEach(d=>eixo[d.Eixo]=(eixo[d.Eixo]||0)+1);
+  const dir={};abaixo.forEach(d=>dir[d.Diretoria]=(dir[d.Diretoria]||0)+1);
+  const ec=Object.entries(eixo).sort((a,b)=>b[1]-a[1])[0], dc=Object.entries(dir).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById('execText').innerHTML=`No recorte atual, <b>${dentro.length} de ${metas.length}</b> indicadores com meta estão dentro ou acima da referência cadastrada. ${abaixo.length?`O ponto de atenção está em <b>${abaixo.length}</b> indicador(es) abaixo da meta.`:''} ${ec?`O eixo com maior concentração de atenção é <b>${ec[0]}</b>.`:''} ${dc?`A diretoria com maior concentração de desvios é <b>${dc[0]}</b>.`:''}`;
+  document.getElementById('chips').innerHTML=[
+    [rows.length,'Indicadores'],[dentro.length,'Dentro da meta'],[abaixo.length,'Abaixo da meta'],[rows.length-metas.length,'Sem meta']
+  ].map(x=>`<div class="chip"><strong>${x[0]}</strong><span>${x[1]}</span></div>`).join('');
 }
-
-function renderAxis(rows){
-
-const groups = {};
-
-rows.forEach(d => {
-groups[d.Eixo] =
-(groups[d.Eixo] || 0) + 1;
-});
-
-document.getElementById('axisCards').innerHTML =
-Object.entries(groups)
-.map(([e,n]) => `
-
-<div class="mini">
-
-<small>Eixo</small>
-
-<b>${e}</b>
-
-<span>${n} indicador(es)</span>
-
-</div>
-
-`).join('');
-
+function renderRank(rows,prefix,id){
+  const r=rows.filter(d=>norm(d.Indicador).includes(norm(prefix))&&d.Acumulado!==null).sort((a,b)=>b.Acumulado-a.Acumulado).slice(0,6);
+  const max=Math.max(...r.map(d=>d.Acumulado),1);
+  document.getElementById(id).innerHTML=r.length?r.map((d,i)=>`<div class="row"><span>${i+1}</span><b>${d.Indicador.replace(prefix,'').replace('-','')}</b><div class="bar"><i style="width:${Math.max(5,d.Acumulado/max*100)}%"></i></div><span>${fmt(d.Acumulado,d.Unidade)}</span></div>`).join(''):'Sem registros.';
 }
-
-function renderTable(rows){
-
-document.getElementById('tableCount')
-.textContent =
-`${rows.length} registros`;
-
-document.getElementById('tableBody')
-.innerHTML =
-rows.slice(0,300)
-.map(d => `
-
-<tr>
-
-<td>${d.Ano || '—'}</td>
-<td>${d.Diretoria || '—'}</td>
-<td>${d.Superintendencia || '—'}</td>
-<td>${d.Eixo || '—'}</td>
-<td>${d.Indicador || '—'}</td>
-
-<td class="num">
-${fmt(d.Acumulado,d.Unidade)}
-</td>
-
-<td>${d.Unidade || '—'}</td>
-
-<td class="num">
-${fmt(d.Meta,d.Unidade)}
-</td>
-
-<td>${statusOf(d)}</td>
-
-</tr>
-
-`).join('');
-
+function renderAnalitico(rows){
+  const s={'Dentro da meta':0,'Abaixo da meta':0,'Sem meta':0};rows.forEach(d=>s[statusOf(d)]=(s[statusOf(d)]||0)+1);
+  chart('statusChart','bar',Object.keys(s),[{label:'Indicadores',data:Object.values(s),borderWidth:0}]);
+  const g={};rows.forEach(d=>g[d.Diretoria]=(g[d.Diretoria]||0)+1);
+  chart('dirChart','bar',Object.keys(g),[{label:'Indicadores',data:Object.values(g),borderWidth:0}]);
+  document.getElementById('tableCount').textContent=`${rows.length} registros`;
+  document.getElementById('tableBody').innerHTML=rows.slice(0,500).map(d=>`<tr><td>${d.Ano||'—'}</td><td>${d.Diretoria}</td><td>${d.Superintendencia}</td><td>${d.Eixo}</td><td>${d.Indicador}</td><td class="num">${fmt(d.Acumulado,d.Unidade)}</td><td>${d.Unidade||'—'}</td><td class="num">${fmt(d.Meta,d.Unidade)}</td><td>${statusOf(d)}</td></tr>`).join('');
 }
-
 function render(){
-
-const rows = filtered();
-
-renderKpis(rows);
-renderLine(rows);
-renderRanks(rows,'1746','rank1746');
-renderRanks(rows,'Ouvidoria','rankOuvidoria');
-renderAxis(rows);
-
-renderExecutiveText(
-rows,
-val('fInd')
-);
-
-renderTable(rows);
-
-document.getElementById('scopeLabel')
-.textContent =
-`${rows.length} registros`;
-
+  const rows=filtered();
+  document.getElementById('scope').textContent=`${rows.length} registros`;
+  renderInsights(rows);renderLine(rows);renderDonut(rows);renderExecText(rows);renderRank(rows,'1746','rank1746');renderRank(rows,'Ouvidoria','rankOuvidoria');renderAnalitico(rows);
 }
-
+function showPage(id,btn){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');render()}
 function init(){
-
-DATA =
-DATA.filter(d =>
-d.Ano &&
-d.Indicador
-);
-
-const years =
-[...new Set(DATA.map(d => d.Ano))]
-.sort((a,b)=>a-b);
-
-const latest =
-years.length
-? years[years.length-1]
-: '';
-
-setOptions(
-'fAno',
-years,
-'Todos',
-latest
-);
-
-document.getElementById('fAno')
-.value = latest;
-
-['fAno','fDir','fSup','fEixo','fInd']
-.forEach(id => {
-
-document
-.getElementById(id)
-.addEventListener('change',() => {
-
-updateOptions();
-render();
-
-});
-
-});
-
-updateOptions();
-render();
-
-const now = new Date();
-
-document.getElementById('refreshLabel')
-.textContent =
-`Atualizado em ${now.toLocaleDateString('pt-BR')} às ${now.toLocaleTimeString('pt-BR',{
-hour:'2-digit',
-minute:'2-digit'
-})}`;
-
+  DATA=DATA.filter(d=>d.Ano&&d.Indicador);
+  const years=[...new Set(DATA.map(d=>d.Ano))].sort((a,b)=>a-b), latest=years.at(-1)||'';
+  setOptions('fAno',years,'Todos',latest);document.getElementById('fAno').value=latest;
+  ['fAno','fDir','fSup','fEixo','fInd'].forEach(id=>document.getElementById(id).addEventListener('change',()=>{updateOptions();render()}));
+  updateOptions();render();
+  const now=new Date();document.getElementById('updated').textContent=`Atualizado em ${now.toLocaleDateString('pt-BR')} ${now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}`;
 }
-
-Papa.parse(CSV_URL,{
-
-download:true,
-header:true,
-skipEmptyLines:true,
-
-complete:function(results){
-
-DATA =
-results.data.map(transform);
-
-init();
-
-},
-
-error:function(err){
-
-console.error(err);
-
-document.getElementById('executiveText')
-.textContent =
-'Erro ao carregar planilha publicada.';
-
-}
-
-});
-
+Papa.parse(CSV_URL,{download:true,header:true,skipEmptyLines:true,complete:r=>{DATA=r.data.map(transform);init()},error:e=>{document.getElementById('scope').textContent='Erro na base';console.error(e)}});
 </script>
-
 </body>
 </html>
