@@ -1,98 +1,1050 @@
-<!doctype html>
-<html lang="pt-br">
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PRE · Resultados Corporativos · HUB COMLURB</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Presidência · COMLURB</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <style>
-:root{--bg:#06101c;--ink:#e8f0fa;--muted:#6a8aa8;--panel:#0b1826;--line:#1e3450;--blue:#5b9bd5;--orange:#e87535;--green:#6ba89a;--red:#d9604e;--yellow:#c9a830}
-*{box-sizing:border-box;margin:0;padding:0}html{font-size:14px}body{background:var(--bg);color:var(--ink);font-family:Inter,Segoe UI,Arial,sans-serif;line-height:1.5}.app{max-width:1440px;margin:0 auto;padding:24px 28px}
-.header{display:flex;align-items:center;gap:24px;padding:18px 24px;border-bottom:1px solid var(--line);margin-bottom:20px}.logo{height:44px;width:auto;object-fit:contain;border-right:1px solid rgba(255,255,255,.15);padding-right:22px}.eyebrow{font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}h1{font-size:20px;color:#fff}.header-right{margin-left:auto;text-align:right}.updated,.scope-info{font-size:11px;color:var(--muted)}
-.controls{display:flex;gap:10px;margin-bottom:22px;flex-wrap:wrap}.field{border:1px solid var(--line);border-radius:6px;padding:7px 11px;flex:1;min-width:120px}label{display:block;font-size:9px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}select{width:100%;background:transparent;border:0;color:var(--ink);font-size:13px;outline:0}select option{background:#0b1826}.btn-clear{border:1px solid var(--line);background:transparent;border-radius:6px;padding:7px 16px;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer}.btn-clear:hover{color:#fff;border-color:#3d6080}
-.sintese-box{border-left:3px solid var(--blue);background:rgba(91,155,213,.055);padding:13px 16px;margin-bottom:14px}.sintese-label{display:block;font-size:9px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#3d6080;margin-bottom:5px}.sintese{font-size:14px;color:#b9d0e8;line-height:1.75}.sintese b{color:#fff}
-.placar{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;margin-bottom:22px;background:var(--panel)}.pl-item{padding:10px 20px;border-right:1px solid var(--line);display:flex;gap:7px;align-items:baseline}.pl-sep{flex:1}.pl-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}.pl-val{font-size:18px;font-weight:800}.pl-val.pct{font-size:22px}.pl-val.crit{color:var(--red)}.pl-val.alert{color:var(--yellow)}.pl-val.sem{color:#3d6080}
-.sec{font-size:9px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:#2a4860;margin:28px 0 10px;padding-bottom:8px;border-bottom:1px solid var(--line)}
-.matriz-wrap{border:1px solid rgba(91,155,213,.18);border-radius:8px;overflow:hidden;background:rgba(11,24,38,.7);box-shadow:0 14px 40px rgba(0,0,0,.22)}table{width:100%;border-collapse:collapse}th{padding:10px 16px;text-align:left;font-size:9px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#2a4860;border-bottom:2px solid var(--line)}th:not(:first-child){text-align:center}td{padding:14px 16px;border-bottom:1px solid rgba(30,52,80,.55);vertical-align:middle}tr:last-child td{border-bottom:0}tr:hover td{background:rgba(91,155,213,.045)}
-.m-eixo{font-size:14px;font-weight:700;color:#d8eaff;display:flex;align-items:center;gap:10px}.m-dot{width:8px;height:8px;border-radius:50%}.m-num{text-align:center}.m-num b{display:block;font-size:21px;font-weight:850;line-height:1}.m-num small{font-size:10px;color:var(--muted)}.m-num.verde b{color:var(--green)}.m-num.amarelo b{color:var(--yellow)}.m-num.crit b{color:var(--red)}.m-sit{text-align:center}.m-badge{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.06em;padding:4px 10px;border-radius:4px;text-transform:uppercase}.m-badge.verde{background:rgba(107,168,154,.12);color:var(--green)}.m-badge.amarelo{background:rgba(201,168,48,.1);color:var(--yellow)}.m-badge.crit{background:rgba(217,96,78,.12);color:var(--red)}.m-badge.sem{background:rgba(61,96,128,.1);color:#3d6080}.m-total{font-size:11px;color:#3d6080;text-align:center}
-.dir-table th:not(:first-child),.dir-table td:not(:first-child){text-align:right}.dir-nome{font-weight:700;color:#d8eaff}.dir-taxa{font-size:16px;font-weight:800}.dir-taxa.alta{color:var(--green)}.dir-taxa.media{color:var(--yellow)}.dir-taxa.baixa{color:var(--red)}.dir-bar-cell{width:140px}.dir-bar-wrap{height:3px;background:rgba(30,52,80,.8);border-radius:2px;overflow:hidden}.dir-bar-fill{height:100%}.dir-crit{color:var(--red)}.dir-alert{color:var(--yellow)}.dir-ok{color:var(--green)}.muted{color:#3d6080}
-.rd-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px}.rd-titulo{font-size:9px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#2a4860;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--line)}.rd-item{padding:12px 0;border-bottom:1px solid rgba(30,52,80,.5);display:grid;grid-template-columns:3px 1fr;gap:12px}.rd-barra{border-radius:2px}.rd-barra.red{background:var(--red)}.rd-barra.green{background:var(--green)}.rd-nome{font-size:13px;font-weight:700;color:#d8eaff;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}.rd-nome:hover{color:#fff;text-decoration:underline}.rd-dados{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--muted)}.rd-dados b{font-weight:700}.v-bad{color:var(--red)}.v-good{color:var(--green)}.rd-tend{font-size:10px;font-weight:800}.rd-tend.piora{color:var(--red)}.rd-tend.melhora{color:var(--green)}
-.ag-item{display:grid;grid-template-columns:28px 1fr;gap:14px;padding:16px 0;border-bottom:1px solid rgba(30,52,80,.5)}.ag-n{font-size:12px;font-weight:800;color:#2a4860}.ag-tema{font-size:14px;font-weight:700;color:#d8eaff;margin-bottom:4px}.ag-tipo{display:inline-block;font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:3px;margin-bottom:6px}.ag-tipo.crit{background:rgba(217,96,78,.12);color:var(--red)}.ag-tipo.alert{background:rgba(201,168,48,.1);color:var(--yellow)}.ag-tipo.obs{background:rgba(61,96,128,.1);color:#4a7090}.ag-contexto{font-size:12px;color:var(--muted);line-height:1.6}.ag-acao{font-size:12px;color:#9fb9d2;line-height:1.6;margin:7px 0;padding-left:10px;border-left:2px solid rgba(91,155,213,.35)}.ag-acao b{color:#d8eaff}.ag-inds{display:flex;flex-wrap:wrap;gap:5px}.ag-ind{font-size:10px;color:#3d6080;background:rgba(30,52,80,.6);border-radius:3px;padding:2px 7px}
-.ficha{display:none}.ficha.active{display:block}.corporativo.hidden{display:none}.btn-voltar{border:0;background:transparent;padding:4px 0;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;margin-bottom:20px}.btn-voltar:hover{color:#fff}.btn-voltar:before{content:"← ";font-size:14px}.ficha-topo{border-bottom:1px solid var(--line);padding-bottom:18px;margin-bottom:24px}.ficha-eyebrow{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}.ficha-nome{font-size:22px;font-weight:800;color:#fff;margin-bottom:12px}.ficha-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}.chip{display:inline-block;font-size:10px;font-weight:700;padding:3px 9px;border-radius:3px}.chip.meta{background:rgba(107,168,154,.15);color:var(--green)}.chip.abaixo{background:rgba(217,96,78,.14);color:var(--red)}.chip.sem{background:rgba(61,96,128,.12);color:#4a7090}.chip.piora{background:rgba(217,96,78,.1);color:var(--red)}.chip.melhora{background:rgba(107,168,154,.1);color:var(--green)}.chip.estavel{background:rgba(61,96,128,.1);color:#4a7090}.chip.cons-alta{background:rgba(107,168,154,.1);color:var(--green)}.chip.cons-media{background:rgba(201,168,48,.08);color:var(--yellow)}.chip.cons-baixa{background:rgba(217,96,78,.08);color:var(--red)}
-.ficha-nums{display:flex;gap:32px;flex-wrap:wrap}.f-num-val{font-size:30px;font-weight:800;color:#fff;line-height:1}.f-num-val.bad{color:var(--red)}.f-num-val.good{color:var(--green)}.f-num-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:3px}.ficha-sep{width:1px;background:var(--line)}.ficha-corpo{display:grid;grid-template-columns:1.5fr 1fr;gap:32px}.ficha-chart-label,.ficha-interp-label{font-size:9px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#2a4860;margin-bottom:10px}.ficha-chart-wrap{height:220px}.ficha-interp{font-size:13px;color:#a8c4e0;line-height:1.8}.ficha-interp b{color:#d8eaff}.ficha-decisao{margin-top:16px;padding:12px 14px;border-left:2px solid #1e3450;background:rgba(30,52,80,.3)}.ficha-decisao-label{font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#2a4860;margin-bottom:5px}.ficha-decisao-text{font-size:12.5px;color:#8aaccc;font-style:italic;line-height:1.6}
-.footer{margin-top:40px;padding-top:14px;border-top:1px solid var(--line);display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px}.footer span{font-size:10px;color:#243648}
-@media(max-width:1100px){.rd-grid,.ficha-corpo{grid-template-columns:1fr}}@media(max-width:800px){.app{padding:16px 18px}.placar{flex-wrap:wrap}.pl-sep{display:none}.matriz th:nth-child(5),.matriz td:nth-child(5){display:none}}@media(max-width:600px){.header{flex-wrap:wrap}.logo{border-right:0;padding-right:0}.header-right{text-align:left;width:100%}h1{font-size:17px}}
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@300;400&display=swap');
+
+  :root {
+    --bg:       #07111f;
+    --bg2:      #0d1a2d;
+    --bg3:      #111f35;
+    --line:     #1c2e45;
+    --line2:    #243549;
+    --text:     #dce8f5;
+    --muted:    #6d8aa8;
+    --faint:    #2d4159;
+    --blue:     #4a8fd4;
+    --blue-d:   #1e4a78;
+    --green:    #3fba8e;
+    --green-d:  #0d4232;
+    --amber:    #d9922c;
+    --amber-d:  #4a2d0a;
+    --red:      #d95858;
+    --red-d:    #4a1010;
+    --purple:   #9178e0;
+    --radius:   6px;
+    --radius-lg:10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  .top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 40px;
+    border-bottom: 1px solid var(--line);
+    background: var(--bg);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .top-bar-left {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+  .logo-mark {
+    width: 32px;
+    height: 32px;
+    background: var(--blue);
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600; color: #fff; letter-spacing: 0.5px;
+  }
+  .page-title {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .page-title strong {
+    color: var(--text);
+    font-weight: 500;
+  }
+  .top-bar-right {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .cycle-badge {
+    background: var(--bg3);
+    border: 1px solid var(--line2);
+    padding: 4px 12px;
+    border-radius: 3px;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    font-family: 'DM Mono', monospace;
+    color: var(--text);
+  }
+
+  /* ── LAYOUT ── */
+  .main {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 48px 40px 80px;
+  }
+
+  /* ── BLOCO 1: RESULTADO CORPORATIVO ── */
+  .section-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+  }
+
+  .resultado-hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: 64px;
+  }
+  .hero-cell {
+    background: var(--bg2);
+    padding: 48px 48px 40px;
+  }
+  .hero-cell.primary {
+    grid-column: 1;
+    padding: 56px 56px 48px;
+  }
+  .hero-number {
+    font-size: 88px;
+    font-weight: 300;
+    line-height: 1;
+    color: var(--text);
+    letter-spacing: -4px;
+    font-variant-numeric: tabular-nums;
+  }
+  .hero-number.green { color: var(--green); }
+  .hero-number.amber { color: var(--amber); }
+  .hero-number.red   { color: var(--red);   }
+  .hero-label {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 12px;
+    letter-spacing: 0.02em;
+  }
+  .hero-delta {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13px;
+    margin-top: 20px;
+    font-family: 'DM Mono', monospace;
+  }
+  .hero-delta.up   { color: var(--green); }
+  .hero-delta.down { color: var(--red);   }
+  .hero-delta.flat { color: var(--muted); }
+
+  .meta-stat {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+  }
+  .meta-stat-n {
+    font-size: 40px;
+    font-weight: 300;
+    letter-spacing: -1px;
+    font-variant-numeric: tabular-nums;
+  }
+  .meta-stat-n.red   { color: var(--red);   }
+  .meta-stat-n.amber { color: var(--amber); }
+  .meta-stat-n.green { color: var(--green); }
+  .meta-stat-lbl {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 8px;
+    letter-spacing: 0.03em;
+  }
+  .meta-stat-delta {
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    margin-top: 14px;
+  }
+  .meta-stat-delta.up   { color: var(--green); }
+  .meta-stat-delta.down { color: var(--red);   }
+  .meta-stat-delta.flat { color: var(--muted); }
+
+  /* ── BLOCO 2: TEMAS ── */
+  .temas-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: 64px;
+  }
+  .tema-card {
+    background: var(--bg2);
+    padding: 36px 36px 32px;
+    position: relative;
+    cursor: default;
+    transition: background 0.15s;
+  }
+  .tema-card:hover { background: var(--bg3); }
+  .tema-status-bar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .tema-status-bar.green { background: var(--green); }
+  .tema-status-bar.amber { background: var(--amber); }
+  .tema-status-bar.red   { background: var(--red);   }
+  .tema-eyebrow {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+    font-weight: 500;
+  }
+  .tema-name {
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--text);
+    margin-bottom: 16px;
+    line-height: 1.2;
+  }
+  .tema-summary {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+  .tema-desvios {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    margin-top: 20px;
+    padding: 5px 10px;
+    border-radius: 3px;
+  }
+  .tema-desvios.red   { background: var(--red-d);   color: var(--red);   }
+  .tema-desvios.amber { background: var(--amber-d); color: var(--amber); }
+  .tema-desvios.green { background: var(--green-d); color: var(--green); }
+
+  /* ── BLOCO 3: MAPA CORPORATIVO ── */
+  .mapa-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: 64px;
+  }
+  .eixo-card {
+    background: var(--bg2);
+    padding: 28px 20px 24px;
+    text-align: center;
+    transition: background 0.15s;
+    cursor: default;
+  }
+  .eixo-card:hover { background: var(--bg3); }
+  .eixo-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    margin: 0 auto 14px;
+  }
+  .eixo-dot.green { background: var(--green); box-shadow: 0 0 8px rgba(63,186,142,0.35); }
+  .eixo-dot.amber { background: var(--amber); box-shadow: 0 0 8px rgba(217,146,44,0.35); }
+  .eixo-dot.red   { background: var(--red);   box-shadow: 0 0 8px rgba(217,88,88,0.35); }
+  .eixo-name {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text);
+    letter-spacing: 0.03em;
+    margin-bottom: 6px;
+  }
+  .eixo-status {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 500;
+  }
+  .eixo-status.green { color: var(--green); }
+  .eixo-status.amber { color: var(--amber); }
+  .eixo-status.red   { color: var(--red);   }
+
+  /* ── BLOCO 4: MOVIMENTOS ── */
+  .movimentos-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: 64px;
+  }
+  .mov-col {
+    background: var(--bg2);
+    padding: 32px 32px 28px;
+  }
+  .mov-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  .mov-dot { width: 7px; height: 7px; border-radius: 50%; }
+  .mov-dot.green { background: var(--green); }
+  .mov-dot.red   { background: var(--red);   }
+  .mov-dot.flat  { background: var(--faint); }
+  .mov-title {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+  .mov-title.green { color: var(--green); }
+  .mov-title.red   { color: var(--red);   }
+  .mov-title.flat  { color: var(--muted); }
+  .mov-item {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .mov-item:last-child { border-bottom: none; }
+  .mov-item-name {
+    font-size: 13px;
+    color: var(--text);
+    margin-bottom: 4px;
+    line-height: 1.3;
+  }
+  .mov-item-detail {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+  }
+  .mov-item-delta {
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    margin-top: 3px;
+  }
+  .mov-item-delta.up   { color: var(--green); }
+  .mov-item-delta.down { color: var(--red);   }
+
+  /* ── BLOCO 5: DRILL ── */
+  .drill-section {
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  .drill-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px 32px;
+    background: var(--bg2);
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+  }
+  .drill-header:hover { background: var(--bg3); }
+  .drill-header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .drill-header-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    letter-spacing: 0.02em;
+  }
+  .drill-header-sub {
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .drill-chevron {
+    font-size: 18px;
+    color: var(--muted);
+    transition: transform 0.25s;
+  }
+  .drill-chevron.open { transform: rotate(180deg); }
+
+  .drill-body {
+    display: none;
+    background: var(--bg);
+    border-top: 1px solid var(--line);
+  }
+  .drill-body.open { display: block; }
+
+  .drill-filters {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 20px 32px;
+    border-bottom: 1px solid var(--line);
+    flex-wrap: wrap;
+  }
+  .drill-filter-label {
+    font-size: 11px;
+    color: var(--muted);
+    margin-right: 4px;
+  }
+  .drill-filter-btn {
+    padding: 5px 14px;
+    border-radius: 3px;
+    border: 1px solid var(--line2);
+    background: transparent;
+    color: var(--muted);
+    font-size: 11px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.12s;
+    letter-spacing: 0.03em;
+  }
+  .drill-filter-btn:hover,
+  .drill-filter-btn.active {
+    border-color: var(--blue);
+    color: var(--blue);
+    background: var(--blue-d);
+  }
+
+  .drill-table-wrap {
+    overflow-x: auto;
+    padding: 0 32px 32px;
+  }
+  .drill-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    margin-top: 20px;
+  }
+  .drill-table th {
+    text-align: left;
+    padding: 8px 12px;
+    color: var(--muted);
+    font-weight: 400;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--line);
+  }
+  .drill-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--line);
+    color: var(--text);
+    vertical-align: middle;
+  }
+  .drill-table tr:last-child td { border-bottom: none; }
+  .drill-table tr:hover td { background: var(--bg2); }
+  .status-pill {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-family: 'DM Mono', monospace;
+  }
+  .status-pill.green { background: var(--green-d); color: var(--green); }
+  .status-pill.amber { background: var(--amber-d); color: var(--amber); }
+  .status-pill.red   { background: var(--red-d);   color: var(--red);   }
+
+  .bar-mini {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .bar-mini-track {
+    flex: 1;
+    height: 3px;
+    background: var(--line2);
+    border-radius: 2px;
+    min-width: 80px;
+  }
+  .bar-mini-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.4s;
+  }
+  .bar-mini-fill.green { background: var(--green); }
+  .bar-mini-fill.amber { background: var(--amber); }
+  .bar-mini-fill.red   { background: var(--red);   }
+  .bar-mini-val {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    min-width: 38px;
+    text-align: right;
+    color: var(--text);
+  }
+
+  /* ── LOADING ── */
+  .loading-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    flex-direction: column;
+    gap: 16px;
+    color: var(--muted);
+    font-size: 13px;
+    letter-spacing: 0.05em;
+  }
+  .spinner {
+    width: 28px;
+    height: 28px;
+    border: 2px solid var(--line2);
+    border-top-color: var(--blue);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── FOOTER ── */
+  .hub-footer {
+    border-top: 1px solid var(--line);
+    padding: 20px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--faint);
+    letter-spacing: 0.04em;
+  }
+
+  /* ── ERROR ── */
+  .error-notice {
+    background: var(--red-d);
+    border: 1px solid var(--red);
+    color: var(--red);
+    padding: 10px 16px;
+    border-radius: var(--radius);
+    font-size: 12px;
+    margin-bottom: 20px;
+    display: none;
+  }
 </style>
 </head>
 <body>
-<div class="app">
-<header class="header">
-  <img class="logo" src="../assets/logos/RIOPREFEITURA Comlurb horizontal monocromatica branco.png" alt="COMLURB">
-  <div><div class="eyebrow">Presidência da COMLURB</div><h1>Resultados Corporativos &mdash; Indicadores Avaliados</h1></div>
-  <div class="header-right"><div class="updated" id="updated">—</div><div class="scope-info" id="scopeInfo">—</div></div>
-</header>
-<section class="controls">
-  <div class="field"><label>Ano</label><select id="fAno"></select></div>
-  <div class="field"><label>Diretoria</label><select id="fDir"></select></div>
-  <div class="field"><label>Sup. / Coord.</label><select id="fSup"></select></div>
-  <div class="field"><label>Indicador</label><select id="fInd"></select></div>
-  <button class="btn-clear" id="btnClear">Limpar</button>
-</section>
-<div class="corporativo" id="viewCorporativo">
-  <div class="sintese-box"><span class="sintese-label">Leitura executiva</span><p class="sintese" id="sintese">Carregando...</p></div>
-  <div class="placar">
-    <div class="pl-item"><span class="pl-label">Consolidado</span><span class="pl-val pct" id="plPct">—</span></div>
-    <div class="pl-item"><span class="pl-label">Críticos</span><span class="pl-val crit" id="plCrit">—</span></div>
-    <div class="pl-item"><span class="pl-label">Atenção</span><span class="pl-val alert" id="plAlert">—</span></div>
-    <div class="pl-item"><span class="pl-label">Sem referência</span><span class="pl-val sem" id="plSem">—</span></div>
-    <div class="pl-sep"></div><div class="pl-item"><span class="pl-label">Total</span><span class="pl-val" id="plTotal">—</span></div>
+
+<!-- ── TOP BAR ── -->
+<header class="top-bar">
+  <div class="top-bar-left">
+    <div class="logo-mark">CML</div>
+    <span class="page-title"><strong>COMLURB</strong> &nbsp;·&nbsp; Presidência</span>
   </div>
-  <div class="sec">Matriz Executiva</div>
-  <div class="matriz-wrap"><table class="matriz"><thead><tr><th style="width:180px">Eixo Estratégico</th><th>Dentro da Meta</th><th>Atenção</th><th>Crítico</th><th>Total</th><th>Situação</th></tr></thead><tbody id="matrizBody"></tbody></table></div>
-  <div class="sec">Resultado por Diretoria</div>
-  <table class="dir-table"><thead><tr><th>Diretoria</th><th style="width:140px">Atingimento</th><th style="width:140px"></th><th>Na Meta</th><th>Críticos</th><th>Alertas</th><th>Total</th></tr></thead><tbody id="dirBody"></tbody></table>
-  <div class="sec">Principais Riscos e Destaques</div>
-  <div class="rd-grid"><div><div class="rd-titulo">Críticos &mdash; Desvio com trajetória desfavorável</div><div id="listaRiscos"></div></div><div><div class="rd-titulo">Destaques &mdash; Resultado frente à meta</div><div id="listaDestaques"></div></div></div>
-  <div class="sec">Agenda da Presidência</div><div class="agenda-lista" id="agendaLista"></div>
-</div>
-<div class="ficha" id="viewFicha"><button class="btn-voltar" id="btnVoltar">Voltar para visão corporativa</button><div id="fichaContent"></div></div>
-<footer class="footer"><span>Gabinete da Presidência / HUB COMLURB &bull; Núcleo de Inteligência e Gestão Estratégica Operacional</span><span>Fonte: SARC &mdash; Indicadores Avaliados</span></footer>
-</div>
+  <div class="top-bar-right">
+    <span id="ts-label" style="font-family:'DM Mono',monospace;font-size:11px;"></span>
+    <span class="cycle-badge" id="cycle-badge">—</span>
+  </div>
+</header>
+
+<!-- ── MAIN ── -->
+<main class="main" id="main-content">
+  <div class="loading-state" id="loading">
+    <div class="spinner"></div>
+    <span>Carregando indicadores</span>
+  </div>
+  <div id="page-body" style="display:none;">
+
+    <div class="error-notice" id="error-notice"></div>
+
+    <!-- BLOCO 1: RESULTADO CORPORATIVO -->
+    <div class="section-label">Resultado corporativo</div>
+    <div class="resultado-hero" id="bloco1">
+      <div class="hero-cell primary">
+        <div class="hero-number" id="h-pct">—%</div>
+        <div class="hero-label">indicadores dentro da meta</div>
+        <div class="hero-delta flat" id="h-delta">— pp ciclo anterior</div>
+      </div>
+      <div class="hero-cell">
+        <div class="meta-stat">
+          <div class="meta-stat-n red" id="h-criticos">—</div>
+          <div class="meta-stat-lbl">indicadores críticos</div>
+          <div class="meta-stat-delta flat" id="h-criticos-d">—</div>
+        </div>
+      </div>
+      <div class="hero-cell">
+        <div class="meta-stat">
+          <div class="meta-stat-n green" id="h-superados">—</div>
+          <div class="meta-stat-lbl">metas superadas</div>
+          <div class="meta-stat-delta flat" id="h-superados-d">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLOCO 2: TEMAS -->
+    <div class="section-label">Temas para a Presidência</div>
+    <div class="temas-grid" id="bloco2"></div>
+    <div style="margin-bottom:64px;"></div>
+
+    <!-- BLOCO 3: MAPA CORPORATIVO -->
+    <div class="section-label">Mapa corporativo</div>
+    <div class="mapa-grid" id="bloco3"></div>
+    <div style="margin-bottom:64px;"></div>
+
+    <!-- BLOCO 4: MOVIMENTOS -->
+    <div class="section-label">Movimentos do ciclo</div>
+    <div class="movimentos-grid" id="bloco4"></div>
+    <div style="margin-bottom:64px;"></div>
+
+    <!-- BLOCO 5: DRILL -->
+    <div class="drill-section" id="bloco5">
+      <div class="drill-header" onclick="toggleDrill()">
+        <div class="drill-header-left">
+          <div>
+            <div class="drill-header-title">Explorar indicadores</div>
+            <div class="drill-header-sub" id="drill-sub">Todos os indicadores do ciclo</div>
+          </div>
+        </div>
+        <span class="drill-chevron" id="drill-chevron">&#8964;</span>
+      </div>
+      <div class="drill-body" id="drill-body">
+        <div class="drill-filters" id="drill-filters"></div>
+        <div class="drill-table-wrap">
+          <table class="drill-table" id="drill-table">
+            <thead>
+              <tr>
+                <th>Indicador</th>
+                <th>Eixo</th>
+                <th>Diretoria</th>
+                <th>Desempenho</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="drill-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /page-body -->
+</main>
+
+<footer class="hub-footer">
+  <span>Gabinete da Presidência / HUB COMLURB &nbsp;·&nbsp; Núcleo de Inteligência e Gestão Estratégica Operacional</span>
+  <span>Greicy Moreira</span>
+</footer>
+
 <script>
-const CSV_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vQphrIIjiY4aWBONgByLezMnFk8YbyYpF-vtgxOLoV8-85_WUVAXH_f_Ahy8ymxmgnGXmQ_KiFSOkIK/pub?gid=1044100274&single=true&output=csv';
-const ANOS=[2025,2026],MESES=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-const EIXOS={'Pessoas':['Absenteísmo - Gerenciável','Empregados Afastados','Hora Extra Realizada','Adicional Noturno Realizado','Horas Domingos e Feriados Realizadas','Treinamentos Realizados (NR)'],'Segurança':['Acidente de Trabalho – Típico','Acidente de Trabalho – Trajeto','Taxa de Frequência de Acidentes','Taxa de Gravidade de Acidentes'],'Operação':['Índice Padrão de Limpeza - IPL','Índice Padrão de Roçada - IPR','Desvio Padrão - IPL Setorial','Índice de Utilização da Frota de Coleta Domiciliar','Índice de Utilização da Frota de Remoção de Lixo Público','Praças','Produção do Serviço de Manejo Arbóreo'],'Atendimento':['Índice de Atendimento das Solicitações 1746','Performance de Atendimento da Remoção Gratuita','Performance de Atendimento de Capina em Logradouro','Performance de Atendimento de Controle de Roedores e Caramujos','Performance de Atendimento de Poda de Árvore','Tempo Médio de Atendimento - Remoção Gratuita','Tempo Médio de Atendimento - Vetores','Solicitações 1746','Solicitações 1746 - Capina','Solicitações 1746 - Coleta','Solicitações 1746 - Destoca de Toco e Raiz','Solicitações 1746 - Limpeza','Solicitações 1746 - Limpeza de Ralos','Solicitações 1746 - Poda de Árvore','Solicitações 1746 - Praças','Solicitações 1746 - Remoção de Árvore','Solicitações 1746 - Remoção de Resíduos','Solicitações 1746 - Remoção Gratuita','Solicitações 1746 - Risco de Queda','Solicitações 1746 - Varrição','Solicitações 1746 - Vetores','Solicitações Ouvidoria','Solicitações Ouvidoria - Capina','Solicitações Ouvidoria - Coleta','Solicitações Ouvidoria - Destoca de Toco e Raiz','Solicitações Ouvidoria - Limpeza de Ralos','Solicitações Ouvidoria - Poda de Árvore','Solicitações Ouvidoria - Praças','Solicitações Ouvidoria - Remoção de Árvore','Solicitações Ouvidoria - Remoção de Resíduos','Solicitações Ouvidoria - Remoção Gratuita','Solicitações Ouvidoria - Risco de Queda','Solicitações Ouvidoria - Varrição','Solicitações Ouvidoria - Vetores'],'Sustentabilidade':['Resíduos Coletados no RJ','Resíduos Desviados do Aterro','Resíduos Orgânicos (Biometanização)','Resíduos Recebidos nas ETRs','Resíduos Recebidos no CTR Gericinó','Índice do Coletado em Relação ao Potencial Reciclável','Cadastro de Grandes Geradores','Cadastro de Grandes Geradores com segregação de resíduos','Ecopontos'],'Receita':['Índice de Eficiência da Arrecadação - Órgãos Públicos','Índice de Eficiência da Arrecadação - Receitas Diversas','Índice de Conformidade - PGR']};
-const ORDEM_EIXOS=['Pessoas','Segurança','Operação','Atendimento','Sustentabilidade','Receita'];
-const TEMA_EIXO={'Pessoas':'Gestão de pessoas e condições de trabalho','Segurança':'Saúde e segurança ocupacional','Operação':'Desempenho operacional de limpeza urbana','Atendimento':'Atendimento ao cidadão e demandas 1746','Sustentabilidade':'Gestão de resíduos e economia circular','Receita':'Arrecadação e conformidade financeira'};
-const ACAO_EIXO={'Pessoas':'avaliar causas de absenteísmo, afastamentos ou horas extras e definir resposta gerencial.','Segurança':'reforçar medidas preventivas, analisar causas dos acidentes e acompanhar os indicadores com maior desvio.','Operação':'verificar gargalos operacionais que impactam IPL, IPR, frota, praças ou manejo arbóreo.','Atendimento':'revisar gargalos dos serviços com maior desvio e priorizar plano de recuperação nos canais 1746/Ouvidoria.','Sustentabilidade':'preservar os resultados positivos e recuperar indicadores ligados a reciclagem, desvio de aterro ou grandes geradores.','Receita':'acompanhar eficiência de arrecadação, receitas diversas e conformidade dos grandes geradores.'};
-const $=id=>document.getElementById(id),norm=s=>String(s??'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[\u2013\u2014\u2015]/g,'-').replace(/\s+/g,' ').trim(),esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-let DATA=[],CHARTS={};
-function num(v){if(v==null)return null;let s=String(v).trim().replace(/[^\d,.\-]/g,'');if(!s||s==='-')return null;if(s.includes(',')&&s.includes('.'))s=s.replace(/\./g,'').replace(',','.');else if(s.includes(','))s=s.replace(',','.');const n=Number(s);return Number.isFinite(n)?n:null}
-function fmt(v,u=''){if(v==null||Number.isNaN(v))return'—';if(String(u).includes('%'))return v.toLocaleString('pt-BR',{maximumFractionDigits:1})+'%';if(Math.abs(v)>=1e6)return(v/1e6).toLocaleString('pt-BR',{maximumFractionDigits:1})+' mi';if(Math.abs(v)>=1000)return v.toLocaleString('pt-BR',{maximumFractionDigits:0});return v.toLocaleString('pt-BR',{maximumFractionDigits:1})}
-function getF(row,names){const ks=Object.keys(row);for(const n of names){const k=ks.find(x=>norm(x)===norm(n));if(k&&String(row[k]).trim())return row[k]}return''}
-const EIXOS_NORM=Object.fromEntries(Object.entries(EIXOS).map(([e,l])=>[e,l.map(norm)]));function eixoDe(ind){const k=norm(ind);for(const[e,l]of Object.entries(EIXOS_NORM))if(l.includes(k))return e;return'Outros'}
-function transform(r){const dir=String(getF(r,['Diretoria','DIRETORIA'])||'').trim(),supRaw=String(getF(r,['Superintendência','Superintendencia','Sup./Coord.'])||'').trim(),sup=(!supRaw||supRaw==='-'||supRaw==='–'||supRaw==='—')?dir:supRaw;const d={Ano:num(getF(r,['Ano','ANO'])),Indicador:String(getF(r,['Indicador','INDICADOR'])||'').trim(),Diretoria:dir,Superintendencia:sup||dir,Unidade:String(getF(r,['Unidade','UNIDADE'])||'').trim(),Sentido:String(getF(r,['Sentido','SENTIDO'])||'').trim(),Acumulado:num(getF(r,['Acumulado','ACUMULADO','Resultado'])),Meta:num(getF(r,['Meta','META','Alvo']))};MESES.forEach(m=>d[m]=num(getF(r,[m])));if(d.Acumulado==null){const v=MESES.map(m=>d[m]).filter(x=>x!=null);if(v.length)d.Acumulado=v.at(-1)}return d}
-function statusOf(d){if(d.Meta==null||d.Acumulado==null)return'Sem meta';const dn=d.Sentido.includes('↓');return(dn?d.Acumulado<=d.Meta:d.Acumulado>=d.Meta)?'Dentro da meta':'Abaixo da meta'}function desvio(d){return(d.Meta==null||d.Acumulado==null)?null:d.Acumulado-d.Meta}
-function tendClass(d){const v=MESES.map(m=>d[m]).filter(x=>x!=null);if(v.length<3)return'flat';const ini=v.slice(0,3).reduce((a,b)=>a+b,0)/3,fim=v.slice(-3).reduce((a,b)=>a+b,0)/3;if(Math.abs(fim-ini)<0.01*Math.abs(ini||1))return'flat';const up=fim>ini,dn=d.Sentido.includes('↓');return((!dn&&up)||(dn&&!up))?'good':'bad'}function tendLabel(d){const t=tendClass(d);return t==='good'?'melhora':t==='bad'?'piora':'estavel'}function consistencia(d){const v=MESES.map(m=>d[m]).filter(x=>x!=null);if(v.length<4)return'baixa';const med=v.reduce((a,b)=>a+b,0)/v.length;if(!med)return'baixa';const cv=Math.sqrt(v.reduce((s,x)=>s+(x-med)**2,0)/v.length)/Math.abs(med);return cv<0.08?'alta':cv<0.18?'media':'baixa'}function superacao(d){if(d.Meta==null||d.Acumulado==null||!d.Meta)return 0;const dn=d.Sentido.includes('↓');return dn?(d.Meta-d.Acumulado)/Math.abs(d.Meta):(d.Acumulado-d.Meta)/Math.abs(d.Meta)}
-const vf=id=>$(id)?.value||'';function filtered(){const a=vf('fAno'),dir=vf('fDir'),sup=vf('fSup'),ind=vf('fInd');return DATA.filter(d=>{if(!ANOS.includes(d.Ano))return false;if(a&&String(d.Ano)!==a)return false;if(dir&&d.Diretoria!==dir)return false;if(sup&&d.Superintendencia!==sup)return false;if(ind&&d.Indicador!==ind)return false;return true})}
-function uniq(arr){return[...new Set(arr.filter(x=>x!=null&&String(x).trim()))].sort((a,b)=>String(a).localeCompare(String(b),'pt-BR'))}function setOpts(id,vals,lbl){const el=$(id),cur=el.value;el.innerHTML=`<option value="">${lbl}</option>`+vals.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');if(vals.map(String).includes(String(cur)))el.value=cur}
-function cascadeFilters(){const a=vf('fAno'),dir=vf('fDir'),sup=vf('fSup');let b=DATA.filter(d=>ANOS.includes(d.Ano));if(a)b=b.filter(d=>String(d.Ano)===a);setOpts('fDir',uniq(b.map(d=>d.Diretoria)),'Todas');if(dir)b=b.filter(d=>d.Diretoria===dir);setOpts('fSup',uniq(b.map(d=>d.Superintendencia)),'Todas');if(sup)b=b.filter(d=>d.Superintendencia===sup);setOpts('fInd',uniq(b.map(d=>d.Indicador)),'Todos');if(dir&&[...$('fDir').options].some(o=>o.value===dir))$('fDir').value=dir;if(sup&&[...$('fSup').options].some(o=>o.value===sup))$('fSup').value=sup}
-function populateAll(){setOpts('fAno',uniq(DATA.filter(d=>ANOS.includes(d.Ano)).map(d=>d.Ano)),'Todos os anos');cascadeFilters()}
-function mkChart(id,type,labels,datasets,extra={}){if(CHARTS[id])CHARTS[id].destroy();CHARTS[id]=new Chart($(id),{type,data:{labels,datasets},options:Object.assign({responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#8aaccc',font:{size:11}}}},scales:type==='line'?{x:{ticks:{color:'#4a6a88'},grid:{color:'rgba(30,52,80,.4)'}},y:{ticks:{color:'#4a6a88'},grid:{color:'rgba(30,52,80,.5)'}}}:{}},extra)})}
-function resumoBase(rows){const cm=rows.filter(d=>d.Meta!=null&&d.Acumulado!=null),dentro=cm.filter(d=>statusOf(d)==='Dentro da meta'),abaixo=cm.filter(d=>statusOf(d)==='Abaixo da meta'),criticos=abaixo.filter(d=>tendClass(d)==='bad'),alertas=dentro.filter(d=>tendClass(d)==='bad'),semRef=rows.filter(d=>d.Meta==null||d.Acumulado==null),pct=cm.length?Math.round(dentro.length/cm.length*100):0;return{cm,dentro,abaixo,criticos,alertas,semRef,pct}}
-function renderSintesePlacar(rows){const {cm,dentro,criticos,alertas,semRef,pct}=resumoBase(rows);const pressao={};criticos.forEach(d=>{const e=eixoDe(d.Indicador);pressao[e]=(pressao[e]||0)+1});const top=Object.entries(pressao).sort((a,b)=>b[1]-a[1]).map(([e])=>e);let s=`O resultado consolidado indica <b>${pct}%</b> de atingimento das metas avaliadas`;s+=cm.length?`, com <b>${dentro.length} de ${cm.length}</b> indicadores com referência dentro da meta. `:'. ';if(top.length>=2)s+=`A principal pressão do ciclo está concentrada em <b>${esc(top[0])}</b> e <b>${esc(top[1])}</b>, exigindo acompanhamento da Presidência nos indicadores críticos associados.`;else if(top.length===1)s+=`A principal pressão do ciclo está concentrada em <b>${esc(top[0])}</b>, exigindo acompanhamento da Presidência nos indicadores críticos associados.`;else if(alertas.length)s+=`Não há eixo em situação crítica, mas há <b>${alertas.length}</b> indicador${alertas.length>1?'es':' '} em atenção preventiva.`;else s+=`Nenhum eixo apresenta sinal crítico ou de atenção no momento.`;if(semRef.length)s+=` Há ainda <b>${semRef.length}</b> indicador${semRef.length>1?'es':' '} sem referência completa para avaliação.`;$('sintese').innerHTML=s;$('plPct').textContent=pct+'%';$('plCrit').textContent=criticos.length;$('plAlert').textContent=alertas.length;$('plSem').textContent=semRef.length;$('plTotal').textContent=rows.length;$('scopeInfo').textContent=`${rows.length} registros · ${uniq(rows.map(d=>d.Indicador)).length} indicadores`}
-function renderMatriz(rows){$('matrizBody').innerHTML=ORDEM_EIXOS.map(e=>{const inds=rows.filter(d=>eixoDe(d.Indicador)===e);if(!inds.length)return'';const cm=inds.filter(d=>d.Meta!=null&&d.Acumulado!=null),dentro=cm.filter(d=>statusOf(d)==='Dentro da meta'),abaixo=cm.filter(d=>statusOf(d)==='Abaixo da meta'),crit=abaixo.filter(d=>tendClass(d)==='bad').length,alert=dentro.filter(d=>tendClass(d)==='bad').length,pct=cm.length?Math.round(dentro.length/cm.length*100):null;let sit='sem',txt='Sem ref.';if(cm.length){sit=crit>0?'crit':alert>0||abaixo.length>0?'amarelo':'verde';txt=crit>0?'Crítico':alert>0||abaixo.length>0?'Atenção':'Estável'}const cor=sit==='verde'?'var(--green)':sit==='amarelo'?'var(--yellow)':sit==='crit'?'var(--red)':'#2a4860';return`<tr><td><div class="m-eixo"><span class="m-dot" style="background:${cor}"></span>${esc(e)}</div></td><td class="m-num verde"><b>${dentro.length}</b><small>${pct!=null?pct+'%':'—'}</small></td><td class="m-num amarelo"><b>${alert||'—'}</b><small>${alert?'preventivo':''}</small></td><td class="m-num crit"><b>${crit||'—'}</b><small>${crit?'crítico':''}</small></td><td class="m-total">${inds.length}</td><td class="m-sit"><span class="m-badge ${sit}">${txt}</span></td></tr>`}).join('')}
-function renderDiretorias(rows){const dirs=uniq(rows.map(d=>d.Diretoria)).filter(Boolean);if(!dirs.length){$('dirBody').innerHTML='<tr><td colspan="7" style="color:var(--muted);padding:14px">Sem dados por diretoria.</td></tr>';return}const info=dirs.map(dir=>{const sub=rows.filter(d=>d.Diretoria===dir),cm=sub.filter(d=>d.Meta!=null&&d.Acumulado!=null),dentro=cm.filter(d=>statusOf(d)==='Dentro da meta'),abaixo=cm.filter(d=>statusOf(d)==='Abaixo da meta'),crit=abaixo.filter(d=>tendClass(d)==='bad').length,alert=dentro.filter(d=>tendClass(d)==='bad').length,pct=cm.length?Math.round(dentro.length/cm.length*100):null;return{dir,pct,total:sub.length,dentro:dentro.length,crit,alert}}).sort((a,b)=>(b.pct??-1)-(a.pct??-1));$('dirBody').innerHTML=info.map(x=>{const cls=x.pct==null?'':x.pct>=80?'alta':x.pct>=60?'media':'baixa',cor=x.pct==null?'#2a4860':x.pct>=80?'var(--green)':x.pct>=60?'var(--yellow)':'var(--red)';return`<tr><td class="dir-nome">${esc(x.dir)}</td><td class="dir-taxa ${cls}">${x.pct!=null?x.pct+'%':'—'}</td><td class="dir-bar-cell"><div class="dir-bar-wrap"><div class="dir-bar-fill" style="width:${x.pct??0}%;background:${cor}"></div></div></td><td class="dir-num dir-ok">${x.dentro}</td><td class="dir-num dir-crit">${x.crit||'—'}</td><td class="dir-num dir-alert">${x.alert||'—'}</td><td class="dir-num muted">${x.total}</td></tr>`}).join('')}
-function renderRiscos(rows){const cm=rows.filter(d=>d.Meta!=null&&d.Acumulado!=null&&statusOf(d)==='Abaixo da meta'),sorted=[...cm].sort((a,b)=>{const pa=tendClass(a)==='bad'?1:0,pb=tendClass(b)==='bad'?1:0;if(pb!==pa)return pb-pa;return Math.abs(desvio(b)||0)-Math.abs(desvio(a)||0)}).slice(0,5);$('listaRiscos').innerHTML=sorted.length?sorted.map(d=>{const dv=desvio(d),pct=d.Meta?(dv/Math.abs(d.Meta)*100):0,tc=tendLabel(d);return`<div class="rd-item"><div class="rd-barra red"></div><div><div class="rd-nome" onclick="abrirFicha('${esc(d.Indicador).replace(/'/g,"\\'")}')">${esc(d.Indicador)}</div><div class="rd-dados"><span>Real: <b class="v-bad">${fmt(d.Acumulado,d.Unidade)}</b></span><span>Meta: <b>${fmt(d.Meta,d.Unidade)}</b></span><span>Desvio: <b class="v-bad">${fmt(dv,d.Unidade)} (${Math.abs(pct).toFixed(1)}%)</b></span><span>${esc(d.Diretoria)}</span><span class="rd-tend ${tc}">${tc}</span></div></div></div>`}).join(''):'<div style="padding:14px 0;color:var(--muted);font-size:12px">Nenhum indicador crítico no recorte.</div>'}
-function renderDestaques(rows){const cm=rows.filter(d=>d.Meta!=null&&d.Acumulado!=null&&statusOf(d)==='Dentro da meta'),sorted=[...cm].sort((a,b)=>{const ca=consistencia(a)==='alta'?1:0,cb=consistencia(b)==='alta'?1:0;if(cb!==ca)return cb-ca;return superacao(b)-superacao(a)}).slice(0,5);$('listaDestaques').innerHTML=sorted.length?sorted.map(d=>{const dv=desvio(d),pct=d.Meta?(dv/Math.abs(d.Meta)*100):0,tc=tendLabel(d),cons=consistencia(d);return`<div class="rd-item"><div class="rd-barra green"></div><div><div class="rd-nome" onclick="abrirFicha('${esc(d.Indicador).replace(/'/g,"\\'")}')">${esc(d.Indicador)}</div><div class="rd-dados"><span>Real: <b class="v-good">${fmt(d.Acumulado,d.Unidade)}</b></span><span>Meta: <b>${fmt(d.Meta,d.Unidade)}</b></span><span>Superação: <b class="v-good">+${Math.abs(pct).toFixed(1)}%</b></span><span>${esc(d.Diretoria)}</span><span class="rd-tend ${tc}">${tc}</span>${cons==='alta'?'<span style="color:#4a7090;font-size:10px">consistência alta</span>':''}</div></div></div>`}).join(''):'<div style="padding:14px 0;color:var(--muted);font-size:12px">Sem destaques no recorte.</div>'}
-function renderAgenda(rows){const cm=rows.filter(d=>d.Meta!=null&&d.Acumulado!=null),crit=[...cm.filter(d=>statusOf(d)==='Abaixo da meta'&&tendClass(d)==='bad')].sort((a,b)=>Math.abs(desvio(b)||0)-Math.abs(desvio(a)||0)),alert=[...cm.filter(d=>statusOf(d)==='Dentro da meta'&&tendClass(d)==='bad')],press=[...cm.filter(d=>statusOf(d)==='Abaixo da meta'&&tendClass(d)!=='bad')].sort((a,b)=>Math.abs(desvio(b)||0)-Math.abs(desvio(a)||0));const agenda={};[...crit,...alert,...press].forEach(d=>{const e=eixoDe(d.Indicador);if(!agenda[e])agenda[e]={tipo:crit.includes(d)?'crit':alert.includes(d)?'alert':'obs',inds:[],scores:0};agenda[e].inds.push(d);agenda[e].scores+=Math.abs(desvio(d)||0)});const ord={crit:0,alert:1,obs:2},itens=Object.entries(agenda).sort((a,b)=>ord[a[1].tipo]-ord[b[1].tipo]||b[1].scores-a[1].scores).slice(0,3);if(!itens.length){$('agendaLista').innerHTML='<div style="color:var(--muted);font-size:12px;padding:12px 0">Nenhum tema crítico ou de atenção no recorte.</div>';return}const tipoLabel={crit:'Risco Institucional',alert:'Sinal de Atenção',obs:'Ponto de Observação'};$('agendaLista').innerHTML=itens.map(([eixo,dados],i)=>{const uniqInds=[...new Map(dados.inds.map(d=>[d.Indicador,d])).values()].slice(0,4),ctx=dados.inds.length===1?`${esc(dados.inds[0].Indicador)} registra desvio de ${fmt(desvio(dados.inds[0]),dados.inds[0].Unidade)}.`:`${dados.inds.length} indicadores com sinal desfavorável neste eixo.`,acao=ACAO_EIXO[eixo]||'avaliar causas, definir responsável e acompanhar a evolução no próximo ciclo.';return`<div class="ag-item"><div class="ag-n">0${i+1}</div><div><div><span class="ag-tipo ${dados.tipo}">${tipoLabel[dados.tipo]}</span></div><div class="ag-tema">${TEMA_EIXO[eixo]||esc(eixo)}</div><div class="ag-contexto">${ctx}</div><div class="ag-acao"><b>Ação sugerida:</b> ${acao}</div><div class="ag-inds">${uniqInds.map(d=>`<span class="ag-ind">${esc(d.Indicador)}</span>`).join('')}</div></div></div>`}).join('')}
-function abrirFicha(nomeInd){$('viewCorporativo').classList.add('hidden');$('viewFicha').classList.add('active');const rows=DATA.filter(d=>d.Indicador===nomeInd&&ANOS.includes(d.Ano));if(!rows.length){$('fichaContent').innerHTML='<p style="color:var(--muted)">Sem dados para este indicador.</p>';return}const d=rows.sort((a,b)=>b.Ano-a.Ano)[0],outro=rows.find(r=>r.Ano!==d.Ano),st=statusOf(d),dv=desvio(d),tc=tendClass(d),cons=consistencia(d),pct=d.Meta&&dv!=null?Math.abs(dv/d.Meta*100):null,yoy=outro&&d.Acumulado!=null&&outro.Acumulado?(d.Acumulado-outro.Acumulado)/Math.abs(outro.Acumulado)*100:null,stC=st==='Dentro da meta'?'meta':st==='Abaixo da meta'?'abaixo':'sem',tcC=tc==='good'?'melhora':tc==='bad'?'piora':'estavel';let interp=`<b>${esc(nomeInd)}</b> integra o eixo estratégico <b>${esc(eixoDe(nomeInd))}</b>`;if(d.Meta!=null&&d.Acumulado!=null){interp+=` e registra acumulado de <b>${fmt(d.Acumulado,d.Unidade)}</b> frente à meta de <b>${fmt(d.Meta,d.Unidade)}</b>.`;interp+=st==='Dentro da meta'?(pct!=null?` O resultado supera a referência em <b>${pct.toFixed(1)}%</b>.`:' O resultado está dentro da referência.'):` Há um desvio de <b>${fmt(dv,d.Unidade)}</b>${pct!=null?` (${pct.toFixed(1)}%)`:''}.`;interp+=tc==='bad'?' A série mensal aponta deterioração de desempenho nos últimos meses.':tc==='good'?' A trajetória mensal é positiva, com melhora recente.':' A trajetória mensal é estável.';if(cons==='alta')interp+=' O resultado apresenta consistência alta ao longo do período.';else if(cons==='baixa')interp+=' A variação mensal é elevada, o que pode indicar sazonalidade ou instabilidade operacional.';if(yoy!=null)interp+=`<br><br>Em relação ao ano anterior, o acumulado ${yoy>=0?'cresceu':'recuou'} <b>${Math.abs(yoy).toFixed(1)}%</b>.`}else interp+='. Não há meta ou acumulado registrado no período.';let situacao=st==='Abaixo da meta'&&tc==='bad'?'Desvio combinado a trajetória desfavorável. O sinal merece acompanhamento próximo neste ciclo.':st==='Abaixo da meta'?'Resultado abaixo da referência, sem agravamento de trajetória no momento.':st==='Dentro da meta'&&tc==='bad'?'Ainda dentro da referência, mas com perda de desempenho recente.':st==='Dentro da meta'&&cons==='alta'?'Resultado consolidado com consistência ao longo do período.':st==='Dentro da meta'?'Resultado dentro da referência.':'Sem meta cadastrada. A leitura de desempenho fica limitada.';$('fichaContent').innerHTML=`<div class="ficha-topo"><div class="ficha-eyebrow">${esc(eixoDe(nomeInd))} · ${esc(d.Diretoria)} · ${d.Ano}</div><div class="ficha-nome">${esc(nomeInd)}</div><div class="ficha-chips"><span class="chip ${stC}">${st}</span><span class="chip ${tcC}">Tendência: ${tendLabel(d)}</span><span class="chip cons-${cons}">Consistência ${cons}</span></div><div class="ficha-nums"><div><div class="f-num-val ${stC==='abaixo'?'bad':stC==='meta'?'good':''}">${fmt(d.Acumulado,d.Unidade)}</div><div class="f-num-label">Realizado</div></div><div class="ficha-sep"></div><div><div class="f-num-val">${fmt(d.Meta,d.Unidade)}</div><div class="f-num-label">Meta</div></div>${dv!=null?`<div class="ficha-sep"></div><div><div class="f-num-val ${dv<0?'bad':'good'}">${dv>=0?'+':''}${fmt(dv,d.Unidade)}</div><div class="f-num-label">Desvio</div></div>`:''}${yoy!=null?`<div class="ficha-sep"></div><div><div class="f-num-val ${yoy<0?'bad':'good'}">${yoy>=0?'+':''}${yoy.toFixed(1)}%</div><div class="f-num-label">Var. anual</div></div>`:''}</div></div><div class="ficha-corpo"><div><div class="ficha-chart-label">Evolução mensal 2025 — 2026</div><div class="ficha-chart-wrap"><canvas id="fichaChart"></canvas></div></div><div><div class="ficha-interp-label">Interpretação executiva</div><div class="ficha-interp">${interp}</div><div class="ficha-decisao"><div class="ficha-decisao-label">Leitura de situação</div><div class="ficha-decisao-text">${situacao}</div></div></div></div>`;setTimeout(()=>{const ds=[];ANOS.forEach((a,i)=>{const row=DATA.find(r=>r.Ano===a&&r.Indicador===nomeInd);if(row)ds.push({label:String(a),data:MESES.map(m=>row[m]),borderColor:i===0?'#5b9bd5':'#e87535',backgroundColor:(i===0?'#5b9bd5':'#e87535')+'14',tension:.35,borderWidth:2,pointRadius:3,fill:i===0})});const rm=[...ANOS].reverse().map(a=>DATA.find(r=>r.Ano===a&&r.Indicador===nomeInd&&r.Meta!=null)).find(Boolean);if(rm)ds.push({label:'Meta',data:MESES.map(()=>rm.Meta),borderColor:'#c9a830',borderDash:[5,3],borderWidth:1.5,pointRadius:0,fill:false});mkChart('fichaChart','line',MESES,ds);$('viewFicha').scrollIntoView({behavior:'smooth',block:'start'})},60)}
-function voltarCorporativo(){$('fInd').value='';$('viewCorporativo').classList.remove('hidden');$('viewFicha').classList.remove('active');cascadeFilters();renderCorporativo(filtered())}
-function renderCorporativo(rows){renderSintesePlacar(rows);renderMatriz(rows);renderDiretorias(rows);renderRiscos(rows);renderDestaques(rows);renderAgenda(rows);const now=new Date();$('updated').textContent=`${now.toLocaleDateString('pt-BR')} ${now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})`}
-function render(){const ind=vf('fInd');if(ind){abrirFicha(ind);return}$('viewCorporativo').classList.remove('hidden');$('viewFicha').classList.remove('active');renderCorporativo(filtered())}
-document.addEventListener('change',e=>{const id=e.target?.id;if(['fAno','fDir','fSup'].includes(id)){cascadeFilters();render()}else if(id==='fInd')render()});document.addEventListener('click',e=>{if(e.target?.closest?.('#btnClear')){['fAno','fDir','fSup','fInd'].forEach(id=>$(id).value='');cascadeFilters();render()}if(e.target?.closest?.('#btnVoltar'))voltarCorporativo()});
-Papa.parse(CSV_URL,{download:true,header:true,skipEmptyLines:true,complete:r=>{DATA=r.data.map(transform).filter(d=>d.Ano&&d.Indicador);populateAll();render()},error:e=>{console.error(e);$('scopeInfo').textContent='Erro ao carregar dados'}});
+// ── CONFIG ──────────────────────────────────────────────────────────────────
+const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQphrIIjiY4aWBONgByLezMnFk8YbyYpF-vtgxOLoV8-85_WUVAXH_f_Ahy8ymxmgnGXmQ_KiFSOkIK/pub?gid=1044100274&single=true&output=csv';
+
+// Mapeamento de eixos corporativos
+const EIXO_MAP = {
+  'pessoas':        'Pessoas',
+  'segurança':      'Segurança',
+  'seguranca':      'Segurança',
+  'operação':       'Operação',
+  'operacao':       'Operação',
+  'atendimento':    'Atendimento',
+  'sustentabilidade':'Sustentabilidade',
+  'receita':        'Receita',
+  'financeiro':     'Receita',
+  'financeira':     'Receita',
+};
+
+const EIXOS = ['Pessoas','Segurança','Operação','Atendimento','Sustentabilidade','Receita'];
+
+// Estado global
+let ALL_DATA = [];
+let FILTERED = [];
+let CURRENT_EIXO = 'Todos';
+
+// ── HELPERS ──────────────────────────────────────────────────────────────────
+function norm(s){ return String(s||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
+function pct(v){ return v == null ? null : Math.round(Number(v)); }
+function delta(v){ return v==null?'—':(v>0?`▲ ${v} pp`:(v<0?`▼ ${Math.abs(v)} pp`:`= estável`)); }
+function statusColor(r){
+  if(r==null) return 'flat';
+  if(r>=100) return 'green';
+  if(r>=85)  return 'amber';
+  return 'red';
+}
+function statusLabel(r){
+  if(r==null) return '—';
+  if(r>=100) return 'Meta atingida';
+  if(r>=85)  return 'Atenção';
+  return 'Crítico';
+}
+
+// ── MAP EIXO ──────────────────────────────────────────────────────────────────
+function detectEixo(row){
+  // Tenta coluna EIXO, DIRETORIA, ÁREA etc.
+  const candidates = [row['EIXO'],row['Eixo'],row['eixo'],row['DIRETORIA'],row['Diretoria'],row['AREA'],row['Área'],row['TEMA'],row['Tema']];
+  for(const c of candidates){
+    if(!c) continue;
+    const k = norm(c);
+    for(const [pat,val] of Object.entries(EIXO_MAP)){
+      if(k.includes(pat)) return val;
+    }
+    // fallback: retorna capitalizado se reconhecível
+    for(const e of EIXOS) if(k.includes(norm(e))) return e;
+  }
+  return 'Outros';
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+async function init(){
+  try {
+    const resp = await fetch(CSV_URL);
+    if(!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const text = await resp.text();
+    Papa.parse(text, {
+      header: true,
+      skipEmptyLines: true,
+      complete: r => { processData(r.data); }
+    });
+  } catch(e){
+    showError('Erro ao carregar planilha: '+e.message+'. Exibindo dados demonstrativos.');
+    loadDemo();
+  }
+}
+
+// ── DEMO DATA ────────────────────────────────────────────────────────────────
+function loadDemo(){
+  ALL_DATA = [
+    {INDICADOR:'Absenteísmo',EIXO:'Pessoas',DIRETORIA:'DAF',REALIZADO:94,META:95,REALIZADO_ANT:91,META_ANT:95},
+    {INDICADOR:'Taxa de rotatividade',EIXO:'Pessoas',DIRETORIA:'DAF',REALIZADO:88,META:90,REALIZADO_ANT:90,META_ANT:90},
+    {INDICADOR:'Horas de capacitação',EIXO:'Pessoas',DIRETORIA:'DAF',REALIZADO:102,META:100,REALIZADO_ANT:97,META_ANT:100},
+    {INDICADOR:'Taxa de frequência acidentes',EIXO:'Segurança',DIRETORIA:'DTE',REALIZADO:72,META:90,REALIZADO_ANT:81,META_ANT:90},
+    {INDICADOR:'Taxa de gravidade acidentes',EIXO:'Segurança',DIRETORIA:'DTE',REALIZADO:68,META:90,REALIZADO_ANT:76,META_ANT:90},
+    {INDICADOR:'EPIs distribuídos',EIXO:'Segurança',DIRETORIA:'DTE',REALIZADO:98,META:100,REALIZADO_ANT:96,META_ANT:100},
+    {INDICADOR:'IPL Médio',EIXO:'Operação',DIRETORIA:'DSU',REALIZADO:87,META:90,REALIZADO_ANT:85,META_ANT:90},
+    {INDICADOR:'Coleta domiciliar',EIXO:'Operação',DIRETORIA:'DSU',REALIZADO:96,META:95,REALIZADO_ANT:94,META_ANT:95},
+    {INDICADOR:'Capina e conservação',EIXO:'Operação',DIRETORIA:'DSU',REALIZADO:79,META:90,REALIZADO_ANT:82,META_ANT:90},
+    {INDICADOR:'Remoção gratuita',EIXO:'Atendimento',DIRETORIA:'DLU',REALIZADO:65,META:90,REALIZADO_ANT:70,META_ANT:90},
+    {INDICADOR:'Poda de árvores',EIXO:'Atendimento',DIRETORIA:'DLU',REALIZADO:71,META:90,REALIZADO_ANT:74,META_ANT:90},
+    {INDICADOR:'1746 – prazo encerramento',EIXO:'Atendimento',DIRETORIA:'DLU',REALIZADO:82,META:95,REALIZADO_ANT:79,META_ANT:95},
+    {INDICADOR:'Reciclagem RSU',EIXO:'Sustentabilidade',DIRETORIA:'DTE',REALIZADO:104,META:100,REALIZADO_ANT:101,META_ANT:100},
+    {INDICADOR:'Ecopontos ativos',EIXO:'Sustentabilidade',DIRETORIA:'DTE',REALIZADO:108,META:100,REALIZADO_ANT:102,META_ANT:100},
+    {INDICADOR:'Resíduo desviado aterro',EIXO:'Sustentabilidade',DIRETORIA:'DTE',REALIZADO:100,META:100,REALIZADO_ANT:98,META_ANT:100},
+    {INDICADOR:'Receita contratos',EIXO:'Receita',DIRETORIA:'DAF',REALIZADO:93,META:100,REALIZADO_ANT:90,META_ANT:100},
+    {INDICADOR:'Inadimplência',EIXO:'Receita',DIRETORIA:'DAF',REALIZADO:85,META:90,REALIZADO_ANT:88,META_ANT:90},
+    {INDICADOR:'Execução orçamentária',EIXO:'Receita',DIRETORIA:'DAF',REALIZADO:91,META:95,REALIZADO_ANT:89,META_ANT:95},
+  ].map(d => ({...d, RESULTADO: Math.round((d.REALIZADO/d.META)*100), RESULTADO_ANT: Math.round((d.REALIZADO_ANT/d.META_ANT)*100)}));
+  processData(ALL_DATA, true);
+}
+
+// ── PROCESS ───────────────────────────────────────────────────────────────────
+function processData(rows, precomputed = false){
+  if(!precomputed){
+    ALL_DATA = rows.map(r => {
+      // detecta nomes de colunas comuns
+      const find = (...keys) => { for(const k of keys){ const v=r[k]; if(v!=null&&v!=='') return v; } return null; };
+      const indicador = find('INDICADOR','Indicador','indicador','NOME','Nome','DESCRIÇÃO','Descricao','Descrição') || '—';
+      const eixo      = detectEixo(r);
+      const diretoria = find('DIRETORIA','Diretoria','ÁREA','Area','SUPERINTENDENCIA','Superintendência') || '—';
+      const realizado = parseFloat(String(find('REALIZADO','Realizado','RESULTADO','Resultado','VALOR','Valor')||'').replace(',','.'));
+      const meta      = parseFloat(String(find('META','Meta','meta')||'').replace(',','.')) || 100;
+      const realizado_ant = parseFloat(String(find('REALIZADO_ANT','Realizado_Ant','REALIZADO_ANTERIOR','Realizado Anterior')||'').replace(',','.'));
+      const meta_ant  = parseFloat(String(find('META_ANT','Meta_Ant','META_ANTERIOR','Meta Anterior')||'').replace(',','.')) || meta;
+      const resultado = (!isNaN(realizado)&&!isNaN(meta)&&meta>0) ? Math.round((realizado/meta)*100) : null;
+      const resultado_ant = (!isNaN(realizado_ant)&&!isNaN(meta_ant)&&meta_ant>0) ? Math.round((realizado_ant/meta_ant)*100) : null;
+      return { INDICADOR:indicador, EIXO:eixo, DIRETORIA:diretoria,
+               REALIZADO:realizado, META:meta, RESULTADO:resultado,
+               REALIZADO_ANT:realizado_ant, META_ANT:meta_ant, RESULTADO_ANT:resultado_ant,
+               _raw: r };
+    });
+  }
+  renderAll();
+}
+
+// ── RENDER ALL ────────────────────────────────────────────────────────────────
+function renderAll(){
+  // Timestamp
+  const now = new Date();
+  document.getElementById('ts-label').textContent = now.toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'});
+  document.getElementById('cycle-badge').textContent = `Ciclo ${now.getMonth()<6?'1':'2'}/${now.getFullYear()}`;
+
+  renderBloco1();
+  renderBloco2();
+  renderBloco3();
+  renderBloco4();
+  renderDrill();
+
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('page-body').style.display = 'block';
+}
+
+// ── BLOCO 1 ───────────────────────────────────────────────────────────────────
+function renderBloco1(){
+  const valid = ALL_DATA.filter(d => d.RESULTADO != null);
+  const total = valid.length;
+  if(total === 0) return;
+
+  const nMeta   = valid.filter(d => d.RESULTADO >= 100).length;
+  const nAbaixo = valid.filter(d => d.RESULTADO >= 85 && d.RESULTADO < 100).length;
+  const nCrit   = valid.filter(d => d.RESULTADO < 85).length;
+  const pctMeta = Math.round((nMeta/total)*100);
+
+  // delta anterior
+  const validAnt = ALL_DATA.filter(d => d.RESULTADO_ANT != null);
+  const pctAnt   = validAnt.length ? Math.round((validAnt.filter(d=>d.RESULTADO_ANT>=100).length/validAnt.length)*100) : null;
+  const diff     = pctAnt != null ? pctMeta - pctAnt : null;
+
+  const color = pctMeta >= 70 ? 'green' : pctMeta >= 50 ? 'amber' : 'red';
+  const el = document.getElementById('h-pct');
+  el.textContent = pctMeta + '%';
+  el.className = 'hero-number ' + color;
+
+  const dEl = document.getElementById('h-delta');
+  if(diff != null){
+    dEl.textContent = diff > 0 ? `▲ ${diff} pp ciclo anterior` : diff < 0 ? `▼ ${Math.abs(diff)} pp ciclo anterior` : `= estável`;
+    dEl.className = 'hero-delta ' + (diff>0?'up':diff<0?'down':'flat');
+  }
+
+  document.getElementById('h-criticos').textContent = nCrit;
+  document.getElementById('h-criticos').className = 'meta-stat-n ' + (nCrit===0?'green':nCrit<=3?'amber':'red');
+
+  document.getElementById('h-superados').textContent = nMeta;
+  document.getElementById('h-superados').className = 'meta-stat-n ' + (nMeta/total>=0.6?'green':'amber');
+}
+
+// ── BLOCO 2 ───────────────────────────────────────────────────────────────────
+function renderBloco2(){
+  // Calcula desempenho por eixo
+  const eixoStats = {};
+  for(const e of EIXOS) eixoStats[e] = {total:0,meta:0,desvios:0,soma:0,indicators:[]};
+  eixoStats['Outros'] = {total:0,meta:0,desvios:0,soma:0,indicators:[]};
+
+  for(const d of ALL_DATA){
+    if(d.RESULTADO == null) continue;
+    const e = eixoStats[d.EIXO] ? d.EIXO : 'Outros';
+    eixoStats[e].total++;
+    eixoStats[e].soma += d.RESULTADO;
+    if(d.RESULTADO >= 100) eixoStats[e].meta++;
+    else eixoStats[e].desvios++;
+    eixoStats[e].indicators.push(d);
+  }
+
+  // Calcula média e classifica
+  const ranked = Object.entries(eixoStats)
+    .filter(([,s]) => s.total > 0)
+    .map(([name, s]) => ({
+      name,
+      avg: Math.round(s.soma / s.total),
+      desvios: s.desvios,
+      meta: s.meta,
+      total: s.total,
+      color: s.soma/s.total >= 100 ? 'green' : s.soma/s.total >= 85 ? 'amber' : 'red'
+    }))
+    .sort((a,b) => a.avg - b.avg); // pior primeiro
+
+  const worst  = ranked.slice(0,2);
+  const best   = ranked.slice(-1);
+  const temas  = [...worst, ...best].slice(0,3);
+
+  const TEMA_CONTEXT = {
+    'Pessoas':         'Gestão de pessoas, absenteísmo e capacitação de equipes.',
+    'Segurança':       'Segurança do trabalho, acidentes e uso de equipamentos.',
+    'Operação':        'Serviços de campo: coleta, capina, varrição e conservação.',
+    'Atendimento':     'Respostas ao cidadão, prazos e serviços demandados via 1746.',
+    'Sustentabilidade':'Reciclagem, destinação de resíduos e ecopontos.',
+    'Receita':         'Contratos, execução orçamentária e inadimplência.',
+    'Outros':          'Indicadores transversais e multidiretorias.',
+  };
+
+  const html = temas.map((t,i) => {
+    const eyebrow = i < worst.length ? 'Atenção requerida' : 'Destaque positivo';
+    const summary = i < worst.length
+      ? `${t.desvios} indicador${t.desvios>1?'es':''} abaixo da meta. Desempenho médio: ${t.avg}%. ${TEMA_CONTEXT[t.name]||''}`
+      : `Melhor desempenho do período. Meta superada de forma consistente. ${TEMA_CONTEXT[t.name]||''}`;
+    const pill = i < worst.length
+      ? `<div class="tema-desvios ${t.color}">${t.desvios} desvio${t.desvios>1?'s':''}</div>`
+      : `<div class="tema-desvios green">&#10003; Acima da meta</div>`;
+    return `<div class="tema-card">
+      <div class="tema-status-bar ${t.color}"></div>
+      <div class="tema-eyebrow">${eyebrow}</div>
+      <div class="tema-name">${t.name}</div>
+      <div class="tema-summary">${summary}</div>
+      ${pill}
+    </div>`;
+  }).join('');
+
+  document.getElementById('bloco2').innerHTML = html;
+}
+
+// ── BLOCO 3 ───────────────────────────────────────────────────────────────────
+function renderBloco3(){
+  const eixoAvg = {};
+  for(const e of EIXOS){ eixoAvg[e] = {soma:0,n:0}; }
+  for(const d of ALL_DATA){
+    if(d.RESULTADO == null || !eixoAvg[d.EIXO]) continue;
+    eixoAvg[d.EIXO].soma += d.RESULTADO;
+    eixoAvg[d.EIXO].n++;
+  }
+
+  const html = EIXOS.map(e => {
+    const s = eixoAvg[e];
+    const avg = s.n ? Math.round(s.soma/s.n) : null;
+    const c   = avg == null ? 'flat' : avg >= 100 ? 'green' : avg >= 85 ? 'amber' : 'red';
+    const lbl = avg == null ? '—' : avg >= 100 ? 'Estável' : avg >= 85 ? 'Atenção' : 'Crítico';
+    return `<div class="eixo-card">
+      <div class="eixo-dot ${c}"></div>
+      <div class="eixo-name">${e}</div>
+      <div class="eixo-status ${c}">${lbl}</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('bloco3').innerHTML = html;
+}
+
+// ── BLOCO 4 ───────────────────────────────────────────────────────────────────
+function renderBloco4(){
+  const comAnt = ALL_DATA.filter(d => d.RESULTADO != null && d.RESULTADO_ANT != null);
+  if(!comAnt.length){
+    // sem histórico: mostra melhores / piores / estáveis do ciclo atual
+    const valid = ALL_DATA.filter(d=>d.RESULTADO!=null).sort((a,b)=>a.RESULTADO-b.RESULTADO);
+    const piores  = valid.slice(0,3);
+    const melhores = valid.slice(-3).reverse();
+    const estaveis = ALL_DATA.filter(d=>d.RESULTADO!=null&&d.RESULTADO>=95&&d.RESULTADO<105).slice(0,3);
+    renderMovCol('Melhorou','green',melhores,'—','up');
+    renderMovCol('Piorou','red',piores,'—','down');
+    renderMovCol('Estável','flat',estaveis,'—','flat');
+    return;
+  }
+  const scored = comAnt.map(d => ({...d, diff: d.RESULTADO - d.RESULTADO_ANT}));
+  const melhorou = scored.filter(d=>d.diff>0).sort((a,b)=>b.diff-a.diff).slice(0,3);
+  const piorou   = scored.filter(d=>d.diff<0).sort((a,b)=>a.diff-b.diff).slice(0,3);
+  const estavel  = scored.filter(d=>d.diff===0).slice(0,3);
+
+  renderMovCol('Melhorou','green',melhorou,'up','up');
+  renderMovCol('Piorou','red',piorou,'down','down');
+  renderMovCol('Estável','flat',estavel,'flat','flat');
+}
+
+function renderMovCol(title, colorClass, items, deltaDir){
+  const col = document.createElement('div');
+  col.className = 'mov-col';
+  col.innerHTML = `<div class="mov-header">
+    <div class="mov-dot ${colorClass}"></div>
+    <div class="mov-title ${colorClass}">${title}</div>
+  </div>`;
+
+  if(!items.length){
+    const empty = document.createElement('div');
+    empty.style.cssText = 'font-size:12px;color:var(--muted);padding:12px 0;';
+    empty.textContent = 'Sem ocorrências no ciclo.';
+    col.appendChild(empty);
+  } else {
+    for(const d of items){
+      const item = document.createElement('div');
+      item.className = 'mov-item';
+      const dd = d.diff != null ? d.diff : 0;
+      const dClass = dd > 0 ? 'up' : dd < 0 ? 'down' : 'flat';
+      const dText  = dd > 0 ? `▲ ${dd} pp` : dd < 0 ? `▼ ${Math.abs(dd)} pp` : `= sem alteração`;
+      item.innerHTML = `<div class="mov-item-name">${d.INDICADOR}</div>
+        <div class="mov-item-detail">${d.EIXO} · ${d.DIRETORIA||'—'}</div>
+        <div class="mov-item-delta ${dClass}">${dText}</div>`;
+      col.appendChild(item);
+    }
+  }
+  document.getElementById('bloco4').appendChild(col);
+}
+
+// ── DRILL ─────────────────────────────────────────────────────────────────────
+function renderDrill(){
+  const total = ALL_DATA.filter(d=>d.RESULTADO!=null).length;
+  document.getElementById('drill-sub').textContent = `${total} indicadores · ciclo atual`;
+
+  // Filtros
+  const filtersEl = document.getElementById('drill-filters');
+  const eixosPresentes = ['Todos',...new Set(ALL_DATA.map(d=>d.EIXO).filter(e=>EIXOS.includes(e)))];
+  filtersEl.innerHTML = `<span class="drill-filter-label">Eixo</span>`;
+  for(const e of eixosPresentes){
+    const btn = document.createElement('button');
+    btn.className = 'drill-filter-btn' + (e==='Todos'?' active':'');
+    btn.textContent = e;
+    btn.onclick = () => {
+      CURRENT_EIXO = e;
+      filtersEl.querySelectorAll('.drill-filter-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      renderDrillTable();
+    };
+    filtersEl.appendChild(btn);
+  }
+  renderDrillTable();
+}
+
+function renderDrillTable(){
+  const data = CURRENT_EIXO === 'Todos'
+    ? ALL_DATA
+    : ALL_DATA.filter(d=>d.EIXO===CURRENT_EIXO);
+
+  const sorted = [...data].filter(d=>d.RESULTADO!=null).sort((a,b)=>a.RESULTADO-b.RESULTADO);
+  const tbody = document.getElementById('drill-tbody');
+  tbody.innerHTML = '';
+
+  for(const d of sorted){
+    const r = d.RESULTADO;
+    const c = statusColor(r);
+    const lbl = statusLabel(r);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td style="max-width:260px;">${d.INDICADOR}</td>
+      <td style="color:var(--muted);">${d.EIXO}</td>
+      <td style="color:var(--muted);">${d.DIRETORIA||'—'}</td>
+      <td style="width:160px;">
+        <div class="bar-mini">
+          <div class="bar-mini-track"><div class="bar-mini-fill ${c}" style="width:${Math.min(r,100)}%"></div></div>
+          <div class="bar-mini-val">${r}%</div>
+        </div>
+      </td>
+      <td><span class="status-pill ${c}">${lbl}</span></td>`;
+    tbody.appendChild(tr);
+  }
+
+  if(!sorted.length){
+    tbody.innerHTML = `<tr><td colspan="5" style="color:var(--muted);text-align:center;padding:24px;">Nenhum indicador disponível.</td></tr>`;
+  }
+}
+
+function toggleDrill(){
+  const body = document.getElementById('drill-body');
+  const chev = document.getElementById('drill-chevron');
+  body.classList.toggle('open');
+  chev.classList.toggle('open');
+}
+
+function showError(msg){
+  const el = document.getElementById('error-notice');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+// ── START ─────────────────────────────────────────────────────────────────────
+init();
 </script>
 </body>
 </html>
