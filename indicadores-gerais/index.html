@@ -38,7 +38,7 @@ select option{background:#0b1826}
 .btn-clear:hover{color:var(--ink);border-color:#3d6080}
 
 /* ── SÍNTESE ── */
-.sintese{font-size:13.5px;color:#a8c4e0;line-height:1.7;margin-bottom:14px;padding:0 2px}
+.sintese{font-size:14px;color:#a8c4e0;line-height:1.75;margin-bottom:14px;padding:11px 16px;border-left:2px solid #1e3450;background:rgba(30,52,80,.2);border-radius:0 4px 4px 0}
 .sintese b{color:#d8eaff;font-weight:600}
 
 /* ── PLACAR ── */
@@ -60,7 +60,7 @@ select option{background:#0b1826}
    MATRIZ EXECUTIVA
    ══════════════════════════════════════ */
 .matriz{width:100%;border-collapse:collapse;margin-bottom:4px}
-.matriz th{padding:9px 16px;text-align:left;font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#2a4860;border-bottom:2px solid var(--line);background:transparent}
+.matriz th{padding:10px 16px;text-align:left;font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#3d6080;border-bottom:2px solid var(--line);background:rgba(30,52,80,.15)}
 .matriz th:not(:first-child){text-align:center}
 .matriz td{padding:16px 16px;border-bottom:1px solid rgba(30,52,80,.6);vertical-align:middle}
 .matriz tr:last-child td{border-bottom:0}
@@ -134,6 +134,7 @@ select option{background:#0b1826}
 .ag-contexto{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:6px}
 .ag-inds{display:flex;flex-wrap:wrap;gap:5px}
 .ag-ind{font-size:10px;color:#3d6080;background:rgba(30,52,80,.6);border-radius:3px;padding:2px 7px}
+.ag-acao{font-size:11.5px;color:#5a7a9a;line-height:1.6;margin-top:8px;font-style:italic}
 
 /* ══════════════════════════════════════
    MODO INDICADOR — FICHA
@@ -331,6 +332,15 @@ const TEMA_EIXO={
   'Sustentabilidade':'Gestao de residuos e economia circular',
   'Receita':'Arrecadacao e conformidade financeira'
 };
+const ACAO_EIXO={
+  'Pessoas':'Avaliar as causas de absenteismo, afastamentos ou horas extras e definir resposta gerencial adequada.',
+  'Segurança':'Reforcar acompanhamento preventivo e verificar se as medidas de segurança ocupacional estao sendo aplicadas.',
+  'Operação':'Identificar os gargalos operacionais que comprometem IPL, IPR, frota ou manejo e avaliar capacidade de recuperacao.',
+  'Atendimento':'Revisar os servicos com maior desvio no atendimento ao cidadao e priorizar acoes de recuperacao do nivel de servico.',
+  'Sustentabilidade':'Preservar a tendencia positiva nos indicadores em destaque ou investigar as causas de recuo nos indicadores abaixo da meta.',
+  'Receita':'Acompanhar a eficiencia de arrecadacao e os indicadores de conformidade financeira para garantir a base de sustentacao operacional.',
+  'Outros':'Verificar a classificacao dos indicadores e avaliar se ha acoes gerenciais pendentes.'
+};
 
 const $=id=>document.getElementById(id);
 const norm=s=>String(s??'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[\u2013\u2014\u2015]/g,'-').replace(/\s+/g,' ').trim();
@@ -388,12 +398,16 @@ function renderSintesePlacar(rows){
   abaixo.filter(d=>tendClass(d)==='bad').forEach(d=>{const e=eixoDe(d.Indicador);pressao[e]=(pressao[e]||0)+1;});
   const topPressao=Object.entries(pressao).sort((a,b)=>b[1]-a[1]).map(([e])=>e);
 
-  // Síntese
-  let s=`No recorte selecionado, a companhia apresenta <b>${pct}%</b> dos indicadores dentro da meta`;
-  if(topPressao.length>=2) s+=`, com maior pressao concentrada em <b>${esc(topPressao[0])}</b> e <b>${esc(topPressao[1])}</b>`;
-  else if(topPressao.length===1) s+=`, com pressao concentrada em <b>${esc(topPressao[0])}</b>`;
-  else if(criticos===0&&alertas===0) s+=`. Nenhum eixo apresenta sinal critico ou de atencao no momento`;
-  s+='.';
+  // Síntese — tom de leitura de reunião
+  let s=`O resultado consolidado indica <b>${pct}%</b> de atingimento das metas no recorte selecionado.`;
+  if(topPressao.length>=2)
+    s+=` A principal pressao do ciclo esta concentrada em <b>${esc(topPressao[0])}</b> e <b>${esc(topPressao[1])}</b>, exigindo acompanhamento da Presidencia nos indicadores criticos associados.`;
+  else if(topPressao.length===1)
+    s+=` A principal pressao do ciclo esta concentrada em <b>${esc(topPressao[0])}</b>, exigindo acompanhamento da Presidencia nos indicadores criticos associados.`;
+  else if(criticos===0&&alertas===0)
+    s+=` Nenhum eixo estrategico apresenta sinal critico ou de atencao no momento. O resultado e considerado estavel no recorte atual.`;
+  if(alertas>0&&!topPressao.length)
+    s+=` Ha <b>${alertas}</b> indicador${alertas>1?'es':''}  dentro da meta com trajetoria de deterioracao recente, o que merece monitoramento preventivo.`;
   $('sintese').innerHTML=s;
 
   // Placar
@@ -537,6 +551,7 @@ function renderAgenda(rows){
         <div class="ag-tema">${TEMA_EIXO[eixo]||esc(eixo)}</div>
         <div class="ag-contexto">${ctx}</div>
         <div class="ag-inds">${uniqInds.map(d=>`<span class="ag-ind">${esc(d.Indicador)}</span>`).join('')}</div>
+        <div class="ag-acao">${ACAO_EIXO[eixo]||ACAO_EIXO['Outros']}</div>
       </div>
     </div>`;
   }).join('');
