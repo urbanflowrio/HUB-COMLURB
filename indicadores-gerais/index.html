@@ -6,1045 +6,705 @@
 <title>Presidência · COMLURB</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@300;400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@300;400&display=swap');
 
-  :root {
-    --bg:       #07111f;
-    --bg2:      #0d1a2d;
-    --bg3:      #111f35;
-    --line:     #1c2e45;
-    --line2:    #243549;
-    --text:     #dce8f5;
-    --muted:    #6d8aa8;
-    --faint:    #2d4159;
-    --blue:     #4a8fd4;
-    --blue-d:   #1e4a78;
-    --green:    #3fba8e;
-    --green-d:  #0d4232;
-    --amber:    #d9922c;
-    --amber-d:  #4a2d0a;
-    --red:      #d95858;
-    --red-d:    #4a1010;
-    --purple:   #9178e0;
-    --radius:   6px;
-    --radius-lg:10px;
-  }
+:root {
+  --bg:      #07111f;
+  --bg2:     #0d1a2d;
+  --bg3:     #122035;
+  --line:    #1a2d44;
+  --line2:   #243a55;
+  --text:    #d8e8f5;
+  --muted:   #5d7d9c;
+  --faint:   #243a55;
+  --blue:    #4a90d4;
+  --blue-bg: #0d2340;
+  --green:   #38b889;
+  --green-bg:#062e1f;
+  --amber:   #d4892a;
+  --amber-bg:#2e1a04;
+  --red:     #d95050;
+  --red-bg:  #2e0c0c;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',system-ui,sans-serif;font-size:14px;line-height:1.6;min-height:100vh}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+/* TOP BAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 40px;border-bottom:1px solid var(--line);background:var(--bg);position:sticky;top:0;z-index:100}
+.topbar-l{display:flex;align-items:center;gap:16px}
+.logo{width:30px;height:30px;background:var(--blue);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#fff;letter-spacing:.5px;flex-shrink:0}
+.page-id{font-size:12px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.page-id strong{color:var(--text);font-weight:500}
+.topbar-r{display:flex;align-items:center;gap:20px;font-size:11px;color:var(--muted)}
+.cycle-tag{background:var(--bg3);border:1px solid var(--line2);padding:4px 12px;border-radius:3px;font-family:'DM Mono',monospace;font-size:11px;color:var(--text)}
+.refresh-btn{background:transparent;border:1px solid var(--line2);color:var(--muted);padding:4px 12px;border-radius:3px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.refresh-btn:hover{border-color:var(--blue);color:var(--blue)}
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', system-ui, sans-serif;
-    font-size: 14px;
-    line-height: 1.6;
-    min-height: 100vh;
-  }
+/* MAIN */
+.main{max-width:1280px;margin:0 auto;padding:48px 40px 80px}
 
-  /* ── HEADER ── */
-  .top-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 18px 40px;
-    border-bottom: 1px solid var(--line);
-    background: var(--bg);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .top-bar-left {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-  }
-  .logo-mark {
-    width: 32px;
-    height: 32px;
-    background: var(--blue);
-    border-radius: 4px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 11px; font-weight: 600; color: #fff; letter-spacing: 0.5px;
-  }
-  .page-title {
-    font-size: 13px;
-    font-weight: 400;
-    color: var(--muted);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-  .page-title strong {
-    color: var(--text);
-    font-weight: 500;
-  }
-  .top-bar-right {
-    display: flex;
-    align-items: center;
-    gap: 24px;
-    font-size: 12px;
-    color: var(--muted);
-  }
-  .cycle-badge {
-    background: var(--bg3);
-    border: 1px solid var(--line2);
-    padding: 4px 12px;
-    border-radius: 3px;
-    font-size: 11px;
-    letter-spacing: 0.05em;
-    font-family: 'DM Mono', monospace;
-    color: var(--text);
-  }
+/* SECTION LABEL */
+.sec-lbl{font-size:10px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:24px;display:flex;align-items:center;gap:10px}
+.sec-lbl::after{content:'';flex:1;height:1px;background:var(--line)}
 
-  /* ── LAYOUT ── */
-  .main {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 48px 40px 80px;
-  }
+/* BLOCO 1 - RESULTADO */
+.b1{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:56px}
+.b1-cell{background:var(--bg2);padding:44px 44px 36px}
+.b1-cell.primary{padding:52px 52px 44px}
+.hero-n{font-size:80px;font-weight:300;line-height:1;letter-spacing:-3px;font-variant-numeric:tabular-nums}
+.hero-n.green{color:var(--green)}
+.hero-n.amber{color:var(--amber)}
+.hero-n.red{color:var(--red)}
+.hero-lbl{font-size:13px;color:var(--muted);margin-top:10px}
+.hero-delta{display:inline-flex;align-items:center;gap:5px;font-size:12px;margin-top:18px;font-family:'DM Mono',monospace}
+.hero-delta.up{color:var(--green)}
+.hero-delta.down{color:var(--red)}
+.hero-delta.flat{color:var(--muted)}
+.stat-n{font-size:36px;font-weight:300;letter-spacing:-1px;font-variant-numeric:tabular-nums}
+.stat-n.green{color:var(--green)}
+.stat-n.amber{color:var(--amber)}
+.stat-n.red{color:var(--red)}
+.stat-lbl{font-size:12px;color:var(--muted);margin-top:8px}
+.stat-sub{font-size:11px;color:var(--muted);margin-top:10px;font-family:'DM Mono',monospace;line-height:1.5}
 
-  /* ── BLOCO 1: RESULTADO CORPORATIVO ── */
-  .section-label {
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 28px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .section-label::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--line);
-  }
+/* BLOCO 2 - TEMAS */
+.b2{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:56px}
+.tema{background:var(--bg2);padding:32px 32px 28px;position:relative;transition:background .15s;cursor:default}
+.tema:hover{background:var(--bg3)}
+.tema-bar{position:absolute;top:0;left:0;right:0;height:2px}
+.tema-bar.green{background:var(--green)}
+.tema-bar.amber{background:var(--amber)}
+.tema-bar.red{background:var(--red)}
+.tema-eye{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;font-weight:500}
+.tema-nome{font-size:19px;font-weight:400;color:var(--text);margin-bottom:14px;line-height:1.2}
+.tema-txt{font-size:13px;color:var(--muted);line-height:1.75}
+.tema-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-family:'DM Mono',monospace;margin-top:18px;padding:4px 10px;border-radius:3px;font-weight:500;letter-spacing:.04em}
+.tema-badge.red{background:var(--red-bg);color:var(--red)}
+.tema-badge.amber{background:var(--amber-bg);color:var(--amber)}
+.tema-badge.green{background:var(--green-bg);color:var(--green)}
 
-  .resultado-hero {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 1px;
-    background: var(--line);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    margin-bottom: 64px;
-  }
-  .hero-cell {
-    background: var(--bg2);
-    padding: 48px 48px 40px;
-  }
-  .hero-cell.primary {
-    grid-column: 1;
-    padding: 56px 56px 48px;
-  }
-  .hero-number {
-    font-size: 88px;
-    font-weight: 300;
-    line-height: 1;
-    color: var(--text);
-    letter-spacing: -4px;
-    font-variant-numeric: tabular-nums;
-  }
-  .hero-number.green { color: var(--green); }
-  .hero-number.amber { color: var(--amber); }
-  .hero-number.red   { color: var(--red);   }
-  .hero-label {
-    font-size: 13px;
-    color: var(--muted);
-    margin-top: 12px;
-    letter-spacing: 0.02em;
-  }
-  .hero-delta {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 13px;
-    margin-top: 20px;
-    font-family: 'DM Mono', monospace;
-  }
-  .hero-delta.up   { color: var(--green); }
-  .hero-delta.down { color: var(--red);   }
-  .hero-delta.flat { color: var(--muted); }
+/* BLOCO 3 - MAPA */
+.b3{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:56px}
+.eixo{background:var(--bg2);padding:24px 16px 20px;text-align:center;transition:background .15s;cursor:default}
+.eixo:hover{background:var(--bg3)}
+.eixo-dot{width:9px;height:9px;border-radius:50%;margin:0 auto 12px}
+.eixo-dot.green{background:var(--green);box-shadow:0 0 8px rgba(56,184,137,.4)}
+.eixo-dot.amber{background:var(--amber);box-shadow:0 0 8px rgba(212,137,42,.4)}
+.eixo-dot.red{background:var(--red);box-shadow:0 0 8px rgba(217,80,80,.4)}
+.eixo-dot.gray{background:var(--muted)}
+.eixo-nome{font-size:12px;font-weight:500;color:var(--text);margin-bottom:5px}
+.eixo-sit{font-size:10px;text-transform:uppercase;letter-spacing:.08em;font-weight:500}
+.eixo-sit.green{color:var(--green)}
+.eixo-sit.amber{color:var(--amber)}
+.eixo-sit.red{color:var(--red)}
+.eixo-sit.gray{color:var(--muted)}
+.eixo-n{font-size:10px;color:var(--muted);margin-top:4px;font-family:'DM Mono',monospace}
 
-  .meta-stat {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    height: 100%;
-  }
-  .meta-stat-n {
-    font-size: 40px;
-    font-weight: 300;
-    letter-spacing: -1px;
-    font-variant-numeric: tabular-nums;
-  }
-  .meta-stat-n.red   { color: var(--red);   }
-  .meta-stat-n.amber { color: var(--amber); }
-  .meta-stat-n.green { color: var(--green); }
-  .meta-stat-lbl {
-    font-size: 12px;
-    color: var(--muted);
-    margin-top: 8px;
-    letter-spacing: 0.03em;
-  }
-  .meta-stat-delta {
-    font-size: 11px;
-    font-family: 'DM Mono', monospace;
-    margin-top: 14px;
-  }
-  .meta-stat-delta.up   { color: var(--green); }
-  .meta-stat-delta.down { color: var(--red);   }
-  .meta-stat-delta.flat { color: var(--muted); }
+/* BLOCO 4 - MOVIMENTOS */
+.b4{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:56px}
+.mov-col{background:var(--bg2);padding:28px 28px 24px}
+.mov-hd{display:flex;align-items:center;gap:8px;margin-bottom:20px}
+.mov-dot{width:6px;height:6px;border-radius:50%}
+.mov-dot.green{background:var(--green)}
+.mov-dot.red{background:var(--red)}
+.mov-dot.flat{background:var(--faint)}
+.mov-ttl{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.12em}
+.mov-ttl.green{color:var(--green)}
+.mov-ttl.red{color:var(--red)}
+.mov-ttl.flat{color:var(--muted)}
+.mov-item{padding:12px 0;border-bottom:1px solid var(--line)}
+.mov-item:last-child{border-bottom:none}
+.mov-iname{font-size:13px;color:var(--text);line-height:1.3;margin-bottom:3px}
+.mov-idetail{font-size:11px;color:var(--muted)}
+.mov-idelta{font-size:11px;font-family:'DM Mono',monospace;margin-top:3px}
+.mov-idelta.up{color:var(--green)}
+.mov-idelta.down{color:var(--red)}
+.mov-idelta.flat{color:var(--muted)}
+.mov-empty{font-size:12px;color:var(--muted);padding:12px 0;font-style:italic}
 
-  /* ── BLOCO 2: TEMAS ── */
-  .temas-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1px;
-    background: var(--line);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    margin-bottom: 64px;
-  }
-  .tema-card {
-    background: var(--bg2);
-    padding: 36px 36px 32px;
-    position: relative;
-    cursor: default;
-    transition: background 0.15s;
-  }
-  .tema-card:hover { background: var(--bg3); }
-  .tema-status-bar {
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-  }
-  .tema-status-bar.green { background: var(--green); }
-  .tema-status-bar.amber { background: var(--amber); }
-  .tema-status-bar.red   { background: var(--red);   }
-  .tema-eyebrow {
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 14px;
-    font-weight: 500;
-  }
-  .tema-name {
-    font-size: 20px;
-    font-weight: 400;
-    color: var(--text);
-    margin-bottom: 16px;
-    line-height: 1.2;
-  }
-  .tema-summary {
-    font-size: 13px;
-    color: var(--muted);
-    line-height: 1.7;
-  }
-  .tema-desvios {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 11px;
-    font-family: 'DM Mono', monospace;
-    margin-top: 20px;
-    padding: 5px 10px;
-    border-radius: 3px;
-  }
-  .tema-desvios.red   { background: var(--red-d);   color: var(--red);   }
-  .tema-desvios.amber { background: var(--amber-d); color: var(--amber); }
-  .tema-desvios.green { background: var(--green-d); color: var(--green); }
+/* BLOCO 5 - DRILL */
+.b5{border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.drill-hd{display:flex;align-items:center;justify-content:space-between;padding:20px 28px;background:var(--bg2);cursor:pointer;user-select:none;transition:background .15s}
+.drill-hd:hover{background:var(--bg3)}
+.drill-hd-l{display:flex;flex-direction:column;gap:3px}
+.drill-hd-ttl{font-size:13px;font-weight:500;color:var(--text)}
+.drill-hd-sub{font-size:11px;color:var(--muted)}
+.drill-chev{font-size:20px;color:var(--muted);transition:transform .2s}
+.drill-chev.open{transform:rotate(180deg)}
+.drill-body{display:none;border-top:1px solid var(--line)}
+.drill-body.open{display:block}
+.drill-filters{display:flex;align-items:center;gap:8px;padding:16px 28px;border-bottom:1px solid var(--line);flex-wrap:wrap;background:var(--bg)}
+.dflt{font-size:10px;color:var(--muted);letter-spacing:.06em;margin-right:4px}
+.fbtn{padding:4px 12px;border-radius:3px;border:1px solid var(--line2);background:transparent;color:var(--muted);font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .12s;letter-spacing:.02em}
+.fbtn:hover,.fbtn.on{border-color:var(--blue);color:var(--blue);background:var(--blue-bg)}
+.drill-tbl-wrap{overflow-x:auto;padding:0 28px 28px;background:var(--bg)}
+.dtbl{width:100%;border-collapse:collapse;font-size:12px;margin-top:16px}
+.dtbl th{text-align:left;padding:7px 10px;color:var(--muted);font-weight:400;font-size:10px;letter-spacing:.1em;text-transform:uppercase;border-bottom:1px solid var(--line)}
+.dtbl td{padding:9px 10px;border-bottom:1px solid var(--line);color:var(--text);vertical-align:middle}
+.dtbl tr:last-child td{border-bottom:none}
+.dtbl tr:hover td{background:var(--bg2)}
+.spill{display:inline-block;padding:3px 8px;border-radius:3px;font-size:10px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;font-family:'DM Mono',monospace}
+.spill.green{background:var(--green-bg);color:var(--green)}
+.spill.amber{background:var(--amber-bg);color:var(--amber)}
+.spill.red{background:var(--red-bg);color:var(--red)}
+.spill.gray{background:var(--faint);color:var(--muted)}
+.bar-w{display:flex;align-items:center;gap:8px}
+.bar-tr{flex:1;height:3px;background:var(--line2);border-radius:2px;min-width:60px;max-width:120px}
+.bar-fi{height:100%;border-radius:2px}
+.bar-fi.green{background:var(--green)}
+.bar-fi.amber{background:var(--amber)}
+.bar-fi.red{background:var(--red)}
+.bar-val{font-family:'DM Mono',monospace;font-size:11px;min-width:45px;text-align:right}
+.tend-tag{font-size:10px;font-family:'DM Mono',monospace}
+.tend-tag.fav{color:var(--green)}
+.tend-tag.desf{color:var(--red)}
+.tend-tag.est{color:var(--muted)}
+.tend-tag.ins{color:var(--faint)}
 
-  /* ── BLOCO 3: MAPA CORPORATIVO ── */
-  .mapa-grid {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 1px;
-    background: var(--line);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    margin-bottom: 64px;
-  }
-  .eixo-card {
-    background: var(--bg2);
-    padding: 28px 20px 24px;
-    text-align: center;
-    transition: background 0.15s;
-    cursor: default;
-  }
-  .eixo-card:hover { background: var(--bg3); }
-  .eixo-dot {
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    margin: 0 auto 14px;
-  }
-  .eixo-dot.green { background: var(--green); box-shadow: 0 0 8px rgba(63,186,142,0.35); }
-  .eixo-dot.amber { background: var(--amber); box-shadow: 0 0 8px rgba(217,146,44,0.35); }
-  .eixo-dot.red   { background: var(--red);   box-shadow: 0 0 8px rgba(217,88,88,0.35); }
-  .eixo-name {
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--text);
-    letter-spacing: 0.03em;
-    margin-bottom: 6px;
-  }
-  .eixo-status {
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-weight: 500;
-  }
-  .eixo-status.green { color: var(--green); }
-  .eixo-status.amber { color: var(--amber); }
-  .eixo-status.red   { color: var(--red);   }
+/* LOADING / ERROR */
+.loading{display:flex;align-items:center;justify-content:center;min-height:60vh;flex-direction:column;gap:14px;color:var(--muted);font-size:13px;letter-spacing:.04em}
+.spin{width:26px;height:26px;border:2px solid var(--line2);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.err-box{background:var(--red-bg);border:1px solid var(--red);color:var(--red);padding:14px 20px;border-radius:6px;font-size:13px;margin-bottom:32px;line-height:1.6;display:none}
 
-  /* ── BLOCO 4: MOVIMENTOS ── */
-  .movimentos-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 1px;
-    background: var(--line);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    margin-bottom: 64px;
-  }
-  .mov-col {
-    background: var(--bg2);
-    padding: 32px 32px 28px;
-  }
-  .mov-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 24px;
-  }
-  .mov-dot { width: 7px; height: 7px; border-radius: 50%; }
-  .mov-dot.green { background: var(--green); }
-  .mov-dot.red   { background: var(--red);   }
-  .mov-dot.flat  { background: var(--faint); }
-  .mov-title {
-    font-size: 10px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-  }
-  .mov-title.green { color: var(--green); }
-  .mov-title.red   { color: var(--red);   }
-  .mov-title.flat  { color: var(--muted); }
-  .mov-item {
-    padding: 14px 0;
-    border-bottom: 1px solid var(--line);
-  }
-  .mov-item:last-child { border-bottom: none; }
-  .mov-item-name {
-    font-size: 13px;
-    color: var(--text);
-    margin-bottom: 4px;
-    line-height: 1.3;
-  }
-  .mov-item-detail {
-    font-size: 11px;
-    color: var(--muted);
-    font-family: 'DM Mono', monospace;
-  }
-  .mov-item-delta {
-    font-size: 11px;
-    font-family: 'DM Mono', monospace;
-    margin-top: 3px;
-  }
-  .mov-item-delta.up   { color: var(--green); }
-  .mov-item-delta.down { color: var(--red);   }
-
-  /* ── BLOCO 5: DRILL ── */
-  .drill-section {
-    border: 1px solid var(--line);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-  }
-  .drill-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 22px 32px;
-    background: var(--bg2);
-    cursor: pointer;
-    user-select: none;
-    transition: background 0.15s;
-  }
-  .drill-header:hover { background: var(--bg3); }
-  .drill-header-left {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-  }
-  .drill-header-title {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text);
-    letter-spacing: 0.02em;
-  }
-  .drill-header-sub {
-    font-size: 11px;
-    color: var(--muted);
-  }
-  .drill-chevron {
-    font-size: 18px;
-    color: var(--muted);
-    transition: transform 0.25s;
-  }
-  .drill-chevron.open { transform: rotate(180deg); }
-
-  .drill-body {
-    display: none;
-    background: var(--bg);
-    border-top: 1px solid var(--line);
-  }
-  .drill-body.open { display: block; }
-
-  .drill-filters {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 20px 32px;
-    border-bottom: 1px solid var(--line);
-    flex-wrap: wrap;
-  }
-  .drill-filter-label {
-    font-size: 11px;
-    color: var(--muted);
-    margin-right: 4px;
-  }
-  .drill-filter-btn {
-    padding: 5px 14px;
-    border-radius: 3px;
-    border: 1px solid var(--line2);
-    background: transparent;
-    color: var(--muted);
-    font-size: 11px;
-    cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
-    transition: all 0.12s;
-    letter-spacing: 0.03em;
-  }
-  .drill-filter-btn:hover,
-  .drill-filter-btn.active {
-    border-color: var(--blue);
-    color: var(--blue);
-    background: var(--blue-d);
-  }
-
-  .drill-table-wrap {
-    overflow-x: auto;
-    padding: 0 32px 32px;
-  }
-  .drill-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 12px;
-    margin-top: 20px;
-  }
-  .drill-table th {
-    text-align: left;
-    padding: 8px 12px;
-    color: var(--muted);
-    font-weight: 400;
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    border-bottom: 1px solid var(--line);
-  }
-  .drill-table td {
-    padding: 10px 12px;
-    border-bottom: 1px solid var(--line);
-    color: var(--text);
-    vertical-align: middle;
-  }
-  .drill-table tr:last-child td { border-bottom: none; }
-  .drill-table tr:hover td { background: var(--bg2); }
-  .status-pill {
-    display: inline-block;
-    padding: 3px 9px;
-    border-radius: 3px;
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    font-family: 'DM Mono', monospace;
-  }
-  .status-pill.green { background: var(--green-d); color: var(--green); }
-  .status-pill.amber { background: var(--amber-d); color: var(--amber); }
-  .status-pill.red   { background: var(--red-d);   color: var(--red);   }
-
-  .bar-mini {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .bar-mini-track {
-    flex: 1;
-    height: 3px;
-    background: var(--line2);
-    border-radius: 2px;
-    min-width: 80px;
-  }
-  .bar-mini-fill {
-    height: 100%;
-    border-radius: 2px;
-    transition: width 0.4s;
-  }
-  .bar-mini-fill.green { background: var(--green); }
-  .bar-mini-fill.amber { background: var(--amber); }
-  .bar-mini-fill.red   { background: var(--red);   }
-  .bar-mini-val {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    min-width: 38px;
-    text-align: right;
-    color: var(--text);
-  }
-
-  /* ── LOADING ── */
-  .loading-state {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 60vh;
-    flex-direction: column;
-    gap: 16px;
-    color: var(--muted);
-    font-size: 13px;
-    letter-spacing: 0.05em;
-  }
-  .spinner {
-    width: 28px;
-    height: 28px;
-    border: 2px solid var(--line2);
-    border-top-color: var(--blue);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* ── FOOTER ── */
-  .hub-footer {
-    border-top: 1px solid var(--line);
-    padding: 20px 40px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 11px;
-    color: var(--faint);
-    letter-spacing: 0.04em;
-  }
-
-  /* ── ERROR ── */
-  .error-notice {
-    background: var(--red-d);
-    border: 1px solid var(--red);
-    color: var(--red);
-    padding: 10px 16px;
-    border-radius: var(--radius);
-    font-size: 12px;
-    margin-bottom: 20px;
-    display: none;
-  }
+/* FOOTER */
+.footer{border-top:1px solid var(--line);padding:18px 40px;display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--faint);letter-spacing:.03em}
 </style>
 </head>
 <body>
 
-<!-- ── TOP BAR ── -->
-<header class="top-bar">
-  <div class="top-bar-left">
-    <div class="logo-mark">CML</div>
-    <span class="page-title"><strong>COMLURB</strong> &nbsp;·&nbsp; Presidência</span>
+<header class="topbar">
+  <div class="topbar-l">
+    <div class="logo">CML</div>
+    <span class="page-id"><strong>COMLURB</strong> &nbsp;·&nbsp; Presidência</span>
   </div>
-  <div class="top-bar-right">
-    <span id="ts-label" style="font-family:'DM Mono',monospace;font-size:11px;"></span>
-    <span class="cycle-badge" id="cycle-badge">—</span>
+  <div class="topbar-r">
+    <span id="ts-label"></span>
+    <span class="cycle-tag" id="cycle-tag">—</span>
+    <button class="refresh-btn" onclick="reload()">↺ Atualizar</button>
   </div>
 </header>
 
-<!-- ── MAIN ── -->
-<main class="main" id="main-content">
-  <div class="loading-state" id="loading">
-    <div class="spinner"></div>
-    <span>Carregando indicadores</span>
-  </div>
-  <div id="page-body" style="display:none;">
+<main class="main" id="main">
+  <div class="loading" id="loading"><div class="spin"></div><span>Carregando dados</span></div>
 
-    <div class="error-notice" id="error-notice"></div>
+  <div id="page" style="display:none">
+    <div class="err-box" id="err-box"></div>
 
-    <!-- BLOCO 1: RESULTADO CORPORATIVO -->
-    <div class="section-label">Resultado corporativo</div>
-    <div class="resultado-hero" id="bloco1">
-      <div class="hero-cell primary">
-        <div class="hero-number" id="h-pct">—%</div>
-        <div class="hero-label">indicadores dentro da meta</div>
-        <div class="hero-delta flat" id="h-delta">— pp ciclo anterior</div>
+    <!-- B1 -->
+    <div class="sec-lbl">Resultado corporativo</div>
+    <div class="b1" id="b1">
+      <div class="b1-cell primary">
+        <div class="hero-n" id="h-pct">—</div>
+        <div class="hero-lbl" id="h-lbl">—</div>
+        <div class="hero-delta flat" id="h-delta">—</div>
       </div>
-      <div class="hero-cell">
-        <div class="meta-stat">
-          <div class="meta-stat-n red" id="h-criticos">—</div>
-          <div class="meta-stat-lbl">indicadores críticos</div>
-          <div class="meta-stat-delta flat" id="h-criticos-d">—</div>
-        </div>
+      <div class="b1-cell" id="b1-c2">
+        <div class="stat-n red" id="h-crit">—</div>
+        <div class="stat-lbl">indicadores críticos</div>
+        <div class="stat-sub" id="h-crit-sub">—</div>
       </div>
-      <div class="hero-cell">
-        <div class="meta-stat">
-          <div class="meta-stat-n green" id="h-superados">—</div>
-          <div class="meta-stat-lbl">metas superadas</div>
-          <div class="meta-stat-delta flat" id="h-superados-d">—</div>
-        </div>
+      <div class="b1-cell" id="b1-c3">
+        <div class="stat-n green" id="h-ok">—</div>
+        <div class="stat-lbl">dentro da meta</div>
+        <div class="stat-sub" id="h-ok-sub">—</div>
       </div>
     </div>
 
-    <!-- BLOCO 2: TEMAS -->
-    <div class="section-label">Temas para a Presidência</div>
-    <div class="temas-grid" id="bloco2"></div>
-    <div style="margin-bottom:64px;"></div>
+    <!-- B2 -->
+    <div class="sec-lbl">Temas para a Presidência</div>
+    <div class="b2" id="b2"></div>
+    <div style="margin-bottom:56px"></div>
 
-    <!-- BLOCO 3: MAPA CORPORATIVO -->
-    <div class="section-label">Mapa corporativo</div>
-    <div class="mapa-grid" id="bloco3"></div>
-    <div style="margin-bottom:64px;"></div>
+    <!-- B3 -->
+    <div class="sec-lbl">Mapa corporativo</div>
+    <div class="b3" id="b3"></div>
+    <div style="margin-bottom:56px"></div>
 
-    <!-- BLOCO 4: MOVIMENTOS -->
-    <div class="section-label">Movimentos do ciclo</div>
-    <div class="movimentos-grid" id="bloco4"></div>
-    <div style="margin-bottom:64px;"></div>
+    <!-- B4 -->
+    <div class="sec-lbl" id="b4-lbl">Movimentos do ciclo</div>
+    <div class="b4" id="b4"></div>
+    <div style="margin-bottom:56px"></div>
 
-    <!-- BLOCO 5: DRILL -->
-    <div class="drill-section" id="bloco5">
-      <div class="drill-header" onclick="toggleDrill()">
-        <div class="drill-header-left">
-          <div>
-            <div class="drill-header-title">Explorar indicadores</div>
-            <div class="drill-header-sub" id="drill-sub">Todos os indicadores do ciclo</div>
-          </div>
+    <!-- B5 -->
+    <div class="b5">
+      <div class="drill-hd" onclick="toggleDrill()">
+        <div class="drill-hd-l">
+          <div class="drill-hd-ttl">Explorar indicadores</div>
+          <div class="drill-hd-sub" id="drill-sub">Detalhamento por indicador</div>
         </div>
-        <span class="drill-chevron" id="drill-chevron">&#8964;</span>
+        <span class="drill-chev" id="drill-chev">&#8964;</span>
       </div>
       <div class="drill-body" id="drill-body">
         <div class="drill-filters" id="drill-filters"></div>
-        <div class="drill-table-wrap">
-          <table class="drill-table" id="drill-table">
-            <thead>
-              <tr>
-                <th>Indicador</th>
-                <th>Eixo</th>
-                <th>Diretoria</th>
-                <th>Desempenho</th>
-                <th>Status</th>
-              </tr>
-            </thead>
+        <div class="drill-tbl-wrap">
+          <table class="dtbl">
+            <thead><tr>
+              <th>Indicador</th>
+              <th>Eixo</th>
+              <th>Diretoria</th>
+              <th>Resultado 2025</th>
+              <th>Acum. 2026</th>
+              <th>Tendência YoY</th>
+              <th>Status 2025</th>
+            </tr></thead>
             <tbody id="drill-tbody"></tbody>
           </table>
         </div>
       </div>
     </div>
-
-  </div><!-- /page-body -->
+  </div>
 </main>
 
-<footer class="hub-footer">
+<footer class="footer">
   <span>Gabinete da Presidência / HUB COMLURB &nbsp;·&nbsp; Núcleo de Inteligência e Gestão Estratégica Operacional</span>
   <span>Greicy Moreira</span>
 </footer>
 
 <script>
-// ── CONFIG ──────────────────────────────────────────────────────────────────
+// ── CONFIGURAÇÃO ─────────────────────────────────────────────────────────────
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQphrIIjiY4aWBONgByLezMnFk8YbyYpF-vtgxOLoV8-85_WUVAXH_f_Ahy8ymxmgnGXmQ_KiFSOkIK/pub?gid=1044100274&single=true&output=csv';
 
-// Mapeamento de eixos corporativos
-const EIXO_MAP = {
-  'pessoas':        'Pessoas',
-  'segurança':      'Segurança',
-  'seguranca':      'Segurança',
-  'operação':       'Operação',
-  'operacao':       'Operação',
-  'atendimento':    'Atendimento',
-  'sustentabilidade':'Sustentabilidade',
-  'receita':        'Receita',
-  'financeiro':     'Receita',
-  'financeira':     'Receita',
-};
+// Mapeamento de eixo estratégico por indicador (nome normalizado)
+// Eixo NÃO vem da planilha — calculado aqui
+const EIXO_RULES = [
+  { eixo: 'Pessoas',         termos: ['absenteísmo','absenteismo','licença','licenca','afastamento','quadro','funcionario','funcionário','rh','gestao de pessoas'] },
+  { eixo: 'Segurança',       termos: ['acidente','acidente de trabalho','epi','frequência de acidente','gravidade','segurança','seguranca','taxa de freq'] },
+  { eixo: 'Operação',        termos: ['ipl','ipr','índice padrão de limpeza','índice padrão de roçada','desvio padrão','frota','coleta domiciliar','remoção de lixo','utilização da frota','performance de atendimento de capina','performance de atendimento da remoção','tempo médio de atendimento','capina em logradouro','varrição','varicao'] },
+  { eixo: 'Atendimento',     termos: ['1746','ouvidoria','reclamação','reclamacao','solicitação','solicitacao','atendimento'] },
+  { eixo: 'Sustentabilidade',termos: ['reciclagem','reciclavel','recicl','resíduo','residuo','ecoponto','destinação','destinacao','compostagem','triagem'] },
+  { eixo: 'Receita',         termos: ['receita','arrecadação','arrecadacao','orçamento','orcamento','contrato','inadimplência','inadimplencia','execução','execucao financeira'] },
+];
 
-const EIXOS = ['Pessoas','Segurança','Operação','Atendimento','Sustentabilidade','Receita'];
-
-// Estado global
-let ALL_DATA = [];
-let FILTERED = [];
-let CURRENT_EIXO = 'Todos';
-
-// ── HELPERS ──────────────────────────────────────────────────────────────────
-function norm(s){ return String(s||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
-function pct(v){ return v == null ? null : Math.round(Number(v)); }
-function delta(v){ return v==null?'—':(v>0?`▲ ${v} pp`:(v<0?`▼ ${Math.abs(v)} pp`:`= estável`)); }
-function statusColor(r){
-  if(r==null) return 'flat';
-  if(r>=100) return 'green';
-  if(r>=85)  return 'amber';
-  return 'red';
-}
-function statusLabel(r){
-  if(r==null) return '—';
-  if(r>=100) return 'Meta atingida';
-  if(r>=85)  return 'Atenção';
-  return 'Crítico';
+function norm(s){ return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim(); }
+function toFloat(s){
+  if(s==null||s===''||s==='-') return null;
+  const n = parseFloat(String(s).replace(/\./g,'').replace(',','.'));
+  return isNaN(n) ? null : n;
 }
 
-// ── MAP EIXO ──────────────────────────────────────────────────────────────────
-function detectEixo(row){
-  // Tenta coluna EIXO, DIRETORIA, ÁREA etc.
-  const candidates = [row['EIXO'],row['Eixo'],row['eixo'],row['DIRETORIA'],row['Diretoria'],row['AREA'],row['Área'],row['TEMA'],row['Tema']];
-  for(const c of candidates){
-    if(!c) continue;
-    const k = norm(c);
-    for(const [pat,val] of Object.entries(EIXO_MAP)){
-      if(k.includes(pat)) return val;
+function detectEixo(indicador){
+  const n = norm(indicador);
+  for(const r of EIXO_RULES){
+    for(const t of r.termos){
+      if(n.includes(norm(t))) return r.eixo;
     }
-    // fallback: retorna capitalizado se reconhecível
-    for(const e of EIXOS) if(k.includes(norm(e))) return e;
   }
   return 'Outros';
 }
 
-// ── INIT ─────────────────────────────────────────────────────────────────────
-async function init(){
+// ── ESTADO ────────────────────────────────────────────────────────────────────
+let IND = [];   // indicadores processados
+let DRILL_EIXO = 'Todos';
+
+// ── CARREGAR ──────────────────────────────────────────────────────────────────
+async function load(){
+  show('loading'); hide('page');
   try {
-    const resp = await fetch(CSV_URL);
-    if(!resp.ok) throw new Error(`HTTP ${resp.status}`);
-    const text = await resp.text();
-    Papa.parse(text, {
-      header: true,
-      skipEmptyLines: true,
-      complete: r => { processData(r.data); }
+    const res = await fetch(CSV_URL);
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const txt = await res.text();
+    if(!txt || txt.length < 50) throw new Error('Arquivo vazio ou inacessível');
+    Papa.parse(txt, {
+      header:true, skipEmptyLines:true,
+      complete: r => process(r.data),
+      error: e => showErr('Erro ao interpretar CSV: '+e.message)
     });
   } catch(e){
-    showError('Erro ao carregar planilha: '+e.message+'. Exibindo dados demonstrativos.');
-    loadDemo();
+    showErr('Não foi possível carregar os dados da planilha.<br>Verifique se o link está publicado corretamente (Arquivo → Publicar na Web).<br><em>Detalhe: '+e.message+'</em>');
   }
 }
 
-// ── DEMO DATA ────────────────────────────────────────────────────────────────
-function loadDemo(){
-  ALL_DATA = [
-    {INDICADOR:'Absenteísmo',EIXO:'Pessoas',DIRETORIA:'DAF',REALIZADO:94,META:95,REALIZADO_ANT:91,META_ANT:95},
-    {INDICADOR:'Taxa de rotatividade',EIXO:'Pessoas',DIRETORIA:'DAF',REALIZADO:88,META:90,REALIZADO_ANT:90,META_ANT:90},
-    {INDICADOR:'Horas de capacitação',EIXO:'Pessoas',DIRETORIA:'DAF',REALIZADO:102,META:100,REALIZADO_ANT:97,META_ANT:100},
-    {INDICADOR:'Taxa de frequência acidentes',EIXO:'Segurança',DIRETORIA:'DTE',REALIZADO:72,META:90,REALIZADO_ANT:81,META_ANT:90},
-    {INDICADOR:'Taxa de gravidade acidentes',EIXO:'Segurança',DIRETORIA:'DTE',REALIZADO:68,META:90,REALIZADO_ANT:76,META_ANT:90},
-    {INDICADOR:'EPIs distribuídos',EIXO:'Segurança',DIRETORIA:'DTE',REALIZADO:98,META:100,REALIZADO_ANT:96,META_ANT:100},
-    {INDICADOR:'IPL Médio',EIXO:'Operação',DIRETORIA:'DSU',REALIZADO:87,META:90,REALIZADO_ANT:85,META_ANT:90},
-    {INDICADOR:'Coleta domiciliar',EIXO:'Operação',DIRETORIA:'DSU',REALIZADO:96,META:95,REALIZADO_ANT:94,META_ANT:95},
-    {INDICADOR:'Capina e conservação',EIXO:'Operação',DIRETORIA:'DSU',REALIZADO:79,META:90,REALIZADO_ANT:82,META_ANT:90},
-    {INDICADOR:'Remoção gratuita',EIXO:'Atendimento',DIRETORIA:'DLU',REALIZADO:65,META:90,REALIZADO_ANT:70,META_ANT:90},
-    {INDICADOR:'Poda de árvores',EIXO:'Atendimento',DIRETORIA:'DLU',REALIZADO:71,META:90,REALIZADO_ANT:74,META_ANT:90},
-    {INDICADOR:'1746 – prazo encerramento',EIXO:'Atendimento',DIRETORIA:'DLU',REALIZADO:82,META:95,REALIZADO_ANT:79,META_ANT:95},
-    {INDICADOR:'Reciclagem RSU',EIXO:'Sustentabilidade',DIRETORIA:'DTE',REALIZADO:104,META:100,REALIZADO_ANT:101,META_ANT:100},
-    {INDICADOR:'Ecopontos ativos',EIXO:'Sustentabilidade',DIRETORIA:'DTE',REALIZADO:108,META:100,REALIZADO_ANT:102,META_ANT:100},
-    {INDICADOR:'Resíduo desviado aterro',EIXO:'Sustentabilidade',DIRETORIA:'DTE',REALIZADO:100,META:100,REALIZADO_ANT:98,META_ANT:100},
-    {INDICADOR:'Receita contratos',EIXO:'Receita',DIRETORIA:'DAF',REALIZADO:93,META:100,REALIZADO_ANT:90,META_ANT:100},
-    {INDICADOR:'Inadimplência',EIXO:'Receita',DIRETORIA:'DAF',REALIZADO:85,META:90,REALIZADO_ANT:88,META_ANT:90},
-    {INDICADOR:'Execução orçamentária',EIXO:'Receita',DIRETORIA:'DAF',REALIZADO:91,META:95,REALIZADO_ANT:89,META_ANT:95},
-  ].map(d => ({...d, RESULTADO: Math.round((d.REALIZADO/d.META)*100), RESULTADO_ANT: Math.round((d.REALIZADO_ANT/d.META_ANT)*100)}));
-  processData(ALL_DATA, true);
-}
+function reload(){ IND=[]; DRILL_EIXO='Todos'; load(); }
 
-// ── PROCESS ───────────────────────────────────────────────────────────────────
-function processData(rows, precomputed = false){
-  if(!precomputed){
-    ALL_DATA = rows.map(r => {
-      // detecta nomes de colunas comuns
-      const find = (...keys) => { for(const k of keys){ const v=r[k]; if(v!=null&&v!=='') return v; } return null; };
-      const indicador = find('INDICADOR','Indicador','indicador','NOME','Nome','DESCRIÇÃO','Descricao','Descrição') || '—';
-      const eixo      = detectEixo(r);
-      const diretoria = find('DIRETORIA','Diretoria','ÁREA','Area','SUPERINTENDENCIA','Superintendência') || '—';
-      const realizado = parseFloat(String(find('REALIZADO','Realizado','RESULTADO','Resultado','VALOR','Valor')||'').replace(',','.'));
-      const meta      = parseFloat(String(find('META','Meta','meta')||'').replace(',','.')) || 100;
-      const realizado_ant = parseFloat(String(find('REALIZADO_ANT','Realizado_Ant','REALIZADO_ANTERIOR','Realizado Anterior')||'').replace(',','.'));
-      const meta_ant  = parseFloat(String(find('META_ANT','Meta_Ant','META_ANTERIOR','Meta Anterior')||'').replace(',','.')) || meta;
-      const resultado = (!isNaN(realizado)&&!isNaN(meta)&&meta>0) ? Math.round((realizado/meta)*100) : null;
-      const resultado_ant = (!isNaN(realizado_ant)&&!isNaN(meta_ant)&&meta_ant>0) ? Math.round((realizado_ant/meta_ant)*100) : null;
-      return { INDICADOR:indicador, EIXO:eixo, DIRETORIA:diretoria,
-               REALIZADO:realizado, META:meta, RESULTADO:resultado,
-               REALIZADO_ANT:realizado_ant, META_ANT:meta_ant, RESULTADO_ANT:resultado_ant,
-               _raw: r };
+// ── PROCESSAR ─────────────────────────────────────────────────────────────────
+function process(rows){
+  const MESES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+
+  // Separar por ano, somente nível COMLURB (corporativo)
+  const corp = rows.filter(r => (r['Diretoria']||'').trim() === 'COMLURB');
+
+  // Indexar por indicador+ano
+  const idx = {};
+  for(const r of corp){
+    const ano = parseInt(r['Ano']);
+    const ind = (r['Indicador']||'').trim();
+    if(!ind || !ano) continue;
+    if(!idx[ind]) idx[ind] = {};
+    idx[ind][ano] = {
+      acumulado: toFloat(r['Acumulado']),
+      meta:      toFloat(r['Meta']),
+      sentido:   (r['Sentido']||'').trim(),
+      meses:     MESES.reduce((o,m)=>{ o[m]=toFloat(r[m]); return o; }, {})
+    };
+  }
+
+  IND = [];
+
+  for(const [indicador, anos] of Object.entries(idx)){
+    const d25 = anos[2025] || null;
+    const d26 = anos[2026] || null;
+    const d24 = anos[2024] || null;
+
+    // Sentido: usar 2025 ou 2024
+    const sentido = (d25||d26||d24||{}).sentido || '↑';
+
+    // Status: baseado em acumulado 2025 vs meta 2025
+    let status = 'sem_meta';
+    let pct_meta = null;
+    if(d25 && d25.meta != null && d25.acumulado != null){
+      if(sentido === '↑'){
+        pct_meta = d25.meta > 0 ? Math.round((d25.acumulado/d25.meta)*100) : null;
+        status = d25.acumulado >= d25.meta ? 'dentro' : 'abaixo';
+      } else {
+        // sentido ↓: menor é melhor. pct_meta: 100% = exatamente na meta
+        pct_meta = d25.acumulado > 0 ? Math.round((d25.meta/d25.acumulado)*100) : null;
+        status = d25.acumulado <= d25.meta ? 'dentro' : 'abaixo';
+      }
+    }
+
+    // Tendência YoY: comparar Q1 (meses com dados) 2026 vs 2025
+    let tendencia = 'insuficiente';
+    if(d25 && d26){
+      const mQ = MESES.filter(m => d26.meses[m]!=null && d25.meses[m]!=null);
+      if(mQ.length >= 1){
+        const avg25 = mQ.reduce((s,m)=>s+d25.meses[m],0)/mQ.length;
+        const avg26 = mQ.reduce((s,m)=>s+d26.meses[m],0)/mQ.length;
+        const delta = avg26 - avg25;
+        const thr = Math.abs(avg25) * 0.03 || 0.1; // tolerância 3%
+        if(sentido === '↑'){
+          tendencia = delta > thr ? 'favoravel' : delta < -thr ? 'desfavoravel' : 'estavel';
+        } else {
+          tendencia = delta < -thr ? 'favoravel' : delta > thr ? 'desfavoravel' : 'estavel';
+        }
+      }
+    }
+
+    // Variação absoluta acumulado 2026 vs 2025
+    let varAcum = null;
+    if(d25 && d25.acumulado!=null && d26 && d26.acumulado!=null){
+      varAcum = d26.acumulado - d25.acumulado;
+    }
+
+    IND.push({
+      indicador, sentido, status, pct_meta,
+      acum25: d25 ? d25.acumulado : null,
+      meta25: d25 ? d25.meta : null,
+      acum26: d26 ? d26.acumulado : null,
+      tendencia, varAcum,
+      eixo: detectEixo(indicador)
     });
   }
-  renderAll();
-}
 
-// ── RENDER ALL ────────────────────────────────────────────────────────────────
-function renderAll(){
-  // Timestamp
-  const now = new Date();
-  document.getElementById('ts-label').textContent = now.toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'});
-  document.getElementById('cycle-badge').textContent = `Ciclo ${now.getMonth()<6?'1':'2'}/${now.getFullYear()}`;
-
-  renderBloco1();
-  renderBloco2();
-  renderBloco3();
-  renderBloco4();
-  renderDrill();
-
-  document.getElementById('loading').style.display = 'none';
-  document.getElementById('page-body').style.display = 'block';
-}
-
-// ── BLOCO 1 ───────────────────────────────────────────────────────────────────
-function renderBloco1(){
-  const valid = ALL_DATA.filter(d => d.RESULTADO != null);
-  const total = valid.length;
-  if(total === 0) return;
-
-  const nMeta   = valid.filter(d => d.RESULTADO >= 100).length;
-  const nAbaixo = valid.filter(d => d.RESULTADO >= 85 && d.RESULTADO < 100).length;
-  const nCrit   = valid.filter(d => d.RESULTADO < 85).length;
-  const pctMeta = Math.round((nMeta/total)*100);
-
-  // delta anterior
-  const validAnt = ALL_DATA.filter(d => d.RESULTADO_ANT != null);
-  const pctAnt   = validAnt.length ? Math.round((validAnt.filter(d=>d.RESULTADO_ANT>=100).length/validAnt.length)*100) : null;
-  const diff     = pctAnt != null ? pctMeta - pctAnt : null;
-
-  const color = pctMeta >= 70 ? 'green' : pctMeta >= 50 ? 'amber' : 'red';
-  const el = document.getElementById('h-pct');
-  el.textContent = pctMeta + '%';
-  el.className = 'hero-number ' + color;
-
-  const dEl = document.getElementById('h-delta');
-  if(diff != null){
-    dEl.textContent = diff > 0 ? `▲ ${diff} pp ciclo anterior` : diff < 0 ? `▼ ${Math.abs(diff)} pp ciclo anterior` : `= estável`;
-    dEl.className = 'hero-delta ' + (diff>0?'up':diff<0?'down':'flat');
-  }
-
-  document.getElementById('h-criticos').textContent = nCrit;
-  document.getElementById('h-criticos').className = 'meta-stat-n ' + (nCrit===0?'green':nCrit<=3?'amber':'red');
-
-  document.getElementById('h-superados').textContent = nMeta;
-  document.getElementById('h-superados').className = 'meta-stat-n ' + (nMeta/total>=0.6?'green':'amber');
-}
-
-// ── BLOCO 2 ───────────────────────────────────────────────────────────────────
-function renderBloco2(){
-  // Calcula desempenho por eixo
-  const eixoStats = {};
-  for(const e of EIXOS) eixoStats[e] = {total:0,meta:0,desvios:0,soma:0,indicators:[]};
-  eixoStats['Outros'] = {total:0,meta:0,desvios:0,soma:0,indicators:[]};
-
-  for(const d of ALL_DATA){
-    if(d.RESULTADO == null) continue;
-    const e = eixoStats[d.EIXO] ? d.EIXO : 'Outros';
-    eixoStats[e].total++;
-    eixoStats[e].soma += d.RESULTADO;
-    if(d.RESULTADO >= 100) eixoStats[e].meta++;
-    else eixoStats[e].desvios++;
-    eixoStats[e].indicators.push(d);
-  }
-
-  // Calcula média e classifica
-  const ranked = Object.entries(eixoStats)
-    .filter(([,s]) => s.total > 0)
-    .map(([name, s]) => ({
-      name,
-      avg: Math.round(s.soma / s.total),
-      desvios: s.desvios,
-      meta: s.meta,
-      total: s.total,
-      color: s.soma/s.total >= 100 ? 'green' : s.soma/s.total >= 85 ? 'amber' : 'red'
-    }))
-    .sort((a,b) => a.avg - b.avg); // pior primeiro
-
-  const worst  = ranked.slice(0,2);
-  const best   = ranked.slice(-1);
-  const temas  = [...worst, ...best].slice(0,3);
-
-  const TEMA_CONTEXT = {
-    'Pessoas':         'Gestão de pessoas, absenteísmo e capacitação de equipes.',
-    'Segurança':       'Segurança do trabalho, acidentes e uso de equipamentos.',
-    'Operação':        'Serviços de campo: coleta, capina, varrição e conservação.',
-    'Atendimento':     'Respostas ao cidadão, prazos e serviços demandados via 1746.',
-    'Sustentabilidade':'Reciclagem, destinação de resíduos e ecopontos.',
-    'Receita':         'Contratos, execução orçamentária e inadimplência.',
-    'Outros':          'Indicadores transversais e multidiretorias.',
-  };
-
-  const html = temas.map((t,i) => {
-    const eyebrow = i < worst.length ? 'Atenção requerida' : 'Destaque positivo';
-    const summary = i < worst.length
-      ? `${t.desvios} indicador${t.desvios>1?'es':''} abaixo da meta. Desempenho médio: ${t.avg}%. ${TEMA_CONTEXT[t.name]||''}`
-      : `Melhor desempenho do período. Meta superada de forma consistente. ${TEMA_CONTEXT[t.name]||''}`;
-    const pill = i < worst.length
-      ? `<div class="tema-desvios ${t.color}">${t.desvios} desvio${t.desvios>1?'s':''}</div>`
-      : `<div class="tema-desvios green">&#10003; Acima da meta</div>`;
-    return `<div class="tema-card">
-      <div class="tema-status-bar ${t.color}"></div>
-      <div class="tema-eyebrow">${eyebrow}</div>
-      <div class="tema-name">${t.name}</div>
-      <div class="tema-summary">${summary}</div>
-      ${pill}
-    </div>`;
-  }).join('');
-
-  document.getElementById('bloco2').innerHTML = html;
-}
-
-// ── BLOCO 3 ───────────────────────────────────────────────────────────────────
-function renderBloco3(){
-  const eixoAvg = {};
-  for(const e of EIXOS){ eixoAvg[e] = {soma:0,n:0}; }
-  for(const d of ALL_DATA){
-    if(d.RESULTADO == null || !eixoAvg[d.EIXO]) continue;
-    eixoAvg[d.EIXO].soma += d.RESULTADO;
-    eixoAvg[d.EIXO].n++;
-  }
-
-  const html = EIXOS.map(e => {
-    const s = eixoAvg[e];
-    const avg = s.n ? Math.round(s.soma/s.n) : null;
-    const c   = avg == null ? 'flat' : avg >= 100 ? 'green' : avg >= 85 ? 'amber' : 'red';
-    const lbl = avg == null ? '—' : avg >= 100 ? 'Estável' : avg >= 85 ? 'Atenção' : 'Crítico';
-    return `<div class="eixo-card">
-      <div class="eixo-dot ${c}"></div>
-      <div class="eixo-name">${e}</div>
-      <div class="eixo-status ${c}">${lbl}</div>
-    </div>`;
-  }).join('');
-
-  document.getElementById('bloco3').innerHTML = html;
-}
-
-// ── BLOCO 4 ───────────────────────────────────────────────────────────────────
-function renderBloco4(){
-  const comAnt = ALL_DATA.filter(d => d.RESULTADO != null && d.RESULTADO_ANT != null);
-  if(!comAnt.length){
-    // sem histórico: mostra melhores / piores / estáveis do ciclo atual
-    const valid = ALL_DATA.filter(d=>d.RESULTADO!=null).sort((a,b)=>a.RESULTADO-b.RESULTADO);
-    const piores  = valid.slice(0,3);
-    const melhores = valid.slice(-3).reverse();
-    const estaveis = ALL_DATA.filter(d=>d.RESULTADO!=null&&d.RESULTADO>=95&&d.RESULTADO<105).slice(0,3);
-    renderMovCol('Melhorou','green',melhores,'—','up');
-    renderMovCol('Piorou','red',piores,'—','down');
-    renderMovCol('Estável','flat',estaveis,'—','flat');
+  if(!IND.length){
+    showErr('A planilha foi carregada, mas nenhum dado pôde ser processado. Verifique se há linhas com Diretoria = "COMLURB".');
     return;
   }
-  const scored = comAnt.map(d => ({...d, diff: d.RESULTADO - d.RESULTADO_ANT}));
-  const melhorou = scored.filter(d=>d.diff>0).sort((a,b)=>b.diff-a.diff).slice(0,3);
-  const piorou   = scored.filter(d=>d.diff<0).sort((a,b)=>a.diff-b.diff).slice(0,3);
-  const estavel  = scored.filter(d=>d.diff===0).slice(0,3);
 
-  renderMovCol('Melhorou','green',melhorou,'up','up');
-  renderMovCol('Piorou','red',piorou,'down','down');
-  renderMovCol('Estável','flat',estavel,'flat','flat');
+  render();
 }
 
-function renderMovCol(title, colorClass, items, deltaDir){
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function render(){
+  // Timestamp
+  const now = new Date();
+  $('ts-label').textContent = now.toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'});
+  $('cycle-tag').textContent = 'Q1 '+now.getFullYear();
+
+  renderB1();
+  renderB2();
+  renderB3();
+  renderB4();
+  renderDrill();
+
+  hide('loading'); show('page');
+}
+
+// B1 ─ Resultado corporativo
+function renderB1(){
+  const comMeta = IND.filter(d => d.status !== 'sem_meta');
+  const total   = comMeta.length;
+
+  if(!total){
+    $('h-pct').textContent = '—';
+    $('h-lbl').textContent = 'sem metas definidas no ciclo';
+    return;
+  }
+
+  const nDentro = comMeta.filter(d=>d.status==='dentro').length;
+  const nAbaixo = comMeta.filter(d=>d.status==='abaixo').length;
+  // Crítico = abaixo da meta E tendência desfavorável
+  const nCrit   = comMeta.filter(d=>d.status==='abaixo' && d.tendencia==='desfavoravel').length;
+  const pct     = Math.round((nDentro/total)*100);
+  const semMeta = IND.filter(d=>d.status==='sem_meta').length;
+
+  const cor = pct >= 60 ? 'green' : pct >= 40 ? 'amber' : 'red';
+
+  $('h-pct').textContent = pct+'%';
+  $('h-pct').className = 'hero-n '+cor;
+  $('h-lbl').textContent = `${nDentro} de ${total} indicadores dentro da meta (2025)`;
+
+  // Delta: sem ciclo anterior disponível — mostrar contexto 2026
+  const comVar = IND.filter(d=>d.varAcum!=null);
+  if(comVar.length){
+    const melhora = comVar.filter(d=>(d.sentido==='↑'?d.varAcum>0:d.varAcum<0)).length;
+    const dEl = $('h-delta');
+    dEl.textContent = `${melhora} de ${comVar.length} indicadores melhorando em 2026`;
+    dEl.className = 'hero-delta '+(melhora/comVar.length>=.5?'up':'down');
+  } else {
+    $('h-delta').textContent = 'comparativo 2026 indisponível';
+    $('h-delta').className = 'hero-delta flat';
+  }
+
+  // Críticos
+  $('h-crit').textContent = nCrit;
+  $('h-crit').className = 'stat-n '+(nCrit===0?'green':nCrit<=2?'amber':'red');
+  const critNomes = comMeta.filter(d=>d.status==='abaixo'&&d.tendencia==='desfavoravel').map(d=>d.indicador.split(' - ')[0].split('–')[0].trim()).slice(0,2);
+  $('h-crit-sub').innerHTML = critNomes.length ? critNomes.join('<br>') : 'nenhum no momento';
+
+  // Dentro
+  $('h-ok').textContent = nDentro;
+  $('h-ok').className = 'stat-n '+(pct>=60?'green':pct>=40?'amber':'red');
+  $('h-ok-sub').textContent = semMeta ? `+ ${semMeta} sem meta definida` : `de ${total} com meta`;
+}
+
+// B2 ─ Temas para a Presidência
+function renderB2(){
+  // 3 temas: pior (crítico), pior (atenção), melhor
+  const comMeta = IND.filter(d=>d.status!=='sem_meta');
+
+  // Candidatos críticos: abaixo + desfavorável
+  const criticos = comMeta.filter(d=>d.status==='abaixo'&&d.tendencia==='desfavoravel');
+  // Atenção: abaixo mas sem tendência desfavorável, ou dentro com desfavorável
+  const atencao  = comMeta.filter(d=>d.status==='abaixo'&&d.tendencia!=='desfavoravel');
+  // Positivos: dentro + favorável
+  const positivos= comMeta.filter(d=>d.status==='dentro'&&d.tendencia==='favoravel');
+
+  const TEMA_DESC = {
+    'Absenteísmo - Gerenciável':      'Taxa de absenteísmo acima da meta. Impacto direto na capacidade operacional das superintendências.',
+    'Acidente de Trabalho – Típico':  'Volume de acidentes típicos superior à meta anual. Tendência requer atenção da alta gestão.',
+    'Índice Padrão de Limpeza - IPL': 'IPL dentro da meta e em evolução positiva no Q1 2026. Melhor resultado em dois anos.',
+    'Desvio Padrão - IPL Setorial':   'Dispersão entre setores controlada. Convergência entre superintendências em curso.',
+    'Performance de Atendimento de Capina em Logradouro': 'Performance de atendimento de capina superando a meta no Q1 2026. Evolução significativa em relação a 2025.',
+    'Performance de Atendimento da Remoção Gratuita':     'Remoção gratuita com crescimento expressivo no atendimento no Q1 2026.',
+    'Solicitações 1746':              'Volume de solicitações 1746 em crescimento. Demanda cidadã acima do nível de 2025.',
+    'Tempo Médio de Atendimento - Remoção Gratuita': 'Tempo médio de atendimento em redução. Ganho de eficiência operacional confirmado.',
+  };
+
+  function desc(ind){ return TEMA_DESC[ind] || ind; }
+  function eixoInd(ind){ return detectEixo(ind); }
+
+  const temas = [];
+  if(criticos.length){
+    temas.push({ ind: criticos[0], cor:'red', eye:'Ponto crítico', badge: '▼ Abaixo · Piora' });
+  }
+  if(criticos.length>1){
+    temas.push({ ind: criticos[1], cor:'red', eye:'Ponto crítico', badge: '▼ Abaixo · Piora' });
+  } else if(atencao.length){
+    temas.push({ ind: atencao[0], cor:'amber', eye:'Requer atenção', badge: '▼ Abaixo da meta' });
+  }
+  if(positivos.length){
+    temas.push({ ind: positivos[positivos.length-1], cor:'green', eye:'Destaque positivo', badge: '▲ Meta superada' });
+  } else if(comMeta.filter(d=>d.status==='dentro').length){
+    const best = comMeta.filter(d=>d.status==='dentro').sort((a,b)=>(b.pct_meta||0)-(a.pct_meta||0))[0];
+    temas.push({ ind: best, cor:'green', eye:'Destaque do ciclo', badge: '✓ Dentro da meta' });
+  }
+
+  // Garante exatamente 3 (ou menos se não houver dados)
+  while(temas.length < 3 && comMeta.length){
+    const fill = comMeta.find(d=>!temas.find(t=>t.ind===d));
+    if(!fill) break;
+    temas.push({ ind:fill, cor:'amber', eye:'Em monitoramento', badge:'— Em avaliação' });
+  }
+
+  $('b2').innerHTML = temas.slice(0,3).map(t=>`
+    <div class="tema">
+      <div class="tema-bar ${t.cor}"></div>
+      <div class="tema-eye">${t.eye}</div>
+      <div class="tema-nome">${eixoInd(t.ind.indicador)}</div>
+      <div class="tema-txt">${desc(t.ind.indicador)}</div>
+      <div class="tema-badge ${t.cor}">${t.badge}</div>
+    </div>`).join('');
+}
+
+// B3 ─ Mapa corporativo
+function renderB3(){
+  const EIXOS = ['Pessoas','Segurança','Operação','Atendimento','Outros'];
+  // "Outros" abriga Sustentabilidade e Receita se não aparecerem — adaptar conforme dados reais
+
+  // Detectar eixos presentes
+  const presentes = [...new Set(IND.map(d=>d.eixo))];
+  const mostrar = EIXOS.filter(e=>presentes.includes(e));
+  // Adiciona os que estão nos dados mas não na lista fixa
+  for(const e of presentes){ if(!mostrar.includes(e)) mostrar.push(e); }
+
+  $('b3').innerHTML = mostrar.map(e=>{
+    const grupo = IND.filter(d=>d.eixo===e && d.status!=='sem_meta');
+    if(!grupo.length){
+      return `<div class="eixo">
+        <div class="eixo-dot gray"></div>
+        <div class="eixo-nome">${e}</div>
+        <div class="eixo-sit gray">Sem dados</div>
+        <div class="eixo-n">—</div>
+      </div>`;
+    }
+    const nDentro = grupo.filter(d=>d.status==='dentro').length;
+    const nCrit   = grupo.filter(d=>d.status==='abaixo'&&d.tendencia==='desfavoravel').length;
+    const pct     = Math.round((nDentro/grupo.length)*100);
+    const cor     = nCrit>0?'red':pct>=60?'green':'amber';
+    const sit     = nCrit>0?'Crítico':pct>=60?'Estável':'Atenção';
+    return `<div class="eixo">
+      <div class="eixo-dot ${cor}"></div>
+      <div class="eixo-nome">${e}</div>
+      <div class="eixo-sit ${cor}">${sit}</div>
+      <div class="eixo-n">${nDentro}/${grupo.length} metas</div>
+    </div>`;
+  }).join('');
+}
+
+// B4 ─ Movimentos do ciclo
+function renderB4(){
+  const comVar = IND.filter(d=>d.acum25!=null&&d.acum26!=null);
+  if(comVar.length < 2){
+    $('b4-lbl').textContent = 'Movimentos do ciclo (dados 2026 parciais)';
+    // Usar comparação 2024 x 2025 quando disponível
+    const com24 = IND.filter(d=>d.acum25!=null&&d.meta25!=null);
+    renderMovCol('b4','Melhorou','green',com24.filter(d=>d.status==='dentro').slice(0,3),'up');
+    renderMovCol('b4','Piorou','red',com24.filter(d=>d.status==='abaixo'&&d.tendencia==='desfavoravel').slice(0,3),'down');
+    renderMovCol('b4','Estável','flat',com24.filter(d=>d.status==='dentro'&&d.tendencia==='estavel').slice(0,3),'flat');
+    return;
+  }
+
+  $('b4-lbl').textContent = 'Movimentos do ciclo (2025 → 2026)';
+
+  // Melhorou: tendência favorável
+  const melhorou = comVar.filter(d=>d.tendencia==='favoravel')
+    .sort((a,b)=>Math.abs(b.varAcum)-Math.abs(a.varAcum)).slice(0,3);
+  // Piorou: tendência desfavorável
+  const piorou   = comVar.filter(d=>d.tendencia==='desfavoravel')
+    .sort((a,b)=>Math.abs(b.varAcum)-Math.abs(a.varAcum)).slice(0,3);
+  // Estável
+  const estavel  = comVar.filter(d=>d.tendencia==='estavel').slice(0,3);
+
+  $('b4').innerHTML = '';
+  renderMovCol('b4','Melhorou','green',melhorou,'up');
+  renderMovCol('b4','Piorou','red',piorou,'down');
+  renderMovCol('b4','Estável','flat',estavel,'flat');
+}
+
+function renderMovCol(parentId, titulo, cor, items, deltaDir){
   const col = document.createElement('div');
   col.className = 'mov-col';
-  col.innerHTML = `<div class="mov-header">
-    <div class="mov-dot ${colorClass}"></div>
-    <div class="mov-title ${colorClass}">${title}</div>
-  </div>`;
-
+  col.innerHTML = `<div class="mov-hd"><div class="mov-dot ${cor}"></div><div class="mov-ttl ${cor}">${titulo}</div></div>`;
   if(!items.length){
-    const empty = document.createElement('div');
-    empty.style.cssText = 'font-size:12px;color:var(--muted);padding:12px 0;';
-    empty.textContent = 'Sem ocorrências no ciclo.';
-    col.appendChild(empty);
+    const e = document.createElement('div');
+    e.className = 'mov-empty';
+    e.textContent = 'Sem ocorrências.';
+    col.appendChild(e);
   } else {
     for(const d of items){
+      const v26 = d.acum26, v25 = d.acum25;
+      const diff = (v26!=null&&v25!=null) ? (v26-v25) : null;
+      const fav  = d.tendencia==='favoravel';
+      const dClass = fav ? 'up' : d.tendencia==='desfavoravel' ? 'down' : 'flat';
+      let dText = '—';
+      if(diff!=null){
+        const abs = Math.abs(diff);
+        const fmt = abs >= 1000 ? abs.toLocaleString('pt-BR',{maximumFractionDigits:0}) : abs.toFixed(abs<10?1:0);
+        dText = (diff>0?'▲ ':'▼ ')+fmt+(d.acum25>100?' unid.':(d.acum25<=2.5?' pp':'%'));
+      }
       const item = document.createElement('div');
       item.className = 'mov-item';
-      const dd = d.diff != null ? d.diff : 0;
-      const dClass = dd > 0 ? 'up' : dd < 0 ? 'down' : 'flat';
-      const dText  = dd > 0 ? `▲ ${dd} pp` : dd < 0 ? `▼ ${Math.abs(dd)} pp` : `= sem alteração`;
-      item.innerHTML = `<div class="mov-item-name">${d.INDICADOR}</div>
-        <div class="mov-item-detail">${d.EIXO} · ${d.DIRETORIA||'—'}</div>
-        <div class="mov-item-delta ${dClass}">${dText}</div>`;
+      item.innerHTML = `<div class="mov-iname">${d.indicador}</div>
+        <div class="mov-idetail">${d.eixo}</div>
+        <div class="mov-idelta ${dClass}">${dText}</div>`;
       col.appendChild(item);
     }
   }
-  document.getElementById('bloco4').appendChild(col);
+  document.getElementById(parentId).appendChild(col);
 }
 
-// ── DRILL ─────────────────────────────────────────────────────────────────────
+// DRILL ────────────────────────────────────────────────────────────────────────
 function renderDrill(){
-  const total = ALL_DATA.filter(d=>d.RESULTADO!=null).length;
-  document.getElementById('drill-sub').textContent = `${total} indicadores · ciclo atual`;
-
-  // Filtros
-  const filtersEl = document.getElementById('drill-filters');
-  const eixosPresentes = ['Todos',...new Set(ALL_DATA.map(d=>d.EIXO).filter(e=>EIXOS.includes(e)))];
-  filtersEl.innerHTML = `<span class="drill-filter-label">Eixo</span>`;
+  $('drill-sub').textContent = `${IND.length} indicadores · base ${new Date().getFullYear()}`;
+  const eixosPresentes = ['Todos',...new Set(IND.map(d=>d.eixo))];
+  $('drill-filters').innerHTML = `<span class="dflt">Eixo</span>`;
   for(const e of eixosPresentes){
     const btn = document.createElement('button');
-    btn.className = 'drill-filter-btn' + (e==='Todos'?' active':'');
+    btn.className = 'fbtn'+(e==='Todos'?' on':'');
     btn.textContent = e;
-    btn.onclick = () => {
-      CURRENT_EIXO = e;
-      filtersEl.querySelectorAll('.drill-filter-btn').forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      renderDrillTable();
-    };
-    filtersEl.appendChild(btn);
+    btn.onclick = ()=>{ DRILL_EIXO=e; $('drill-filters').querySelectorAll('.fbtn').forEach(b=>b.classList.remove('on')); btn.classList.add('on'); renderDrillTable(); };
+    $('drill-filters').appendChild(btn);
   }
   renderDrillTable();
 }
 
 function renderDrillTable(){
-  const data = CURRENT_EIXO === 'Todos'
-    ? ALL_DATA
-    : ALL_DATA.filter(d=>d.EIXO===CURRENT_EIXO);
+  const data = DRILL_EIXO==='Todos' ? IND : IND.filter(d=>d.eixo===DRILL_EIXO);
+  // ordenar: críticos primeiro
+  const sorted = [...data].sort((a,b)=>{
+    const score = d => d.status==='abaixo'&&d.tendencia==='desfavoravel'?0:d.status==='abaixo'?1:d.tendencia==='desfavoravel'?2:3;
+    return score(a)-score(b);
+  });
 
-  const sorted = [...data].filter(d=>d.RESULTADO!=null).sort((a,b)=>a.RESULTADO-b.RESULTADO);
-  const tbody = document.getElementById('drill-tbody');
+  const tbody = $('drill-tbody');
   tbody.innerHTML = '';
-
   for(const d of sorted){
-    const r = d.RESULTADO;
-    const c = statusColor(r);
-    const lbl = statusLabel(r);
+    const cor = d.status==='abaixo'&&d.tendencia==='desfavoravel'?'red': d.status==='abaixo'?'amber': d.status==='dentro'?'green':'gray';
+    const lbl = d.status==='abaixo'&&d.tendencia==='desfavoravel'?'Crítico': d.status==='abaixo'?'Abaixo': d.status==='dentro'?'Meta atingida':'Sem meta';
+    const tCor = d.tendencia==='favoravel'?'fav':d.tendencia==='desfavoravel'?'desf':d.tendencia==='estavel'?'est':'ins';
+    const tLbl = d.tendencia==='favoravel'?'▲ Favorável':d.tendencia==='desfavoravel'?'▼ Desfavorável':d.tendencia==='estavel'?'= Estável':'— Insuf.';
+
+    // barra de progresso baseada em pct_meta
+    const pct   = d.pct_meta!=null ? Math.min(d.pct_meta,130) : null;
+    const pctW  = pct!=null ? Math.min(Math.round((pct/130)*100),100) : 0;
+    const barHtml = d.acum25!=null ? `
+      <div class="bar-w">
+        <div class="bar-tr"><div class="bar-fi ${cor}" style="width:${pctW}%"></div></div>
+        <div class="bar-val">${fmtVal(d.acum25)}</div>
+      </div>` : '<span style="color:var(--muted)">—</span>';
+
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td style="max-width:260px;">${d.INDICADOR}</td>
-      <td style="color:var(--muted);">${d.EIXO}</td>
-      <td style="color:var(--muted);">${d.DIRETORIA||'—'}</td>
-      <td style="width:160px;">
-        <div class="bar-mini">
-          <div class="bar-mini-track"><div class="bar-mini-fill ${c}" style="width:${Math.min(r,100)}%"></div></div>
-          <div class="bar-mini-val">${r}%</div>
-        </div>
-      </td>
-      <td><span class="status-pill ${c}">${lbl}</span></td>`;
+    tr.innerHTML = `<td style="max-width:240px;line-height:1.3">${d.indicador}</td>
+      <td style="color:var(--muted)">${d.eixo}</td>
+      <td style="color:var(--muted)">COMLURB</td>
+      <td>${barHtml}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:11px">${d.acum26!=null?fmtVal(d.acum26):'—'}</td>
+      <td><span class="tend-tag ${tCor}">${tLbl}</span></td>
+      <td><span class="spill ${cor}">${lbl}</span></td>`;
     tbody.appendChild(tr);
   }
-
   if(!sorted.length){
-    tbody.innerHTML = `<tr><td colspan="5" style="color:var(--muted);text-align:center;padding:24px;">Nenhum indicador disponível.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:20px">Nenhum indicador.</td></tr>`;
   }
+}
+
+function fmtVal(v){
+  if(v==null) return '—';
+  if(v>=1000) return v.toLocaleString('pt-BR',{maximumFractionDigits:0});
+  if(v>=10)   return v.toLocaleString('pt-BR',{maximumFractionDigits:1});
+  return v.toLocaleString('pt-BR',{maximumFractionDigits:2});
 }
 
 function toggleDrill(){
-  const body = document.getElementById('drill-body');
-  const chev = document.getElementById('drill-chevron');
-  body.classList.toggle('open');
-  chev.classList.toggle('open');
+  $('drill-body').classList.toggle('open');
+  $('drill-chev').classList.toggle('open');
 }
 
-function showError(msg){
-  const el = document.getElementById('error-notice');
-  el.textContent = msg;
-  el.style.display = 'block';
+// ── UTILS ─────────────────────────────────────────────────────────────────────
+function $(id){ return document.getElementById(id); }
+function show(id){ $(id).style.display=''; }
+function hide(id){ $(id).style.display='none'; }
+function showErr(msg){
+  const el = $('err-box');
+  el.innerHTML = msg;
+  el.style.display='block';
+  hide('loading');
+  show('page');
 }
 
-// ── START ─────────────────────────────────────────────────────────────────────
-init();
+// ── INICIAR ───────────────────────────────────────────────────────────────────
+load();
 </script>
 </body>
 </html>
