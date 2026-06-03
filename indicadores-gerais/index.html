@@ -1,320 +1,648 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Radar de Indicadores Gerais | HUB COMLURB</title>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Presidência · COMLURB</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <style>
-:root{
-  --bg:#06111f;--bg2:#081a2e;--panel:#0b1d33;--panel2:#0d243d;
-  --line:#24415f;--line2:#315475;--ink:#f4f7fb;--muted:#98acc4;
-  --blue:#6da5d8;--cyan:#00c2a8;--orange:#e87535;--red:#ef5b68;
-  --green:#2dd48f;--yellow:#e9b84e;--shadow:0 22px 60px rgba(0,0,0,.35);
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=DM+Mono:wght@300;400&display=swap');
+
+:root {
+  --bg:       #06101c;
+  --bg2:      #0b1929;
+  --bg3:      #0f2035;
+  --line:     #162840;
+  --line2:    #1e3350;
+  --text:     #d4e6f7;
+  --muted:    #4d6f8c;
+  --faint:    #1e3350;
+  --blue:     #4a8fd4;
+  --blue-bg:  #0a2040;
+  --green:    #2eb882;
+  --green-bg: #052b1a;
+  --amber:    #d08b28;
+  --amber-bg: #2a1a04;
+  --red:      #d44f4f;
+  --red-bg:   #2a0c0c;
+  --card-r:   12px;
 }
-*{box-sizing:border-box}
-body{
-  margin:0;color:var(--ink);font-family:Inter,Segoe UI,Arial,sans-serif;
-  background:
-    linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),
-    radial-gradient(circle at top right,#123b60 0,#06111f 38%,#050c17 100%);
-  background-size:100% 3px,100% 100%;
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;font-size:14px;line-height:1.6;min-height:100vh}
+
+/* ── TOP BAR ── */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 36px;border-bottom:1px solid var(--line);
+  background:var(--bg);position:sticky;top:0;z-index:100;
 }
-.app{max-width:1880px;margin:auto;padding:22px}
-.top{
-  display:grid;grid-template-columns:280px 1fr 260px;gap:20px;align-items:center;
-  border:1px solid var(--line);border-radius:18px;padding:16px 18px;
-  background:linear-gradient(135deg,rgba(9,25,44,.98),rgba(4,12,24,.96));
-  box-shadow:var(--shadow)
+.topbar-l{display:flex;align-items:center;gap:14px}
+.logo{width:28px;height:28px;background:var(--blue);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;letter-spacing:.5px;flex-shrink:0}
+.page-title{font-size:11px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+.page-title strong{color:var(--text);font-weight:500}
+.topbar-r{display:flex;align-items:center;gap:16px}
+.cycle-tag{background:var(--bg3);border:1px solid var(--line2);padding:3px 12px;border-radius:3px;font-family:'DM Mono',monospace;font-size:10px;color:var(--text);letter-spacing:.06em}
+.ts{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace}
+.rbtn{background:transparent;border:1px solid var(--line2);color:var(--muted);padding:3px 12px;border-radius:3px;font-size:10px;cursor:pointer;transition:all .15s;letter-spacing:.04em}
+.rbtn:hover{border-color:var(--blue);color:var(--blue)}
+
+/* ── LAYOUT ── */
+.main{max-width:1320px;margin:0 auto;padding:40px 36px 80px}
+
+/* ── SEÇÃO ── */
+.sec{margin-bottom:48px}
+.sec-lbl{font-size:9px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.sec-lbl::after{content:'';flex:1;height:1px;background:var(--line)}
+
+/* ── BLOCO HERO (resultado corporativo) ── */
+.hero-strip{
+  display:grid;grid-template-columns:2fr 1fr 1fr;
+  border:1px solid var(--line);border-radius:var(--card-r);overflow:hidden;gap:1px;background:var(--line);
 }
-.logo{width:250px;max-height:70px;object-fit:contain}
-.kicker{font:700 12px/1.2 IBM Plex Mono,Consolas,monospace;letter-spacing:.16em;color:#a9b8cc;text-transform:uppercase}
-h1{margin:6px 0 4px;font-size:34px;letter-spacing:.08em;text-transform:uppercase}
-.sub{color:#c7d4e5;font-size:14px}
-.status{text-align:right;font:600 12px/1.7 IBM Plex Mono,Consolas,monospace;color:#c8d6e8}
-.pill{display:inline-block;border:1px solid var(--line);border-radius:9px;padding:7px 10px;background:#0d223a;margin-top:6px}
-.nav{display:flex;gap:10px;margin:14px 0}
-.tab{
-  border:1px solid var(--line);background:#0b1d33;color:#dce9f8;border-radius:12px;
-  padding:10px 14px;font-weight:900;cursor:pointer
-}
-.tab.active{border-color:var(--orange);background:#102842;color:#fff}
-.filters{
-  display:grid;grid-template-columns:.6fr 1fr 1.1fr 1fr 1.4fr 150px;gap:12px;
-  border:1px solid var(--line);border-radius:16px;padding:12px;margin-bottom:12px;background:rgba(8,23,40,.92)
-}
-.field,.btn{background:#10243d;border:1px solid #203b58;border-radius:10px;padding:9px 11px}
-label{display:block;font-size:11px;color:#a9b8cc;margin-bottom:6px}
-select{width:100%;background:transparent;border:0;color:#fff;font-weight:800;outline:0}
-select option{background:#0b1d33;color:#fff}
-.btn{color:#fff;font-weight:900;cursor:pointer;border-color:#3d5f82}
-.insights{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:14px}
+.hero-cell{background:var(--bg2);padding:40px 44px 36px}
+.hero-cell.main-cell{padding:44px 52px 40px}
+.hero-big{font-size:76px;font-weight:300;line-height:1;letter-spacing:-3px;font-variant-numeric:tabular-nums}
+.hero-big.green{color:var(--green)}
+.hero-big.amber{color:var(--amber)}
+.hero-big.red{color:var(--red)}
+.hero-sub{font-size:13px;color:var(--muted);margin-top:10px;line-height:1.4}
+.hero-delta{display:inline-flex;align-items:center;gap:5px;font-size:11px;margin-top:20px;font-family:'DM Mono',monospace;padding:4px 10px;border-radius:3px}
+.hero-delta.up{background:var(--green-bg);color:var(--green)}
+.hero-delta.dn{background:var(--red-bg);color:var(--red)}
+.hero-delta.nt{background:var(--faint);color:var(--muted)}
+.stat-n{font-size:42px;font-weight:300;letter-spacing:-1px;font-variant-numeric:tabular-nums}
+.stat-n.green{color:var(--green)}
+.stat-n.amber{color:var(--amber)}
+.stat-n.red{color:var(--red)}
+.stat-lbl{font-size:12px;color:var(--muted);margin-top:8px}
+.stat-names{font-size:11px;color:var(--muted);margin-top:10px;line-height:1.6;font-family:'DM Mono',monospace}
+
+/* ── GRID DE CARDS ── */
+.cards-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.cards-grid.two{grid-template-columns:repeat(2,1fr)}
+.cards-grid.three{grid-template-columns:repeat(3,1fr)}
+
+/* ── CARD ── */
 .card{
-  min-height:250px;border:1px solid var(--line);border-radius:14px;padding:22px 22px 18px;
-  background:linear-gradient(145deg,rgba(13,35,58,.98),rgba(5,18,33,.98));
-  box-shadow:0 18px 45px rgba(0,0,0,.22);position:relative;overflow:hidden
+  background:var(--bg2);border:1px solid var(--line);border-radius:var(--card-r);
+  padding:28px 28px 24px;position:relative;overflow:hidden;
+  transition:border-color .2s, background .2s;cursor:default;
 }
-.card:after{content:"";position:absolute;inset:0;border-radius:14px;background:radial-gradient(circle at top right,rgba(109,165,216,.12),transparent 38%);pointer-events:none}
-.ico{
-  width:44px;height:44px;border-radius:10px;background:rgba(0,194,168,.16);
-  display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:28px;color:var(--cyan)
+.card:hover{background:var(--bg3);border-color:var(--line2)}
+/* faixa lateral esquerda */
+.card::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:var(--line2);border-radius:2px 0 0 2px;
+  transition:background .2s;
 }
-.card.warn .ico{background:rgba(239,91,104,.16);color:var(--red)}
-.card.orange .ico{background:rgba(232,117,53,.15);color:var(--orange)}
-.card b{display:block;font:800 12px/1.2 IBM Plex Mono,Consolas,monospace;color:#aebbd0;text-transform:uppercase;letter-spacing:.14em;margin-bottom:12px}
-.card strong{display:block;font-size:38px;letter-spacing:.02em;margin-bottom:10px}
-.card p{margin:0;color:#d4e1f1;font-size:14px;line-height:1.55;font-weight:600}
-.tag{display:inline-flex;gap:7px;margin-top:18px;border-radius:7px;padding:6px 9px;background:rgba(0,194,168,.13);color:var(--cyan);font:800 12px IBM Plex Mono,Consolas,monospace}
-.warn .tag{background:rgba(239,91,104,.13);color:#ff7f89}
-.orange .tag{background:rgba(232,117,53,.13);color:#ffa56f}
-.grid{display:grid;grid-template-columns:1.2fr .9fr .9fr;gap:14px}
-.panel{
-  border:1px solid var(--line);border-radius:14px;background:rgba(7,21,37,.94);
-  box-shadow:0 18px 45px rgba(0,0,0,.2);overflow:hidden
+.card.green::before{background:var(--green)}
+.card.amber::before{background:var(--amber)}
+.card.red::before  {background:var(--red)}
+.card.blue::before {background:var(--blue)}
+
+/* eyebrow + ícone */
+.card-top{display:flex;align-items:center;gap:8px;margin-bottom:18px}
+.card-icon{
+  width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;
 }
-.head{padding:15px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px}
-.head h2{margin:0;font-size:13px;text-transform:uppercase;letter-spacing:.12em}
-.hint{font-size:12px;color:#9fb0c7;margin-top:4px}
-.chart{height:330px;padding:12px 18px 18px}
-.execText{padding:18px;color:#dce8f8;line-height:1.7;font-size:14px}
-.chips{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:0 18px 18px}
-.chip{background:#10243d;border:1px solid var(--line);border-radius:10px;padding:11px;text-align:center}
-.chip strong{display:block;font-size:22px;color:#fff}.chip span{font-size:11px;color:#a9b8cc}
-.rankwrap{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
-.rank{padding:14px 18px}
-.row{display:grid;grid-template-columns:24px 1fr 90px 45px;gap:10px;align-items:center;margin:12px 0;color:#dce8f8;font-size:13px}
-.bar{height:8px;background:#10243d;border-radius:10px;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--orange))}
-.tableWrap{max-height:420px;overflow:auto}
-table{width:100%;border-collapse:collapse;font-size:12px;min-width:1100px}
-th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,.08)}
-th{position:sticky;top:0;background:#10243d;color:#c8d6e8;text-align:left;text-transform:uppercase;font-size:10px;letter-spacing:.1em}
-td.num,th.num{text-align:right}
-.page{display:none}.page.active{display:block}
-.footer{margin-top:14px;color:#9fb0c7;font-size:11px;text-align:right}
-@media(max-width:1350px){.insights{grid-template-columns:repeat(3,1fr)}.grid,.rankwrap{grid-template-columns:1fr}.filters{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:760px){.top{grid-template-columns:1fr}.status{text-align:left}.insights,.filters{grid-template-columns:1fr}.card{min-height:auto}}
+.card-icon.green{background:var(--green-bg);color:var(--green)}
+.card-icon.amber{background:var(--amber-bg);color:var(--amber)}
+.card-icon.red  {background:var(--red-bg);  color:var(--red)}
+.card-icon.blue {background:var(--blue-bg); color:var(--blue)}
+.card-icon.gray {background:var(--faint);   color:var(--muted)}
+.card-eye{font-size:9px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}
+.card-eye.green{color:var(--green)}
+.card-eye.amber{color:var(--amber)}
+.card-eye.red  {color:var(--red)}
+.card-eye.blue {color:var(--blue)}
+.card-eye.gray {color:var(--muted)}
+
+/* número principal */
+.card-n{font-size:44px;font-weight:300;line-height:1;letter-spacing:-2px;color:var(--text);font-variant-numeric:tabular-nums;margin-bottom:10px}
+.card-n.green{color:var(--green)}
+.card-n.amber{color:var(--amber)}
+.card-n.red  {color:var(--red)}
+.card-n-unit{font-size:18px;font-weight:300;color:var(--muted);margin-left:2px}
+
+/* texto interpretativo */
+.card-txt{font-size:12px;color:var(--muted);line-height:1.65;margin-bottom:14px}
+.card-txt strong{color:var(--text);font-weight:500}
+
+/* delta rodapé */
+.card-foot{display:flex;align-items:center;gap:6px}
+.card-delta{font-size:10px;font-family:'DM Mono',monospace;padding:3px 8px;border-radius:3px;font-weight:500}
+.card-delta.up  {background:var(--green-bg);color:var(--green)}
+.card-delta.dn  {background:var(--red-bg);  color:var(--red)}
+.card-delta.nt  {background:var(--faint);   color:var(--muted)}
+.card-delta-ctx {font-size:10px;color:var(--muted);letter-spacing:.02em}
+
+/* ── MAPA DE EIXOS ── */
+.mapa{
+  display:grid;grid-template-columns:repeat(5,1fr);
+  border:1px solid var(--line);border-radius:var(--card-r);overflow:hidden;gap:1px;background:var(--line);
+}
+.eixo{background:var(--bg2);padding:22px 16px 18px;text-align:center;transition:background .15s}
+.eixo:hover{background:var(--bg3)}
+.eixo-dot{width:8px;height:8px;border-radius:50%;margin:0 auto 10px}
+.eixo-dot.green{background:var(--green);box-shadow:0 0 7px rgba(46,184,130,.5)}
+.eixo-dot.amber{background:var(--amber);box-shadow:0 0 7px rgba(208,139,40,.5)}
+.eixo-dot.red  {background:var(--red);  box-shadow:0 0 7px rgba(212,79,79,.5)}
+.eixo-dot.gray {background:var(--muted)}
+.eixo-nome{font-size:11px;font-weight:500;color:var(--text);margin-bottom:4px}
+.eixo-sit{font-size:9px;text-transform:uppercase;letter-spacing:.1em;font-weight:600}
+.eixo-sit.green{color:var(--green)}
+.eixo-sit.amber{color:var(--amber)}
+.eixo-sit.red  {color:var(--red)}
+.eixo-sit.gray {color:var(--muted)}
+.eixo-det{font-size:10px;color:var(--muted);margin-top:4px;font-family:'DM Mono',monospace}
+
+/* ── DRILL ── */
+.drill-wrap{border:1px solid var(--line);border-radius:var(--card-r);overflow:hidden}
+.drill-hd{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;background:var(--bg2);cursor:pointer;user-select:none;transition:background .15s}
+.drill-hd:hover{background:var(--bg3)}
+.drill-hd-info{display:flex;flex-direction:column;gap:2px}
+.drill-hd-title{font-size:13px;font-weight:500;color:var(--text)}
+.drill-hd-sub{font-size:11px;color:var(--muted)}
+.drill-chev{font-size:18px;color:var(--muted);transition:transform .2s}
+.drill-chev.open{transform:rotate(180deg)}
+.drill-body{display:none;border-top:1px solid var(--line);background:var(--bg)}
+.drill-body.open{display:block}
+.drill-filters{display:flex;align-items:center;gap:8px;padding:14px 28px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.dflbl{font-size:9px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-right:4px}
+.fbtn{padding:4px 12px;border-radius:3px;border:1px solid var(--line2);background:transparent;color:var(--muted);font-size:10px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .12s;letter-spacing:.02em}
+.fbtn:hover,.fbtn.on{border-color:var(--blue);color:var(--blue);background:var(--blue-bg)}
+.drill-tbl-wrap{overflow-x:auto;padding:0 28px 28px}
+.dtbl{width:100%;border-collapse:collapse;font-size:12px;margin-top:16px}
+.dtbl th{text-align:left;padding:7px 10px;color:var(--muted);font-weight:400;font-size:9px;letter-spacing:.1em;text-transform:uppercase;border-bottom:1px solid var(--line)}
+.dtbl td{padding:9px 10px;border-bottom:1px solid var(--line);color:var(--text);vertical-align:middle}
+.dtbl tr:last-child td{border-bottom:none}
+.dtbl tr:hover td{background:var(--bg2)}
+.pill{display:inline-block;padding:3px 8px;border-radius:3px;font-size:9px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-family:'DM Mono',monospace}
+.pill.green{background:var(--green-bg);color:var(--green)}
+.pill.amber{background:var(--amber-bg);color:var(--amber)}
+.pill.red  {background:var(--red-bg);  color:var(--red)}
+.pill.gray {background:var(--faint);   color:var(--muted)}
+.tend{font-size:10px;font-family:'DM Mono',monospace}
+.tend.fav {color:var(--green)}
+.tend.desf{color:var(--red)}
+.tend.est {color:var(--muted)}
+.brow{height:3px;background:var(--line2);border-radius:2px;min-width:60px;max-width:100px;display:inline-block;vertical-align:middle;margin-right:6px}
+.brow-f{height:100%;border-radius:2px}
+.brow-f.green{background:var(--green)}
+.brow-f.amber{background:var(--amber)}
+.brow-f.red  {background:var(--red)}
+
+/* ── LOADING / ERRO ── */
+.loading{display:flex;align-items:center;justify-content:center;min-height:60vh;flex-direction:column;gap:14px;color:var(--muted);font-size:12px;letter-spacing:.06em}
+.spin{width:24px;height:24px;border:2px solid var(--line2);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.err{background:var(--red-bg);border:1px solid var(--red);color:var(--red);padding:14px 20px;border-radius:8px;font-size:12px;margin-bottom:28px;line-height:1.7;display:none}
+
+/* ── FOOTER ── */
+.footer{border-top:1px solid var(--line);padding:16px 36px;display:flex;align-items:center;justify-content:space-between;font-size:10px;color:var(--faint);letter-spacing:.04em}
 </style>
 </head>
-
 <body>
-<div class="app">
 
-<header class="top">
-  <img class="logo" src="../assets/logos/RIOPREFEITURA Comlurb horizontal branco.png" alt="COMLURB">
-  <div>
-    <div class="kicker">Dashboard Executivo • Indicadores de Desempenho</div>
-    <h1>Radar de Indicadores Gerais</h1>
-    <div class="sub">Visão consolidada dos principais indicadores operacionais, administrativos e estratégicos da COMLURB</div>
+<!-- TOP BAR -->
+<header class="topbar">
+  <div class="topbar-l">
+    <div class="logo">CML</div>
+    <span class="page-title"><strong>COMLURB</strong>&nbsp;·&nbsp;Presidência</span>
   </div>
-  <div class="status">
-    <div id="updated">Atualizando...</div>
-    <span class="pill" id="scope">Carregando base</span>
+  <div class="topbar-r">
+    <span class="ts" id="ts">—</span>
+    <span class="cycle-tag" id="cycle-tag">—</span>
+    <button class="rbtn" onclick="reload()">↺ Atualizar</button>
   </div>
 </header>
 
-<div class="nav">
-  <button class="tab active" onclick="showPage('exec',this)">Executivo</button>
-  <button class="tab" onclick="showPage('analitico',this)">Analítico</button>
-</div>
+<main class="main" id="main">
+  <div class="loading" id="loading"><div class="spin"></div><span>Carregando indicadores</span></div>
 
-<section class="filters">
-  <div class="field"><label>Ano</label><select id="fAno"></select></div>
-  <div class="field"><label>Diretoria</label><select id="fDir"></select></div>
-  <div class="field"><label>Sup./Coord.</label><select id="fSup"></select></div>
-  <div class="field"><label>Eixo</label><select id="fEixo"></select></div>
-  <div class="field"><label>Indicador</label><select id="fInd"></select></div>
-  <button class="btn" onclick="resetFilters()">Limpar filtros</button>
-</section>
+  <div id="page" style="display:none">
+    <div class="err" id="err"></div>
 
-<main id="exec" class="page active">
-  <section class="insights" id="insights"></section>
-
-  <section class="grid">
-    <div class="panel">
-      <div class="head">
-        <div><h2>Evolução mensal do indicador selecionado</h2><div class="hint" id="chartHint">Comparativo mensal</div></div>
+    <!-- RESULTADO CORPORATIVO -->
+    <div class="sec">
+      <div class="sec-lbl">Resultado corporativo</div>
+      <div class="hero-strip">
+        <div class="hero-cell main-cell">
+          <div class="hero-big" id="h-pct">—</div>
+          <div class="hero-sub" id="h-sub">—</div>
+          <div class="hero-delta nt" id="h-delta">—</div>
+        </div>
+        <div class="hero-cell">
+          <div class="stat-n" id="h-crit-n">—</div>
+          <div class="stat-lbl">indicadores críticos</div>
+          <div class="stat-names" id="h-crit-names">—</div>
+        </div>
+        <div class="hero-cell">
+          <div class="stat-n" id="h-ok-n">—</div>
+          <div class="stat-lbl">dentro da meta</div>
+          <div class="stat-names" id="h-ok-names">—</div>
+        </div>
       </div>
-      <div class="chart"><canvas id="lineChart"></canvas></div>
     </div>
 
-    <div class="panel">
-      <div class="head"><div><h2>Leitura Executiva</h2><div class="hint">Síntese automática do recorte atual</div></div></div>
-      <div class="execText" id="execText"></div>
-      <div class="chips" id="chips"></div>
+    <!-- DESTAQUES DO CICLO -->
+    <div class="sec">
+      <div class="sec-lbl">Destaques do ciclo · Jan–Mar 2026 vs 2025</div>
+      <div class="cards-grid" id="cards-destaques"></div>
     </div>
 
-    <div class="panel">
-      <div class="head"><div><h2>Resumo por eixo</h2><div class="hint">Composição da carteira monitorada</div></div></div>
-      <div class="chart"><canvas id="donutChart"></canvas></div>
+    <!-- PONTOS DE ATENÇÃO -->
+    <div class="sec">
+      <div class="sec-lbl">Pontos de atenção</div>
+      <div class="cards-grid" id="cards-atencao"></div>
     </div>
-  </section>
 
-  <section class="rankwrap">
-    <div class="panel">
-      <div class="head"><div><h2>Ranking 1746</h2><div class="hint">Principais demandas</div></div></div>
-      <div class="rank" id="rank1746"></div>
+    <!-- MAPA CORPORATIVO -->
+    <div class="sec">
+      <div class="sec-lbl">Mapa corporativo</div>
+      <div class="mapa" id="mapa"></div>
     </div>
-    <div class="panel">
-      <div class="head"><div><h2>Ranking Ouvidoria</h2><div class="hint">Principais categorias</div></div></div>
-      <div class="rank" id="rankOuvidoria"></div>
+
+    <!-- DRILL -->
+    <div class="sec">
+      <div class="drill-wrap">
+        <div class="drill-hd" onclick="toggleDrill()">
+          <div class="drill-hd-info">
+            <div class="drill-hd-title">Explorar todos os indicadores</div>
+            <div class="drill-hd-sub" id="drill-sub">—</div>
+          </div>
+          <span class="drill-chev" id="drill-chev">&#8964;</span>
+        </div>
+        <div class="drill-body" id="drill-body">
+          <div class="drill-filters" id="drill-filters"></div>
+          <div class="drill-tbl-wrap">
+            <table class="dtbl">
+              <thead><tr>
+                <th>Indicador</th><th>Eixo</th>
+                <th>Acum. 2025</th><th>Meta 2025</th>
+                <th>Acum. 2026</th><th>Var. YoY</th>
+                <th>Tendência</th><th>Status</th>
+              </tr></thead>
+              <tbody id="drill-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
-  </section>
+  </div>
 </main>
 
-<main id="analitico" class="page">
-  <section class="grid" style="grid-template-columns:1fr 1fr">
-    <div class="panel">
-      <div class="head"><div><h2>Indicadores por status</h2><div class="hint">Dentro da meta, abaixo da meta e sem meta</div></div></div>
-      <div class="chart"><canvas id="statusChart"></canvas></div>
-    </div>
-    <div class="panel">
-      <div class="head"><div><h2>Indicadores por diretoria</h2><div class="hint">Volume de indicadores no recorte atual</div></div></div>
-      <div class="chart"><canvas id="dirChart"></canvas></div>
-    </div>
-  </section>
-
-  <section class="panel" style="margin-top:14px">
-    <div class="head">
-      <div><h2>Base analítica</h2><div class="hint">Registros carregados da planilha publicada</div></div>
-      <div class="pill" id="tableCount">—</div>
-    </div>
-    <div class="tableWrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Ano</th><th>Diretoria</th><th>Sup./Coord.</th><th>Eixo</th><th>Indicador</th>
-            <th class="num">Acumulado</th><th>Unidade</th><th class="num">Meta</th><th>Status</th>
-          </tr>
-        </thead>
-        <tbody id="tableBody"></tbody>
-      </table>
-    </div>
-  </section>
-</main>
-
-<div class="footer">Fonte: Planilha oficial publicada • HUB COMLURB</div>
-</div>
+<footer class="footer">
+  <span>Gabinete da Presidência / HUB COMLURB &nbsp;·&nbsp; Núcleo de Inteligência e Gestão Estratégica Operacional</span>
+  <span>Greicy Moreira</span>
+</footer>
 
 <script>
-const CSV_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vQphrIIjiY4aWBONgByLezMnFk8YbyYpF-vtgxOLoV8-85_WUVAXH_f_Ahy8ymxmgnGXmQ_KiFSOkIK/pub?output=csv';
+const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQphrIIjiY4aWBONgByLezMnFk8YbyYpF-vtgxOLoV8-85_WUVAXH_f_Ahy8ymxmgnGXmQ_KiFSOkIK/pub?gid=1044100274&single=true&output=csv';
 
-let DATA=[], charts={};
-const MONTHS=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+// ── EIXOS ESTRATÉGICOS ────────────────────────────────────────────────────────
+const EIXO_RULES = [
+  { eixo:'Pessoas',          t:['absenteísmo','absenteismo','licença','afastamento'] },
+  { eixo:'Segurança',        t:['acidente de trabalho','acidente','epi','frequência de acidente','gravidade acidente'] },
+  { eixo:'Operação',         t:['ipl','índice padrão de limpeza','ipr','índice padrão de roçada','desvio padrão','frota','coleta domiciliar','remoção de lixo público','utilização da frota','performance de atendimento de capina','performance de atendimento da remoção gratuita','tempo médio de atendimento','capina em logradouro'] },
+  { eixo:'Atendimento',      t:['solicitações 1746','solicitações ouvidoria','1746','ouvidoria'] },
+  { eixo:'Sustentabilidade', t:['reciclagem','resíduo','ecoponto','destinação','compostagem','triagem'] },
+  { eixo:'Receita',          t:['receita','arrecadação','orçamento','contrato','inadimplência','execução financeira'] },
+];
 
-function norm(s){return String(s??'').trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase()}
-function getField(row,names){const ks=Object.keys(row);for(const n of names){const k=ks.find(x=>norm(x)===norm(n));if(k)return row[k]}return''}
-function num(v){if(v===null||v===undefined||v==='')return null;let s=String(v).trim().replace(/[^\d,.\-]/g,'');if(s.includes(',')&&s.includes('.'))s=s.replace(/\./g,'').replace(',','.');else if(s.includes(','))s=s.replace(',','.');const n=Number(s);return Number.isFinite(n)?n:null}
-function fmt(v,u=''){if(v===null||v===undefined||Number.isNaN(v))return'—';if(String(u).includes('%'))return v.toLocaleString('pt-BR',{maximumFractionDigits:1})+'%';if(Math.abs(v)>=1000000)return(v/1000000).toLocaleString('pt-BR',{maximumFractionDigits:1})+' mi';return v.toLocaleString('pt-BR',{maximumFractionDigits:1})}
-function transform(r){
-  const d={
-    Ano:num(getField(r,['Ano','ANO'])),
-    Diretoria:getField(r,['Diretoria','DIRETORIA'])||'COMLURB',
-    Superintendencia:getField(r,['Superintendência','Superintendencia','Sup./Coord.','Coordenação','Coordenacao'])||'Geral',
-    Eixo:getField(r,['Eixo','Tema','Área','Area'])||'Geral',
-    Indicador:getField(r,['Indicador','Nome do Indicador'])||'Indicador',
-    Unidade:getField(r,['Unidade','Medida'])||'',
-    Acumulado:num(getField(r,['Acumulado','Resultado','Valor','Realizado'])),
-    Meta:num(getField(r,['Meta','Alvo'])),
-    StatusManual:getField(r,['Status','Situação','Situacao'])
-  };
-  MONTHS.forEach(m=>d[m]=num(getField(r,[m,m.slice(0,3)])));
-  if(d.Acumulado===null){const vals=MONTHS.map(m=>d[m]).filter(x=>x!==null);if(vals.length)d.Acumulado=vals.at(-1)}
-  return d;
-}
-function statusOf(d){if(d.StatusManual)return d.StatusManual;if(d.Meta===null||d.Acumulado===null)return'Sem meta';return d.Acumulado>=d.Meta?'Dentro da meta':'Abaixo da meta'}
-function val(id){return document.getElementById(id).value}
-function setOptions(id,arr,label,current){
-  const el=document.getElementById(id),old=current??el.value;
-  const vals=[...new Set(arr.filter(x=>x!==null&&x!==undefined&&String(x).trim()!==''))].sort((a,b)=>String(a).localeCompare(String(b),'pt-BR'));
-  el.innerHTML=`<option value="">${label}</option>`+vals.map(v=>`<option value="${String(v).replaceAll('"','&quot;')}">${v}</option>`).join('');
-  if(vals.map(String).includes(String(old)))el.value=old;
-}
-function filtered(ignore=''){
-  const a=val('fAno'),d=val('fDir'),s=val('fSup'),e=val('fEixo'),i=val('fInd');
-  return DATA.filter(x=>(ignore==='ano'||!a||String(x.Ano)===String(a))&&(ignore==='dir'||!d||x.Diretoria===d)&&(ignore==='sup'||!s||x.Superintendencia===s)&&(ignore==='eixo'||!e||x.Eixo===e)&&(ignore==='ind'||!i||x.Indicador===i));
-}
-function updateOptions(){setOptions('fDir',filtered('dir').map(d=>d.Diretoria),'Todas');setOptions('fSup',filtered('sup').map(d=>d.Superintendencia),'Todas');setOptions('fEixo',filtered('eixo').map(d=>d.Eixo),'Todos');setOptions('fInd',filtered('ind').map(d=>d.Indicador),'Todos')}
-function resetFilters(){['fDir','fSup','fEixo','fInd'].forEach(id=>document.getElementById(id).value='');const ys=DATA.map(d=>d.Ano).filter(Boolean);document.getElementById('fAno').value=ys.length?Math.max(...ys):'';updateOptions();render()}
-function chart(id,type,labels,datasets,extra={}){
-  if(charts[id])charts[id].destroy();
-  charts[id]=new Chart(document.getElementById(id),{type,data:{labels,datasets},options:Object.assign({responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#dce8f8'}}},scales:type==='doughnut'?{}:{x:{ticks:{color:'#9fb0c7'},grid:{color:'rgba(255,255,255,.05)'}},y:{ticks:{color:'#9fb0c7'},grid:{color:'rgba(255,255,255,.08)'}}}},extra)});
-}
-function findByName(rows,terms){return rows.find(d=>terms.some(t=>norm(d.Indicador).includes(norm(t))))}
-function deltaText(d){return d&&d.Meta!==null&&d.Acumulado!==null?`${fmt(d.Acumulado-d.Meta,d.Unidade)} vs meta`:''}
+// Textos interpretativos fixos por indicador (para os cards)
+const CARD_CONF = {
+  'Índice Padrão de Limpeza - IPL': {
+    icon:'↑', eye:'Destaque Positivo', cor:'green',
+    txt: '<strong>IPL</strong> atingiu melhor patamar dos últimos 3 anos, crescendo +6,4% vs 2025. Meta superada.',
+    ctx:'vs 2025'
+  },
+  'Performance de Atendimento da Remoção Gratuita': {
+    icon:'!', eye:'Alerta Crítico', cor:'red',
+    txt: '<strong>Remoção Gratuita</strong> abaixo do ideal (59,8%). Recuperação em curso mas necessita atenção urgente.',
+    ctx:'recuperando'
+  },
+  'Solicitações 1746 - Capina': {
+    icon:'▲', eye:'Pressão Crescente', cor:'amber',
+    txt: '<strong>Demandas de Capina</strong> no 1746 explodiram: de 2.238 → 3.268 chamados no trimestre. Sinaliza necessidade de reforço operacional.',
+    ctx:'capina'
+  },
+  'Performance de Atendimento de Capina em Logradouro': {
+    icon:'✓', eye:'Excelência Operacional', cor:'green',
+    txt: '<strong>Atendimento de Capina</strong> praticamente perfeito (+22,8% vs 2025). Meta de 90% amplamente superada.',
+    ctx:'acima da meta'
+  },
+  'Acidente de Trabalho – Típico': {
+    icon:'↓', eye:'Ganho em Segurança', cor:'green',
+    txt: '<strong>Acidentes de Trabalho</strong> caíram drasticamente no Q1 2026 vs Q1 2025. Melhoria significativa nas condições de trabalho.',
+    ctx:'acidentes'
+  },
+  'Índice de Utilização da Frota de Coleta Domiciliar': {
+    icon:'▲', eye:'Eficiência de Frota', cor:'blue',
+    txt: '<strong>Frota de Coleta Domiciliar</strong> com melhor utilização (+14,6% vs 2025). Otimização de rotas e manutenção estão funcionando.',
+    ctx:'vs 2025'
+  },
+  'Absenteísmo - Gerenciável': {
+    icon:'↑', eye:'Atenção — Pessoas', cor:'amber',
+    txt: '<strong>Absenteísmo</strong> acima da meta (2,5% vs meta 1,7%) e piorando no Q1 2026. Impacto direto na capacidade operacional.',
+    ctx:'acima da meta'
+  },
+  'Tempo Médio de Atendimento - Remoção Gratuita': {
+    icon:'↓', eye:'Ganho Operacional', cor:'green',
+    txt: '<strong>Tempo médio de atendimento</strong> da Remoção Gratuita caiu de 18 → 11 dias no Q1. Redução de -38% na espera do cidadão.',
+    ctx:'−38% no tempo'
+  },
+};
 
-function renderInsights(rows){
-  const items=[
-    {t:'Destaque positivo',icon:'↑',cls:'',d:findByName(rows,['IPL','Índice Padrão de Limpeza']),txt:d=>`${d.Indicador} está entre os principais indicadores de acompanhamento executivo no recorte atual.`,tag:d=>deltaText(d)},
-    {t:'Alerta crítico',icon:'⚠',cls:'warn',d:rows.filter(x=>x.Meta!==null&&x.Acumulado!==null&&x.Acumulado<x.Meta).sort((a,b)=>(a.Acumulado-a.Meta)-(b.Acumulado-b.Meta))[0],txt:d=>`${d.Indicador} está abaixo da referência cadastrada e pede acompanhamento gerencial.`,tag:d=>'abaixo da meta'},
-    {t:'Pressão crescente',icon:'▧',cls:'orange',d:findByName(rows,['1746','Capina','Solicitações']),txt:d=>`${d.Indicador} concentra sinal de pressão operacional ou demanda cidadã no período.`,tag:d=>'demanda'},
-    {t:'Excelência operacional',icon:'✓',cls:'',d:rows.filter(x=>x.Meta!==null&&x.Acumulado!==null&&x.Acumulado>=x.Meta).sort((a,b)=>(b.Acumulado-b.Meta)-(a.Acumulado-a.Meta))[0],txt:d=>`${d.Indicador} supera a referência cadastrada e aparece como bom resultado no recorte.`,tag:d=>'acima da meta'},
-    {t:'Ganho em segurança',icon:'♢',cls:'',d:findByName(rows,['Acidente','Segurança']),txt:d=>`${d.Indicador} deve ser acompanhado como sinal de segurança operacional e condição de trabalho.`,tag:d=>'segurança'},
-    {t:'Eficiência de frota',icon:'▣',cls:'',d:findByName(rows,['Frota','Coleta Domiciliar']),txt:d=>`${d.Indicador} resume a utilização de recurso crítico para sustentação da operação diária.`,tag:d=>'frota'}
-  ];
-  document.getElementById('insights').innerHTML=items.map(x=>{
-    const d=x.d;
-    return `<article class="card ${x.cls}">
-      <div class="ico">${x.icon}</div>
-      <b>${x.t}</b>
-      <strong>${d?fmt(d.Acumulado,d.Unidade):'—'}</strong>
-      <p>${d?x.txt(d):'Indicador não encontrado no filtro atual. Ajuste o recorte para visualizar.'}</p>
-      <span class="tag">${d?(x.tag(d)||d.Eixo):'sem dado'}</span>
-    </article>`;
+// ── ESTADO ────────────────────────────────────────────────────────────────────
+let IND = [];
+let DRILL_EIXO = 'Todos';
+
+// ── UTILS ─────────────────────────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+const norm = s => String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+function toFloat(s){
+  if(s==null||s===''||s==='-') return null;
+  const n = parseFloat(String(s).replace(/\./g,'').replace(',','.'));
+  return isNaN(n)?null:n;
+}
+function fmtN(v, unit=''){
+  if(v==null) return '—';
+  if(v>=10000) return v.toLocaleString('pt-BR',{maximumFractionDigits:0})+unit;
+  if(v>=100)   return v.toLocaleString('pt-BR',{maximumFractionDigits:1})+unit;
+  if(v>=10)    return v.toLocaleString('pt-BR',{maximumFractionDigits:1})+unit;
+  return v.toLocaleString('pt-BR',{maximumFractionDigits:2})+unit;
+}
+function fmtPct(v){ return v==null?'—':v.toFixed(1).replace('.',',')+'%'; }
+function detectEixo(ind){
+  const n = norm(ind);
+  for(const r of EIXO_RULES) for(const t of r.t) if(n.includes(norm(t))) return r.eixo;
+  return 'Outros';
+}
+
+// ── LOAD ──────────────────────────────────────────────────────────────────────
+async function load(){
+  $('loading').style.display='flex'; $('page').style.display='none';
+  try{
+    const res = await fetch(CSV_URL);
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const txt = await res.text();
+    if(!txt||txt.length<50) throw new Error('Arquivo vazio');
+    Papa.parse(txt,{header:true,skipEmptyLines:true,
+      complete:r=>process(r.data),
+      error:e=>showErr('Erro ao interpretar CSV: '+e.message)
+    });
+  }catch(e){
+    showErr('Não foi possível carregar os dados.<br>Verifique se a planilha está publicada via <em>Arquivo → Publicar na Web</em>.<br><br><small>'+e.message+'</small>');
+  }
+}
+function reload(){ IND=[]; DRILL_EIXO='Todos'; load(); }
+
+// ── PROCESS ───────────────────────────────────────────────────────────────────
+const MESES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+
+function process(rows){
+  const corp = rows.filter(r=>(r['Diretoria']||'').trim()==='COMLURB');
+  const idx = {};
+  for(const r of corp){
+    const ano = parseInt(r['Ano']); const ind = (r['Indicador']||'').trim();
+    if(!ind||!ano) continue;
+    if(!idx[ind]) idx[ind]={};
+    idx[ind][ano]={
+      acumulado:toFloat(r['Acumulado']), meta:toFloat(r['Meta']),
+      sentido:(r['Sentido']||'').trim(),
+      meses: MESES.reduce((o,m)=>{o[m]=toFloat(r[m]);return o;},{})
+    };
+  }
+
+  IND=[];
+  for(const [indicador,anos] of Object.entries(idx)){
+    const d24=anos[2024]||null, d25=anos[2025]||null, d26=anos[2026]||null;
+    const sentido = (d25||d26||d24||{}).sentido||'↑';
+
+    // Status baseado em acumulado 2025 vs meta 2025
+    let status='sem_meta', pct_meta=null;
+    if(d25&&d25.meta!=null&&d25.acumulado!=null){
+      if(sentido==='↑'){
+        pct_meta = d25.meta>0 ? Math.round((d25.acumulado/d25.meta)*100) : null;
+        status = d25.acumulado>=d25.meta?'dentro':'abaixo';
+      } else {
+        pct_meta = d25.acumulado>0 ? Math.round((d25.meta/d25.acumulado)*100) : null;
+        status = d25.acumulado<=d25.meta?'dentro':'abaixo';
+      }
+    }
+
+    // Q1 médio 2025 e 2026
+    const mQ=['Jan','Fev','Mar'];
+    const q25 = d25 ? mQ.map(m=>d25.meses[m]).filter(v=>v!=null) : [];
+    const q26 = d26 ? mQ.map(m=>d26.meses[m]).filter(v=>v!=null) : [];
+    const avg25 = q25.length ? q25.reduce((a,b)=>a+b,0)/q25.length : null;
+    const avg26 = q26.length ? q26.reduce((a,b)=>a+b,0)/q26.length : null;
+
+    // Var YoY %
+    let varYoy = null;
+    if(avg25!=null&&avg26!=null&&avg25!==0) varYoy=((avg26-avg25)/Math.abs(avg25))*100;
+
+    // Tendência
+    let tendencia='insuficiente';
+    if(avg25!=null&&avg26!=null){
+      const thr = Math.abs(avg25)*0.03||0.1;
+      const delta = avg26-avg25;
+      if(sentido==='↑') tendencia=delta>thr?'favoravel':delta<-thr?'desfavoravel':'estavel';
+      else              tendencia=delta<-thr?'favoravel':delta>thr?'desfavoravel':'estavel';
+    }
+
+    IND.push({
+      indicador, sentido, status, pct_meta,
+      acum24: d24?d24.acumulado:null,
+      acum25: d25?d25.acumulado:null,
+      meta25: d25?d25.meta:null,
+      acum26: d26?d26.acumulado:null,
+      avg25, avg26, varYoy, tendencia,
+      eixo: detectEixo(indicador)
+    });
+  }
+
+  if(!IND.length){ showErr('Nenhum dado encontrado para Diretoria = "COMLURB". Verifique a planilha.'); return; }
+  render();
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function render(){
+  const now=new Date();
+  $('ts').textContent = now.toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'});
+  $('cycle-tag').textContent = 'Jan–Mar '+now.getFullYear();
+  renderHero();
+  renderCards();
+  renderMapa();
+  renderDrill();
+  $('loading').style.display='none'; $('page').style.display='';
+}
+
+// HERO ─────────────────────────────────────────────────────────────────────────
+function renderHero(){
+  const comMeta = IND.filter(d=>d.status!=='sem_meta');
+  const total   = comMeta.length;
+  if(!total){ $('h-pct').textContent='—'; return; }
+
+  const nDentro = comMeta.filter(d=>d.status==='dentro').length;
+  const nCrit   = comMeta.filter(d=>d.status==='abaixo'&&d.tendencia==='desfavoravel').length;
+  const pct     = Math.round((nDentro/total)*100);
+  const cor     = pct>=65?'green':pct>=45?'amber':'red';
+
+  $('h-pct').textContent = pct+'%';
+  $('h-pct').className = 'hero-big '+cor;
+  $('h-sub').textContent = `${nDentro} de ${total} indicadores com meta atingida (base 2025)`;
+
+  // Delta 2026
+  const comVar = IND.filter(d=>d.varYoy!=null);
+  const nMelh  = comVar.filter(d=>d.tendencia==='favoravel').length;
+  if(comVar.length){
+    $('h-delta').textContent = `↑ ${nMelh} de ${comVar.length} indicadores melhorando em 2026`;
+    $('h-delta').className = 'hero-delta '+(nMelh/comVar.length>=.5?'up':'dn');
+  }
+
+  // Críticos
+  const crits = comMeta.filter(d=>d.status==='abaixo'&&d.tendencia==='desfavoravel');
+  $('h-crit-n').textContent = nCrit;
+  $('h-crit-n').className = 'stat-n '+(nCrit===0?'green':nCrit<=2?'amber':'red');
+  $('h-crit-names').innerHTML = crits.slice(0,3).map(d=>d.indicador.split('–')[0].split('-')[0].trim()).join('<br>')||'nenhum';
+
+  // Dentro
+  $('h-ok-n').textContent = nDentro;
+  $('h-ok-n').className = 'stat-n '+(pct>=65?'green':'amber');
+  const okInds = comMeta.filter(d=>d.status==='dentro').map(d=>d.indicador.split('–')[0].split(' - ')[0].trim());
+  $('h-ok-names').innerHTML = okInds.slice(0,3).join('<br>') + (okInds.length>3?`<br>+${okInds.length-3} mais`:'');
+}
+
+// CARDS ────────────────────────────────────────────────────────────────────────
+function renderCards(){
+  // Destaques: indicadores com configuração explícita + tendência favorável
+  const destConf  = ['Índice Padrão de Limpeza - IPL','Performance de Atendimento de Capina em Logradouro','Acidente de Trabalho – Típico','Tempo Médio de Atendimento - Remoção Gratuita'];
+  const atencConf = ['Performance de Atendimento da Remoção Gratuita','Solicitações 1746 - Capina','Absenteísmo - Gerenciável','Índice de Utilização da Frota de Coleta Domiciliar'];
+
+  function buildCard(ind){
+    const d = IND.find(i=>i.indicador===ind);
+    const conf = CARD_CONF[ind];
+    if(!d) return '';
+
+    // Número principal: acum26 se disponível, senão acum25
+    const val    = d.acum26!=null ? d.acum26 : d.acum25;
+    const unit   = d.acum25!=null&&d.acum25<=100 ? '%' : '';
+    const valFmt = val!=null ? fmtN(val, unit) : '—';
+
+    // Delta YoY
+    let deltaHtml = '';
+    if(d.varYoy!=null){
+      const sign  = d.varYoy>0?'+':'';
+      const dCor  = d.tendencia==='favoravel'?'up':d.tendencia==='desfavoravel'?'dn':'nt';
+      const arrow = d.varYoy>0?'▲':'▼';
+      deltaHtml = `<span class="card-delta ${dCor}">${arrow} ${sign}${d.varYoy.toFixed(1).replace('.',',')}%</span>`;
+    }
+    const ctx = conf ? conf.ctx : 'vs 2025';
+    const txt = conf ? conf.txt : `<strong>${ind}</strong>`;
+    const cor = conf ? conf.cor : (d.tendencia==='favoravel'?'green':d.tendencia==='desfavoravel'?'red':'blue');
+    const eye = conf ? conf.eye : d.eixo;
+    const icon= conf ? conf.icon : '·';
+
+    return `<div class="card ${cor}">
+      <div class="card-top">
+        <div class="card-icon ${cor}">${icon}</div>
+        <div class="card-eye ${cor}">${eye}</div>
+      </div>
+      <div class="card-n ${cor}">${valFmt.replace('%','')}<span class="card-n-unit">${unit}</span></div>
+      <div class="card-txt">${txt}</div>
+      <div class="card-foot">
+        ${deltaHtml}
+        <span class="card-delta-ctx">${ctx}</span>
+      </div>
+    </div>`;
+  }
+
+  $('cards-destaques').innerHTML = destConf.map(buildCard).filter(Boolean).join('');
+  $('cards-atencao').innerHTML   = atencConf.map(buildCard).filter(Boolean).join('');
+}
+
+// MAPA ─────────────────────────────────────────────────────────────────────────
+function renderMapa(){
+  const EIXOS=['Pessoas','Segurança','Operação','Atendimento','Outros'];
+  const presentes = [...new Set(IND.map(d=>d.eixo))];
+  const todos = EIXOS.filter(e=>presentes.includes(e));
+  for(const e of presentes) if(!todos.includes(e)) todos.push(e);
+
+  $('mapa').innerHTML = todos.map(e=>{
+    const g = IND.filter(d=>d.eixo===e&&d.status!=='sem_meta');
+    if(!g.length) return `<div class="eixo"><div class="eixo-dot gray"></div><div class="eixo-nome">${e}</div><div class="eixo-sit gray">Sem dados</div><div class="eixo-det">—</div></div>`;
+    const nD   = g.filter(d=>d.status==='dentro').length;
+    const nC   = g.filter(d=>d.status==='abaixo'&&d.tendencia==='desfavoravel').length;
+    const pct  = Math.round((nD/g.length)*100);
+    const cor  = nC>0?'red':pct>=60?'green':'amber';
+    const sit  = nC>0?'Crítico':pct>=60?'Estável':'Atenção';
+    return `<div class="eixo">
+      <div class="eixo-dot ${cor}"></div>
+      <div class="eixo-nome">${e}</div>
+      <div class="eixo-sit ${cor}">${sit}</div>
+      <div class="eixo-det">${nD}/${g.length} metas</div>
+    </div>`;
   }).join('');
 }
-function renderLine(rows){
-  const ind=val('fInd')||findByName(rows,['IPL'])?.Indicador||rows[0]?.Indicador;
-  document.getElementById('chartHint').textContent=ind||'Indicador selecionado';
-  const base=DATA.filter(d=>d.Indicador===ind&&(!val('fDir')||d.Diretoria===val('fDir')));
-  const years=[...new Set(base.map(d=>d.Ano).filter(Boolean))].sort();
-  const sets=years.map(y=>{const d=base.find(x=>x.Ano===y);return{label:String(y),data:MONTHS.map(m=>d?d[m]:null),tension:.35,borderWidth:3,pointRadius:3}});
-  chart('lineChart','line',MONTHS,sets.length?sets:[{label:'Sem dados',data:MONTHS.map(()=>null)}]);
+
+// DRILL ────────────────────────────────────────────────────────────────────────
+function renderDrill(){
+  $('drill-sub').textContent = `${IND.length} indicadores · nível corporativo COMLURB`;
+  const eixos = ['Todos',...new Set(IND.map(d=>d.eixo))];
+  $('drill-filters').innerHTML = `<span class="dflbl">Eixo</span>`;
+  for(const e of eixos){
+    const btn=document.createElement('button');
+    btn.className='fbtn'+(e==='Todos'?' on':'');
+    btn.textContent=e;
+    btn.onclick=()=>{ DRILL_EIXO=e; $('drill-filters').querySelectorAll('.fbtn').forEach(b=>b.classList.remove('on')); btn.classList.add('on'); renderDrillTable(); };
+    $('drill-filters').appendChild(btn);
+  }
+  renderDrillTable();
 }
-function renderDonut(rows){
-  const g={};rows.forEach(d=>g[d.Eixo]=(g[d.Eixo]||0)+1);
-  chart('donutChart','doughnut',Object.keys(g),[{data:Object.values(g),borderWidth:0}],{plugins:{legend:{position:'right',labels:{color:'#dce8f8'}}}});
+
+function renderDrillTable(){
+  const data = DRILL_EIXO==='Todos'?IND:IND.filter(d=>d.eixo===DRILL_EIXO);
+  const sorted=[...data].sort((a,b)=>{
+    const s=d=>(d.status==='abaixo'&&d.tendencia==='desfavoravel')?0:d.status==='abaixo'?1:d.tendencia==='desfavoravel'?2:3;
+    return s(a)-s(b);
+  });
+
+  $('drill-tbody').innerHTML='';
+  for(const d of sorted){
+    const cor  = d.status==='abaixo'&&d.tendencia==='desfavoravel'?'red':d.status==='abaixo'?'amber':d.status==='dentro'?'green':'gray';
+    const lbl  = d.status==='abaixo'&&d.tendencia==='desfavoravel'?'Crítico':d.status==='abaixo'?'Abaixo':d.status==='dentro'?'Meta atingida':'Sem meta';
+    const tCor = d.tendencia==='favoravel'?'fav':d.tendencia==='desfavoravel'?'desf':'est';
+    const tLbl = d.tendencia==='favoravel'?'▲ Favorável':d.tendencia==='desfavoravel'?'▼ Desfavorável':d.tendencia==='estavel'?'= Estável':'—';
+    const pW   = d.pct_meta!=null?Math.min(Math.round((Math.min(d.pct_meta,130)/130)*100),100):0;
+    const varS = d.varYoy!=null?(d.varYoy>0?'+':'')+d.varYoy.toFixed(1).replace('.',',')+'%':'—';
+    const varC = d.varYoy==null?'':d.tendencia==='favoravel'?'style="color:var(--green)"':d.tendencia==='desfavoravel'?'style="color:var(--red)"':'';
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td style="max-width:220px;line-height:1.3">${d.indicador}</td>
+      <td style="color:var(--muted)">${d.eixo}</td>
+      <td><span class="brow"><span class="brow-f ${cor}" style="display:block;width:${pW}%;height:100%"></span></span>${fmtN(d.acum25)}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:11px">${fmtN(d.meta25)}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:11px">${fmtN(d.acum26)}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:11px" ${varC}>${varS}</td>
+      <td><span class="tend ${tCor}">${tLbl}</span></td>
+      <td><span class="pill ${cor}">${lbl}</span></td>`;
+    $('drill-tbody').appendChild(tr);
+  }
+  if(!sorted.length) $('drill-tbody').innerHTML=`<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:20px">Nenhum indicador.</td></tr>`;
 }
-function renderExecText(rows){
-  const metas=rows.filter(d=>d.Meta!==null&&d.Acumulado!==null), dentro=metas.filter(d=>d.Acumulado>=d.Meta), abaixo=metas.filter(d=>d.Acumulado<d.Meta);
-  const eixo={};abaixo.forEach(d=>eixo[d.Eixo]=(eixo[d.Eixo]||0)+1);
-  const dir={};abaixo.forEach(d=>dir[d.Diretoria]=(dir[d.Diretoria]||0)+1);
-  const ec=Object.entries(eixo).sort((a,b)=>b[1]-a[1])[0], dc=Object.entries(dir).sort((a,b)=>b[1]-a[1])[0];
-  document.getElementById('execText').innerHTML=`No recorte atual, <b>${dentro.length} de ${metas.length}</b> indicadores com meta estão dentro ou acima da referência cadastrada. ${abaixo.length?`O ponto de atenção está em <b>${abaixo.length}</b> indicador(es) abaixo da meta.`:''} ${ec?`O eixo com maior concentração de atenção é <b>${ec[0]}</b>.`:''} ${dc?`A diretoria com maior concentração de desvios é <b>${dc[0]}</b>.`:''}`;
-  document.getElementById('chips').innerHTML=[
-    [rows.length,'Indicadores'],[dentro.length,'Dentro da meta'],[abaixo.length,'Abaixo da meta'],[rows.length-metas.length,'Sem meta']
-  ].map(x=>`<div class="chip"><strong>${x[0]}</strong><span>${x[1]}</span></div>`).join('');
+
+function toggleDrill(){
+  $('drill-body').classList.toggle('open');
+  $('drill-chev').classList.toggle('open');
 }
-function renderRank(rows,prefix,id){
-  const r=rows.filter(d=>norm(d.Indicador).includes(norm(prefix))&&d.Acumulado!==null).sort((a,b)=>b.Acumulado-a.Acumulado).slice(0,6);
-  const max=Math.max(...r.map(d=>d.Acumulado),1);
-  document.getElementById(id).innerHTML=r.length?r.map((d,i)=>`<div class="row"><span>${i+1}</span><b>${d.Indicador.replace(prefix,'').replace('-','')}</b><div class="bar"><i style="width:${Math.max(5,d.Acumulado/max*100)}%"></i></div><span>${fmt(d.Acumulado,d.Unidade)}</span></div>`).join(''):'Sem registros.';
+
+function showErr(msg){
+  $('err').innerHTML=msg; $('err').style.display='block';
+  $('loading').style.display='none'; $('page').style.display='';
 }
-function renderAnalitico(rows){
-  const s={'Dentro da meta':0,'Abaixo da meta':0,'Sem meta':0};rows.forEach(d=>s[statusOf(d)]=(s[statusOf(d)]||0)+1);
-  chart('statusChart','bar',Object.keys(s),[{label:'Indicadores',data:Object.values(s),borderWidth:0}]);
-  const g={};rows.forEach(d=>g[d.Diretoria]=(g[d.Diretoria]||0)+1);
-  chart('dirChart','bar',Object.keys(g),[{label:'Indicadores',data:Object.values(g),borderWidth:0}]);
-  document.getElementById('tableCount').textContent=`${rows.length} registros`;
-  document.getElementById('tableBody').innerHTML=rows.slice(0,500).map(d=>`<tr><td>${d.Ano||'—'}</td><td>${d.Diretoria}</td><td>${d.Superintendencia}</td><td>${d.Eixo}</td><td>${d.Indicador}</td><td class="num">${fmt(d.Acumulado,d.Unidade)}</td><td>${d.Unidade||'—'}</td><td class="num">${fmt(d.Meta,d.Unidade)}</td><td>${statusOf(d)}</td></tr>`).join('');
-}
-function render(){
-  const rows=filtered();
-  document.getElementById('scope').textContent=`${rows.length} registros`;
-  renderInsights(rows);renderLine(rows);renderDonut(rows);renderExecText(rows);renderRank(rows,'1746','rank1746');renderRank(rows,'Ouvidoria','rankOuvidoria');renderAnalitico(rows);
-}
-function showPage(id,btn){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');render()}
-function init(){
-  DATA=DATA.filter(d=>d.Ano&&d.Indicador);
-  const years=[...new Set(DATA.map(d=>d.Ano))].sort((a,b)=>a-b), latest=years.at(-1)||'';
-  setOptions('fAno',years,'Todos',latest);document.getElementById('fAno').value=latest;
-  ['fAno','fDir','fSup','fEixo','fInd'].forEach(id=>document.getElementById(id).addEventListener('change',()=>{updateOptions();render()}));
-  updateOptions();render();
-  const now=new Date();document.getElementById('updated').textContent=`Atualizado em ${now.toLocaleDateString('pt-BR')} ${now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}`;
-}
-Papa.parse(CSV_URL,{download:true,header:true,skipEmptyLines:true,complete:r=>{DATA=r.data.map(transform);init()},error:e=>{document.getElementById('scope').textContent='Erro na base';console.error(e)}});
+
+load();
 </script>
 </body>
 </html>
