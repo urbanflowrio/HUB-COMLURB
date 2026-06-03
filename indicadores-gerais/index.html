@@ -3,645 +3,584 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Presidência · COMLURB</title>
+<title>Radar de Indicadores · COMLURB</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=DM+Mono:wght@300;400&display=swap');
-
-:root {
-  --bg:       #06101c;
-  --bg2:      #0b1929;
-  --bg3:      #0f2035;
-  --line:     #162840;
-  --line2:    #1e3350;
-  --text:     #d4e6f7;
-  --muted:    #4d6f8c;
-  --faint:    #1e3350;
-  --blue:     #4a8fd4;
-  --blue-bg:  #0a2040;
-  --green:    #2eb882;
-  --green-bg: #052b1a;
-  --amber:    #d08b28;
-  --amber-bg: #2a1a04;
-  --red:      #d44f4f;
-  --red-bg:   #2a0c0c;
-  --card-r:   12px;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Mono:wght@300;400&display=swap');
+:root{
+  --bg:#07111f;--bg2:#0c1b2e;--bg3:#102035;
+  --line:#172b42;--line2:#1e3550;
+  --text:#cfe2f5;--muted:#4d6f8f;--faint:#172b42;
+  --blue:#4a8fd4;--blue-bg:#0a2040;
+  --green:#29b87a;--green-bg:#052b1a;
+  --amber:#cc8a26;--amber-bg:#281804;
+  --red:#d04848;--red-bg:#280c0c;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;font-size:14px;line-height:1.6;min-height:100vh}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:13px;line-height:1.5}
+a{color:inherit;text-decoration:none}
 
-/* ── TOP BAR ── */
-.topbar{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:14px 36px;border-bottom:1px solid var(--line);
-  background:var(--bg);position:sticky;top:0;z-index:100;
-}
-.topbar-l{display:flex;align-items:center;gap:14px}
-.logo{width:28px;height:28px;background:var(--blue);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;letter-spacing:.5px;flex-shrink:0}
-.page-title{font-size:11px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
-.page-title strong{color:var(--text);font-weight:500}
-.topbar-r{display:flex;align-items:center;gap:16px}
-.cycle-tag{background:var(--bg3);border:1px solid var(--line2);padding:3px 12px;border-radius:3px;font-family:'DM Mono',monospace;font-size:10px;color:var(--text);letter-spacing:.06em}
-.ts{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace}
-.rbtn{background:transparent;border:1px solid var(--line2);color:var(--muted);padding:3px 12px;border-radius:3px;font-size:10px;cursor:pointer;transition:all .15s;letter-spacing:.04em}
+/* ─ HEADER ─ */
+.hdr{background:var(--bg2);border-bottom:1px solid var(--line);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:64px;gap:20px;position:sticky;top:0;z-index:200}
+.hdr-brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.hdr-logo-box{display:flex;align-items:center;gap:8px}
+.hdr-cml{background:var(--blue);color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:4px;letter-spacing:.06em}
+.hdr-sub{font-size:9px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-top:2px}
+.hdr-divider{width:1px;height:28px;background:var(--line2)}
+.hdr-ttl{display:flex;flex-direction:column}
+.hdr-eyebrow{font-size:9px;color:var(--muted);letter-spacing:.14em;text-transform:uppercase}
+.hdr-name{font-size:18px;font-weight:700;color:var(--text);letter-spacing:-.3px;line-height:1.1}
+.hdr-desc{font-size:11px;color:var(--muted);margin-top:2px}
+.hdr-desc span{color:var(--blue)}
+.hdr-right{display:flex;align-items:center;gap:16px;flex-shrink:0}
+.hdr-ts-block{text-align:right}
+.hdr-ts-lbl{font-size:9px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.hdr-ts-val{font-size:13px;font-family:'DM Mono',monospace;color:var(--text);font-weight:400}
+.hdr-live{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--muted)}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px rgba(41,184,122,.6);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.rbtn{background:transparent;border:1px solid var(--line2);color:var(--muted);padding:5px 14px;border-radius:4px;font-size:10px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s;letter-spacing:.04em}
 .rbtn:hover{border-color:var(--blue);color:var(--blue)}
 
-/* ── LAYOUT ── */
-.main{max-width:1320px;margin:0 auto;padding:40px 36px 80px}
+/* ─ FILTROS ─ */
+.filters-bar{background:var(--bg2);border-bottom:1px solid var(--line);padding:12px 28px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.fgroup{display:flex;flex-direction:column;gap:4px;min-width:100px}
+.fgroup label{font-size:9px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;font-weight:500}
+.fselect{background:var(--bg3);border:1px solid var(--line2);color:var(--text);padding:6px 28px 6px 10px;border-radius:4px;font-size:11px;font-family:'Inter',sans-serif;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%234d6f8f'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;transition:border-color .15s;min-width:120px}
+.fselect:hover,.fselect:focus{border-color:var(--blue)}
+.clr-btn{background:transparent;border:1px solid var(--line2);color:var(--muted);padding:6px 14px;border-radius:4px;font-size:10px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s;display:flex;align-items:center;gap:5px;margin-left:auto;white-space:nowrap}
+.clr-btn:hover{border-color:var(--amber);color:var(--amber)}
 
-/* ── SEÇÃO ── */
-.sec{margin-bottom:48px}
-.sec-lbl{font-size:9px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:20px;display:flex;align-items:center;gap:10px}
-.sec-lbl::after{content:'';flex:1;height:1px;background:var(--line)}
+/* ─ MAIN ─ */
+.main{padding:20px 28px 60px;max-width:1440px;margin:0 auto}
 
-/* ── BLOCO HERO (resultado corporativo) ── */
-.hero-strip{
-  display:grid;grid-template-columns:2fr 1fr 1fr;
-  border:1px solid var(--line);border-radius:var(--card-r);overflow:hidden;gap:1px;background:var(--line);
-}
-.hero-cell{background:var(--bg2);padding:40px 44px 36px}
-.hero-cell.main-cell{padding:44px 52px 40px}
-.hero-big{font-size:76px;font-weight:300;line-height:1;letter-spacing:-3px;font-variant-numeric:tabular-nums}
-.hero-big.green{color:var(--green)}
-.hero-big.amber{color:var(--amber)}
-.hero-big.red{color:var(--red)}
-.hero-sub{font-size:13px;color:var(--muted);margin-top:10px;line-height:1.4}
-.hero-delta{display:inline-flex;align-items:center;gap:5px;font-size:11px;margin-top:20px;font-family:'DM Mono',monospace;padding:4px 10px;border-radius:3px}
-.hero-delta.up{background:var(--green-bg);color:var(--green)}
-.hero-delta.dn{background:var(--red-bg);color:var(--red)}
-.hero-delta.nt{background:var(--faint);color:var(--muted)}
-.stat-n{font-size:42px;font-weight:300;letter-spacing:-1px;font-variant-numeric:tabular-nums}
-.stat-n.green{color:var(--green)}
-.stat-n.amber{color:var(--amber)}
-.stat-n.red{color:var(--red)}
-.stat-lbl{font-size:12px;color:var(--muted);margin-top:8px}
-.stat-names{font-size:11px;color:var(--muted);margin-top:10px;line-height:1.6;font-family:'DM Mono',monospace}
-
-/* ── GRID DE CARDS ── */
-.cards-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
-.cards-grid.two{grid-template-columns:repeat(2,1fr)}
-.cards-grid.three{grid-template-columns:repeat(3,1fr)}
-
-/* ── CARD ── */
-.card{
-  background:var(--bg2);border:1px solid var(--line);border-radius:var(--card-r);
-  padding:28px 28px 24px;position:relative;overflow:hidden;
-  transition:border-color .2s, background .2s;cursor:default;
-}
+/* ─ CARDS ROW ─ */
+.cards-row{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:20px}
+.card{background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:18px 18px 14px;position:relative;overflow:hidden;transition:border-color .2s,background .2s;cursor:default}
 .card:hover{background:var(--bg3);border-color:var(--line2)}
-/* faixa lateral esquerda */
-.card::before{
-  content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
-  background:var(--line2);border-radius:2px 0 0 2px;
-  transition:background .2s;
-}
+.card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:2px 0 0 2px}
 .card.green::before{background:var(--green)}
 .card.amber::before{background:var(--amber)}
-.card.red::before  {background:var(--red)}
-.card.blue::before {background:var(--blue)}
-
-/* eyebrow + ícone */
-.card-top{display:flex;align-items:center;gap:8px;margin-bottom:18px}
-.card-icon{
-  width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;
-}
-.card-icon.green{background:var(--green-bg);color:var(--green)}
-.card-icon.amber{background:var(--amber-bg);color:var(--amber)}
-.card-icon.red  {background:var(--red-bg);  color:var(--red)}
-.card-icon.blue {background:var(--blue-bg); color:var(--blue)}
-.card-icon.gray {background:var(--faint);   color:var(--muted)}
-.card-eye{font-size:9px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}
+.card.red::before{background:var(--red)}
+.card.blue::before{background:var(--blue)}
+.card-top{display:flex;align-items:center;gap:7px;margin-bottom:10px}
+.card-ico{width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+.card-ico.green{background:var(--green-bg);color:var(--green)}
+.card-ico.amber{background:var(--amber-bg);color:var(--amber)}
+.card-ico.red{background:var(--red-bg);color:var(--red)}
+.card-ico.blue{background:var(--blue-bg);color:var(--blue)}
+.card-eye{font-size:8px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}
 .card-eye.green{color:var(--green)}
 .card-eye.amber{color:var(--amber)}
-.card-eye.red  {color:var(--red)}
-.card-eye.blue {color:var(--blue)}
-.card-eye.gray {color:var(--muted)}
-
-/* número principal */
-.card-n{font-size:44px;font-weight:300;line-height:1;letter-spacing:-2px;color:var(--text);font-variant-numeric:tabular-nums;margin-bottom:10px}
-.card-n.green{color:var(--green)}
-.card-n.amber{color:var(--amber)}
-.card-n.red  {color:var(--red)}
-.card-n-unit{font-size:18px;font-weight:300;color:var(--muted);margin-left:2px}
-
-/* texto interpretativo */
-.card-txt{font-size:12px;color:var(--muted);line-height:1.65;margin-bottom:14px}
+.card-eye.red{color:var(--red)}
+.card-eye.blue{color:var(--blue)}
+.card-n{font-size:34px;font-weight:300;line-height:1;letter-spacing:-1.5px;color:var(--text);font-variant-numeric:tabular-nums;margin-bottom:7px}
+.card-n.green{color:var(--green)}.card-n.amber{color:var(--amber)}.card-n.red{color:var(--red)}
+.card-unit{font-size:14px;font-weight:300;color:var(--muted);margin-left:1px}
+.card-txt{font-size:11px;color:var(--muted);line-height:1.55;margin-bottom:10px}
 .card-txt strong{color:var(--text);font-weight:500}
-
-/* delta rodapé */
 .card-foot{display:flex;align-items:center;gap:6px}
-.card-delta{font-size:10px;font-family:'DM Mono',monospace;padding:3px 8px;border-radius:3px;font-weight:500}
-.card-delta.up  {background:var(--green-bg);color:var(--green)}
-.card-delta.dn  {background:var(--red-bg);  color:var(--red)}
-.card-delta.nt  {background:var(--faint);   color:var(--muted)}
-.card-delta-ctx {font-size:10px;color:var(--muted);letter-spacing:.02em}
+.card-delta{font-size:9px;font-family:'DM Mono',monospace;padding:2px 7px;border-radius:3px;font-weight:500}
+.card-delta.up{background:var(--green-bg);color:var(--green)}
+.card-delta.dn{background:var(--red-bg);color:var(--red)}
+.card-delta.nt{background:var(--faint);color:var(--muted)}
+.card-ctx{font-size:10px;color:var(--muted)}
 
-/* ── MAPA DE EIXOS ── */
-.mapa{
-  display:grid;grid-template-columns:repeat(5,1fr);
-  border:1px solid var(--line);border-radius:var(--card-r);overflow:hidden;gap:1px;background:var(--line);
-}
-.eixo{background:var(--bg2);padding:22px 16px 18px;text-align:center;transition:background .15s}
-.eixo:hover{background:var(--bg3)}
-.eixo-dot{width:8px;height:8px;border-radius:50%;margin:0 auto 10px}
-.eixo-dot.green{background:var(--green);box-shadow:0 0 7px rgba(46,184,130,.5)}
-.eixo-dot.amber{background:var(--amber);box-shadow:0 0 7px rgba(208,139,40,.5)}
-.eixo-dot.red  {background:var(--red);  box-shadow:0 0 7px rgba(212,79,79,.5)}
-.eixo-dot.gray {background:var(--muted)}
-.eixo-nome{font-size:11px;font-weight:500;color:var(--text);margin-bottom:4px}
-.eixo-sit{font-size:9px;text-transform:uppercase;letter-spacing:.1em;font-weight:600}
-.eixo-sit.green{color:var(--green)}
-.eixo-sit.amber{color:var(--amber)}
-.eixo-sit.red  {color:var(--red)}
-.eixo-sit.gray {color:var(--muted)}
-.eixo-det{font-size:10px;color:var(--muted);margin-top:4px;font-family:'DM Mono',monospace}
+/* ─ MID ROW ─ */
+.mid-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px}
+.panel{background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:20px 22px}
+.panel-title{font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.panel-title::after{content:'';flex:1;height:1px;background:var(--line)}
+/* gráfico */
+.chart-controls{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.chart-sel{background:var(--bg3);border:1px solid var(--line2);color:var(--text);padding:5px 28px 5px 8px;border-radius:4px;font-size:11px;font-family:'Inter',sans-serif;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%234d6f8f'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;flex:1;min-width:0}
+.chart-legend{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.leg-item{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted)}
+.leg-dot{width:8px;height:8px;border-radius:50%}
+/* leitura executiva */
+.exec-body{font-size:12px;color:var(--muted);line-height:1.75}
+.exec-body p{margin-bottom:10px}
+.exec-body p:last-child{margin-bottom:0}
+.exec-kpis{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.ekpi{flex:1;min-width:60px;background:var(--bg3);border:1px solid var(--line);border-radius:6px;padding:10px 12px;text-align:center}
+.ekpi-n{font-size:20px;font-weight:300;font-variant-numeric:tabular-nums}
+.ekpi-n.green{color:var(--green)}.ekpi-n.amber{color:var(--amber)}.ekpi-n.red{color:var(--red)}.ekpi-n.gray{color:var(--muted)}
+.ekpi-lbl{font-size:9px;color:var(--muted);margin-top:3px;line-height:1.3;letter-spacing:.02em}
+/* donut */
+.donut-wrap{display:flex;align-items:center;gap:20px}
+.donut-canvas{flex-shrink:0}
+.donut-legend{flex:1;display:flex;flex-direction:column;gap:8px}
+.dl-item{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.dl-left{display:flex;align-items:center;gap:7px}
+.dl-swatch{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+.dl-name{font-size:11px;color:var(--text)}
+.dl-right{display:flex;align-items:center;gap:6px}
+.dl-n{font-size:11px;font-family:'DM Mono',monospace;color:var(--text)}
+.dl-pct{font-size:10px;color:var(--muted)}
 
-/* ── DRILL ── */
-.drill-wrap{border:1px solid var(--line);border-radius:var(--card-r);overflow:hidden}
-.drill-hd{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;background:var(--bg2);cursor:pointer;user-select:none;transition:background .15s}
-.drill-hd:hover{background:var(--bg3)}
-.drill-hd-info{display:flex;flex-direction:column;gap:2px}
-.drill-hd-title{font-size:13px;font-weight:500;color:var(--text)}
-.drill-hd-sub{font-size:11px;color:var(--muted)}
-.drill-chev{font-size:18px;color:var(--muted);transition:transform .2s}
-.drill-chev.open{transform:rotate(180deg)}
-.drill-body{display:none;border-top:1px solid var(--line);background:var(--bg)}
-.drill-body.open{display:block}
-.drill-filters{display:flex;align-items:center;gap:8px;padding:14px 28px;border-bottom:1px solid var(--line);flex-wrap:wrap}
-.dflbl{font-size:9px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-right:4px}
-.fbtn{padding:4px 12px;border-radius:3px;border:1px solid var(--line2);background:transparent;color:var(--muted);font-size:10px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .12s;letter-spacing:.02em}
-.fbtn:hover,.fbtn.on{border-color:var(--blue);color:var(--blue);background:var(--blue-bg)}
-.drill-tbl-wrap{overflow-x:auto;padding:0 28px 28px}
-.dtbl{width:100%;border-collapse:collapse;font-size:12px;margin-top:16px}
-.dtbl th{text-align:left;padding:7px 10px;color:var(--muted);font-weight:400;font-size:9px;letter-spacing:.1em;text-transform:uppercase;border-bottom:1px solid var(--line)}
-.dtbl td{padding:9px 10px;border-bottom:1px solid var(--line);color:var(--text);vertical-align:middle}
-.dtbl tr:last-child td{border-bottom:none}
-.dtbl tr:hover td{background:var(--bg2)}
-.pill{display:inline-block;padding:3px 8px;border-radius:3px;font-size:9px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-family:'DM Mono',monospace}
-.pill.green{background:var(--green-bg);color:var(--green)}
-.pill.amber{background:var(--amber-bg);color:var(--amber)}
-.pill.red  {background:var(--red-bg);  color:var(--red)}
-.pill.gray {background:var(--faint);   color:var(--muted)}
-.tend{font-size:10px;font-family:'DM Mono',monospace}
-.tend.fav {color:var(--green)}
-.tend.desf{color:var(--red)}
-.tend.est {color:var(--muted)}
-.brow{height:3px;background:var(--line2);border-radius:2px;min-width:60px;max-width:100px;display:inline-block;vertical-align:middle;margin-right:6px}
-.brow-f{height:100%;border-radius:2px}
-.brow-f.green{background:var(--green)}
-.brow-f.amber{background:var(--amber)}
-.brow-f.red  {background:var(--red)}
+/* ─ BOT ROW ─ */
+.bot-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+/* ranking */
+.rank-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.rank-item:last-child{border-bottom:none}
+.rank-pos{font-size:10px;font-family:'DM Mono',monospace;color:var(--muted);width:14px;text-align:right;flex-shrink:0}
+.rank-name{font-size:12px;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rank-bar-wrap{width:80px;flex-shrink:0}
+.rank-bar-track{height:4px;background:var(--line2);border-radius:2px}
+.rank-bar-fill{height:100%;border-radius:2px;transition:width .6s}
+.rank-bar-fill.blue{background:var(--blue)}
+.rank-bar-fill.amber{background:var(--amber)}
+.rank-val{font-size:10px;font-family:'DM Mono',monospace;color:var(--text);width:50px;text-align:right;flex-shrink:0}
+.rank-pct{font-size:10px;color:var(--muted);width:28px;text-align:right;flex-shrink:0}
 
-/* ── LOADING / ERRO ── */
-.loading{display:flex;align-items:center;justify-content:center;min-height:60vh;flex-direction:column;gap:14px;color:var(--muted);font-size:12px;letter-spacing:.06em}
-.spin{width:24px;height:24px;border:2px solid var(--line2);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite}
+/* ─ LOADING / ERRO ─ */
+.loading{display:flex;align-items:center;justify-content:center;min-height:60vh;flex-direction:column;gap:12px;color:var(--muted);font-size:12px;letter-spacing:.06em}
+.spin{width:22px;height:22px;border:2px solid var(--line2);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.err{background:var(--red-bg);border:1px solid var(--red);color:var(--red);padding:14px 20px;border-radius:8px;font-size:12px;margin-bottom:28px;line-height:1.7;display:none}
+.err{background:var(--red-bg);border:1px solid var(--red);color:var(--red);padding:14px 20px;border-radius:6px;font-size:12px;margin:20px 28px;line-height:1.7;display:none}
 
-/* ── FOOTER ── */
-.footer{border-top:1px solid var(--line);padding:16px 36px;display:flex;align-items:center;justify-content:space-between;font-size:10px;color:var(--faint);letter-spacing:.04em}
+/* ─ FOOTER ─ */
+.footer{border-top:1px solid var(--line);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;font-size:10px;color:var(--faint);letter-spacing:.04em}
 </style>
 </head>
 <body>
 
-<!-- TOP BAR -->
-<header class="topbar">
-  <div class="topbar-l">
-    <div class="logo">CML</div>
-    <span class="page-title"><strong>COMLURB</strong>&nbsp;·&nbsp;Presidência</span>
+<!-- ═══ HEADER ═══ -->
+<header class="hdr">
+  <div class="hdr-brand">
+    <div class="hdr-logo-box">
+      <div class="hdr-cml">COMLURB</div>
+      <div class="hdr-sub">A serviço da cidade</div>
+    </div>
+    <div class="hdr-divider"></div>
+    <div class="hdr-ttl">
+      <div class="hdr-eyebrow">Dashboard Executivo</div>
+      <div class="hdr-name">RADAR DE INDICADORES GERAIS</div>
+      <div class="hdr-desc"><span>Visão consolidada</span> dos principais indicadores operacionais e estratégicos da COMLURB</div>
+    </div>
   </div>
-  <div class="topbar-r">
-    <span class="ts" id="ts">—</span>
-    <span class="cycle-tag" id="cycle-tag">—</span>
-    <button class="rbtn" onclick="reload()">↺ Atualizar</button>
+  <div class="hdr-right">
+    <div class="hdr-ts-block">
+      <div class="hdr-ts-lbl">Atualizado em</div>
+      <div class="hdr-ts-val" id="ts-val">—</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+      <div class="hdr-live"><div class="live-dot"></div>Dados dinâmicos da planilha</div>
+      <button class="rbtn" onclick="reload()">↺ Recarregar</button>
+    </div>
   </div>
 </header>
 
-<main class="main" id="main">
-  <div class="loading" id="loading"><div class="spin"></div><span>Carregando indicadores</span></div>
+<!-- ═══ FILTROS ═══ -->
+<div class="filters-bar">
+  <div class="fgroup">
+    <label>Ano</label>
+    <select class="fselect" id="f-ano" onchange="applyFilters()"></select>
+  </div>
+  <div class="fgroup">
+    <label>Diretoria</label>
+    <select class="fselect" id="f-dir" onchange="applyFilters()"></select>
+  </div>
+  <div class="fgroup">
+    <label>Eixo</label>
+    <select class="fselect" id="f-eixo" onchange="applyFilters()"></select>
+  </div>
+  <div class="fgroup">
+    <label>Indicador</label>
+    <select class="fselect" id="f-ind" onchange="applyFilters()"></select>
+  </div>
+  <button class="clr-btn" onclick="clearFilters()">✕ &nbsp;Limpar filtros</button>
+</div>
 
+<!-- ═══ CONTEÚDO ═══ -->
+<div class="main" id="main">
+  <div class="loading" id="loading"><div class="spin"></div><span>Carregando indicadores</span></div>
   <div id="page" style="display:none">
     <div class="err" id="err"></div>
 
-    <!-- RESULTADO CORPORATIVO -->
-    <div class="sec">
-      <div class="sec-lbl">Resultado corporativo</div>
-      <div class="hero-strip">
-        <div class="hero-cell main-cell">
-          <div class="hero-big" id="h-pct">—</div>
-          <div class="hero-sub" id="h-sub">—</div>
-          <div class="hero-delta nt" id="h-delta">—</div>
+    <!-- CARDS -->
+    <div class="cards-row" id="cards-row"></div>
+
+    <!-- MID: gráfico | leitura executiva | donut -->
+    <div class="mid-row">
+      <div class="panel">
+        <div class="panel-title">Evolução mensal do indicador selecionado</div>
+        <div class="chart-controls">
+          <select class="chart-sel" id="chart-sel" onchange="updateChart()"></select>
+          <div class="chart-legend">
+            <div class="leg-item"><div class="leg-dot" style="background:#4a8fd4"></div>2024</div>
+            <div class="leg-item"><div class="leg-dot" style="background:#cc8a26"></div>2025</div>
+            <div class="leg-item"><div class="leg-dot" style="background:#29b87a"></div>2026</div>
+          </div>
         </div>
-        <div class="hero-cell">
-          <div class="stat-n" id="h-crit-n">—</div>
-          <div class="stat-lbl">indicadores críticos</div>
-          <div class="stat-names" id="h-crit-names">—</div>
-        </div>
-        <div class="hero-cell">
-          <div class="stat-n" id="h-ok-n">—</div>
-          <div class="stat-lbl">dentro da meta</div>
-          <div class="stat-names" id="h-ok-names">—</div>
+        <canvas id="line-chart" height="180"></canvas>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">Leitura executiva</div>
+        <div class="exec-body" id="exec-body">—</div>
+        <div class="exec-kpis" id="exec-kpis"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">Resumo por eixo</div>
+        <div class="donut-wrap">
+          <canvas class="donut-canvas" id="donut-chart" width="130" height="130"></canvas>
+          <div class="donut-legend" id="donut-legend"></div>
         </div>
       </div>
     </div>
 
-    <!-- DESTAQUES DO CICLO -->
-    <div class="sec">
-      <div class="sec-lbl">Destaques do ciclo · Jan–Mar 2026 vs 2025</div>
-      <div class="cards-grid" id="cards-destaques"></div>
-    </div>
-
-    <!-- PONTOS DE ATENÇÃO -->
-    <div class="sec">
-      <div class="sec-lbl">Pontos de atenção</div>
-      <div class="cards-grid" id="cards-atencao"></div>
-    </div>
-
-    <!-- MAPA CORPORATIVO -->
-    <div class="sec">
-      <div class="sec-lbl">Mapa corporativo</div>
-      <div class="mapa" id="mapa"></div>
-    </div>
-
-    <!-- DRILL -->
-    <div class="sec">
-      <div class="drill-wrap">
-        <div class="drill-hd" onclick="toggleDrill()">
-          <div class="drill-hd-info">
-            <div class="drill-hd-title">Explorar todos os indicadores</div>
-            <div class="drill-hd-sub" id="drill-sub">—</div>
-          </div>
-          <span class="drill-chev" id="drill-chev">&#8964;</span>
-        </div>
-        <div class="drill-body" id="drill-body">
-          <div class="drill-filters" id="drill-filters"></div>
-          <div class="drill-tbl-wrap">
-            <table class="dtbl">
-              <thead><tr>
-                <th>Indicador</th><th>Eixo</th>
-                <th>Acum. 2025</th><th>Meta 2025</th>
-                <th>Acum. 2026</th><th>Var. YoY</th>
-                <th>Tendência</th><th>Status</th>
-              </tr></thead>
-              <tbody id="drill-tbody"></tbody>
-            </table>
-          </div>
-        </div>
+    <!-- BOT: rankings -->
+    <div class="bot-row">
+      <div class="panel">
+        <div class="panel-title">Ranking 1746 · principais demandas (acum. 2026)</div>
+        <div id="rank-1746"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">Ranking Ouvidoria · principais categorias (acum. 2026)</div>
+        <div id="rank-ouv"></div>
       </div>
     </div>
   </div>
-</main>
+</div>
 
 <footer class="footer">
-  <span>Gabinete da Presidência / HUB COMLURB &nbsp;·&nbsp; Núcleo de Inteligência e Gestão Estratégica Operacional</span>
-  <span>Greicy Moreira</span>
+  <span>Fonte: Planilha oficial publicada &nbsp;·&nbsp; Dados atualizados automaticamente</span>
+  <span>HUB COMLURB &nbsp;·&nbsp; Inteligência a serviço da cidade</span>
 </footer>
 
 <script>
+// ══════════════════════════════════════════════════════════════════════════════
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQphrIIjiY4aWBONgByLezMnFk8YbyYpF-vtgxOLoV8-85_WUVAXH_f_Ahy8ymxmgnGXmQ_KiFSOkIK/pub?gid=1044100274&single=true&output=csv';
+const MESES   = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
 
-// ── EIXOS ESTRATÉGICOS ────────────────────────────────────────────────────────
 const EIXO_RULES = [
-  { eixo:'Pessoas',          t:['absenteísmo','absenteismo','licença','afastamento'] },
-  { eixo:'Segurança',        t:['acidente de trabalho','acidente','epi','frequência de acidente','gravidade acidente'] },
-  { eixo:'Operação',         t:['ipl','índice padrão de limpeza','ipr','índice padrão de roçada','desvio padrão','frota','coleta domiciliar','remoção de lixo público','utilização da frota','performance de atendimento de capina','performance de atendimento da remoção gratuita','tempo médio de atendimento','capina em logradouro'] },
-  { eixo:'Atendimento',      t:['solicitações 1746','solicitações ouvidoria','1746','ouvidoria'] },
-  { eixo:'Sustentabilidade', t:['reciclagem','resíduo','ecoponto','destinação','compostagem','triagem'] },
-  { eixo:'Receita',          t:['receita','arrecadação','orçamento','contrato','inadimplência','execução financeira'] },
+  {e:'Pessoas',    t:['absenteísmo','absenteismo']},
+  {e:'Segurança',  t:['acidente de trabalho','acidente']},
+  {e:'Operação',   t:['índice padrão de limpeza','ipl','índice padrão de roçada','ipr','desvio padrão','frota','coleta domiciliar','remoção de lixo público','utilização da frota','performance de atendimento de capina','performance de atendimento da remoção','tempo médio de atendimento','capina em logradouro']},
+  {e:'Atendimento',t:['solicitações 1746','solicitações ouvidoria','1746','ouvidoria']},
+  {e:'Sustentabilidade',t:['reciclagem','resíduo','ecoponto','destinação','compostagem']},
+  {e:'Receita',    t:['receita','arrecadação','orçamento','contrato','inadimplência']},
 ];
+const DONUT_COLORS = ['#4a8fd4','#cc8a26','#d04848','#29b87a','#9178e0','#4db8c8'];
 
-// Textos interpretativos fixos por indicador (para os cards)
 const CARD_CONF = {
-  'Índice Padrão de Limpeza - IPL': {
-    icon:'↑', eye:'Destaque Positivo', cor:'green',
-    txt: '<strong>IPL</strong> atingiu melhor patamar dos últimos 3 anos, crescendo +6,4% vs 2025. Meta superada.',
-    ctx:'vs 2025'
-  },
-  'Performance de Atendimento da Remoção Gratuita': {
-    icon:'!', eye:'Alerta Crítico', cor:'red',
-    txt: '<strong>Remoção Gratuita</strong> abaixo do ideal (59,8%). Recuperação em curso mas necessita atenção urgente.',
-    ctx:'recuperando'
-  },
-  'Solicitações 1746 - Capina': {
-    icon:'▲', eye:'Pressão Crescente', cor:'amber',
-    txt: '<strong>Demandas de Capina</strong> no 1746 explodiram: de 2.238 → 3.268 chamados no trimestre. Sinaliza necessidade de reforço operacional.',
-    ctx:'capina'
-  },
-  'Performance de Atendimento de Capina em Logradouro': {
-    icon:'✓', eye:'Excelência Operacional', cor:'green',
-    txt: '<strong>Atendimento de Capina</strong> praticamente perfeito (+22,8% vs 2025). Meta de 90% amplamente superada.',
-    ctx:'acima da meta'
-  },
-  'Acidente de Trabalho – Típico': {
-    icon:'↓', eye:'Ganho em Segurança', cor:'green',
-    txt: '<strong>Acidentes de Trabalho</strong> caíram drasticamente no Q1 2026 vs Q1 2025. Melhoria significativa nas condições de trabalho.',
-    ctx:'acidentes'
-  },
-  'Índice de Utilização da Frota de Coleta Domiciliar': {
-    icon:'▲', eye:'Eficiência de Frota', cor:'blue',
-    txt: '<strong>Frota de Coleta Domiciliar</strong> com melhor utilização (+14,6% vs 2025). Otimização de rotas e manutenção estão funcionando.',
-    ctx:'vs 2025'
-  },
-  'Absenteísmo - Gerenciável': {
-    icon:'↑', eye:'Atenção — Pessoas', cor:'amber',
-    txt: '<strong>Absenteísmo</strong> acima da meta (2,5% vs meta 1,7%) e piorando no Q1 2026. Impacto direto na capacidade operacional.',
-    ctx:'acima da meta'
-  },
-  'Tempo Médio de Atendimento - Remoção Gratuita': {
-    icon:'↓', eye:'Ganho Operacional', cor:'green',
-    txt: '<strong>Tempo médio de atendimento</strong> da Remoção Gratuita caiu de 18 → 11 dias no Q1. Redução de -38% na espera do cidadão.',
-    ctx:'−38% no tempo'
-  },
+  'Índice Padrão de Limpeza - IPL':                          {ico:'↑',eye:'Destaque Positivo',cor:'green',txt:'<strong>IPL</strong> atinge melhor patamar em 3 anos, crescendo +6,4% vs 2025.',ctx:'vs 2025',field:'acum26'},
+  'Performance de Atendimento da Remoção Gratuita':          {ico:'!',eye:'Alerta Crítico',cor:'red',txt:'<strong>Remoção Gratuita</strong> abaixo do ideal. Recuperação em curso, mas exige atenção urgente.',ctx:'recuperando',field:'acum26'},
+  'Solicitações 1746 - Capina':                              {ico:'▲',eye:'Pressão Crescente',cor:'amber',txt:'Demanda de <strong>Capina no 1746</strong> explodiu: de 2.238 → 3.268 chamados no trimestre.',ctx:'capina',field:'acum26'},
+  'Performance de Atendimento de Capina em Logradouro':      {ico:'✓',eye:'Excelência Operacional',cor:'green',txt:'<strong>Atendimento de Capina</strong> praticamente perfeito (+22,8% vs 2025). Meta de 90% amplamente superada.',ctx:'acima da meta',field:'acum26'},
+  'Acidente de Trabalho – Típico':                           {ico:'↓',eye:'Ganho em Segurança',cor:'green',txt:'<strong>Acidentes de Trabalho</strong> caíram drasticamente no Q1 2026 vs Q1 2025.',ctx:'acidentes',field:'acum26'},
+  'Índice de Utilização da Frota de Coleta Domiciliar':      {ico:'▲',eye:'Eficiência de Frota',cor:'blue',txt:'<strong>Frota de Coleta</strong> com melhor utilização (+14,6% vs 2025). Otimização funcionando.',ctx:'vs 2025',field:'acum26'},
 };
 
-// ── ESTADO ────────────────────────────────────────────────────────────────────
-let IND = [];
-let DRILL_EIXO = 'Todos';
+// ── Estado ─────────────────────────────────────────────────────────────────────
+let RAW = [], IND = [], FILT = [];
+let lineChart = null, donutChart = null;
 
-// ── UTILS ─────────────────────────────────────────────────────────────────────
-const $ = id => document.getElementById(id);
-const norm = s => String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
-function toFloat(s){
-  if(s==null||s===''||s==='-') return null;
-  const n = parseFloat(String(s).replace(/\./g,'').replace(',','.'));
-  return isNaN(n)?null:n;
-}
-function fmtN(v, unit=''){
-  if(v==null) return '—';
-  if(v>=10000) return v.toLocaleString('pt-BR',{maximumFractionDigits:0})+unit;
-  if(v>=100)   return v.toLocaleString('pt-BR',{maximumFractionDigits:1})+unit;
-  if(v>=10)    return v.toLocaleString('pt-BR',{maximumFractionDigits:1})+unit;
-  return v.toLocaleString('pt-BR',{maximumFractionDigits:2})+unit;
-}
-function fmtPct(v){ return v==null?'—':v.toFixed(1).replace('.',',')+'%'; }
+// ── Utils ──────────────────────────────────────────────────────────────────────
+const $  = id => document.getElementById(id);
+const nf = s => { try{ return parseFloat(String(s||'').replace(/\./g,'').replace(',','.')); }catch{return NaN;} };
+const tf = s => { const v=nf(s); return isNaN(v)?null:v; };
+function fmtN(v,decimals=1){ if(v==null||isNaN(v)) return '—'; return v.toLocaleString('pt-BR',{maximumFractionDigits:decimals}); }
+function normS(s){ return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim(); }
 function detectEixo(ind){
-  const n = norm(ind);
-  for(const r of EIXO_RULES) for(const t of r.t) if(n.includes(norm(t))) return r.eixo;
+  const n=normS(ind);
+  for(const r of EIXO_RULES) for(const t of r.t) if(n.includes(normS(t))) return r.e;
   return 'Outros';
 }
 
-// ── LOAD ──────────────────────────────────────────────────────────────────────
+// ── Load ───────────────────────────────────────────────────────────────────────
 async function load(){
-  $('loading').style.display='flex'; $('page').style.display='none';
+  $('loading').style.display='flex'; $('page').style.display='none'; $('err').style.display='none';
   try{
-    const res = await fetch(CSV_URL);
-    if(!res.ok) throw new Error('HTTP '+res.status);
-    const txt = await res.text();
-    if(!txt||txt.length<50) throw new Error('Arquivo vazio');
-    Papa.parse(txt,{header:true,skipEmptyLines:true,
-      complete:r=>process(r.data),
-      error:e=>showErr('Erro ao interpretar CSV: '+e.message)
-    });
-  }catch(e){
-    showErr('Não foi possível carregar os dados.<br>Verifique se a planilha está publicada via <em>Arquivo → Publicar na Web</em>.<br><br><small>'+e.message+'</small>');
-  }
+    const r=await fetch(CSV_URL);
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const t=await r.text();
+    if(!t||t.length<50) throw new Error('Arquivo vazio');
+    Papa.parse(t,{header:true,skipEmptyLines:true,complete:d=>process(d.data),error:e=>showErr(e.message)});
+  }catch(e){ showErr('Erro ao carregar planilha: '+e.message+'<br>Verifique se está publicada via <em>Arquivo → Publicar na Web</em>.'); }
 }
-function reload(){ IND=[]; DRILL_EIXO='Todos'; load(); }
+function reload(){ RAW=[]; IND=[]; FILT=[]; load(); }
 
-// ── PROCESS ───────────────────────────────────────────────────────────────────
-const MESES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-
+// ── Process ───────────────────────────────────────────────────────────────────
 function process(rows){
-  const corp = rows.filter(r=>(r['Diretoria']||'').trim()==='COMLURB');
-  const idx = {};
-  for(const r of corp){
-    const ano = parseInt(r['Ano']); const ind = (r['Indicador']||'').trim();
+  RAW = rows;
+  // Indexar COMLURB por indicador+ano
+  const idx={};
+  for(const r of rows.filter(r=>(r['Diretoria']||'').trim()==='COMLURB')){
+    const ano=parseInt(r['Ano']), ind=(r['Indicador']||'').trim();
     if(!ind||!ano) continue;
     if(!idx[ind]) idx[ind]={};
     idx[ind][ano]={
-      acumulado:toFloat(r['Acumulado']), meta:toFloat(r['Meta']),
+      acumulado:tf(r['Acumulado']), meta:tf(r['Meta']),
       sentido:(r['Sentido']||'').trim(),
-      meses: MESES.reduce((o,m)=>{o[m]=toFloat(r[m]);return o;},{})
+      meses: MESES.reduce((o,m)=>{o[m]=tf(r[m]);return o;},{})
     };
   }
-
   IND=[];
   for(const [indicador,anos] of Object.entries(idx)){
-    const d24=anos[2024]||null, d25=anos[2025]||null, d26=anos[2026]||null;
-    const sentido = (d25||d26||d24||{}).sentido||'↑';
-
-    // Status baseado em acumulado 2025 vs meta 2025
-    let status='sem_meta', pct_meta=null;
+    const d24=anos[2024]||null,d25=anos[2025]||null,d26=anos[2026]||null;
+    const sentido=(d25||d26||d24||{}).sentido||'↑';
+    let status='sem_meta',pct_meta=null;
     if(d25&&d25.meta!=null&&d25.acumulado!=null){
-      if(sentido==='↑'){
-        pct_meta = d25.meta>0 ? Math.round((d25.acumulado/d25.meta)*100) : null;
-        status = d25.acumulado>=d25.meta?'dentro':'abaixo';
-      } else {
-        pct_meta = d25.acumulado>0 ? Math.round((d25.meta/d25.acumulado)*100) : null;
-        status = d25.acumulado<=d25.meta?'dentro':'abaixo';
-      }
+      if(sentido==='↑'){pct_meta=d25.meta>0?Math.round((d25.acumulado/d25.meta)*100):null;status=d25.acumulado>=d25.meta?'dentro':'abaixo';}
+      else{pct_meta=d25.acumulado>0?Math.round((d25.meta/d25.acumulado)*100):null;status=d25.acumulado<=d25.meta?'dentro':'abaixo';}
     }
-
-    // Q1 médio 2025 e 2026
-    const mQ=['Jan','Fev','Mar'];
-    const q25 = d25 ? mQ.map(m=>d25.meses[m]).filter(v=>v!=null) : [];
-    const q26 = d26 ? mQ.map(m=>d26.meses[m]).filter(v=>v!=null) : [];
-    const avg25 = q25.length ? q25.reduce((a,b)=>a+b,0)/q25.length : null;
-    const avg26 = q26.length ? q26.reduce((a,b)=>a+b,0)/q26.length : null;
-
-    // Var YoY %
-    let varYoy = null;
+    const q=['Jan','Fev','Mar'];
+    const avg25=d25?avg(q.map(m=>d25.meses[m]).filter(v=>v!=null)):null;
+    const avg26=d26?avg(q.map(m=>d26.meses[m]).filter(v=>v!=null)):null;
+    let varYoy=null;
     if(avg25!=null&&avg26!=null&&avg25!==0) varYoy=((avg26-avg25)/Math.abs(avg25))*100;
-
-    // Tendência
     let tendencia='insuficiente';
     if(avg25!=null&&avg26!=null){
-      const thr = Math.abs(avg25)*0.03||0.1;
-      const delta = avg26-avg25;
-      if(sentido==='↑') tendencia=delta>thr?'favoravel':delta<-thr?'desfavoravel':'estavel';
-      else              tendencia=delta<-thr?'favoravel':delta>thr?'desfavoravel':'estavel';
+      const thr=Math.abs(avg25)*0.03||0.1,d=avg26-avg25;
+      tendencia=sentido==='↑'?(d>thr?'favoravel':d<-thr?'desfavoravel':'estavel'):(d<-thr?'favoravel':d>thr?'desfavoravel':'estavel');
     }
-
-    IND.push({
-      indicador, sentido, status, pct_meta,
-      acum24: d24?d24.acumulado:null,
-      acum25: d25?d25.acumulado:null,
-      meta25: d25?d25.meta:null,
-      acum26: d26?d26.acumulado:null,
-      avg25, avg26, varYoy, tendencia,
-      eixo: detectEixo(indicador)
+    IND.push({indicador,sentido,status,pct_meta,
+      acum24:d24?d24.acumulado:null,acum25:d25?d25.acumulado:null,
+      meta25:d25?d25.meta:null,acum26:d26?d26.acumulado:null,
+      avg25,avg26,varYoy,tendencia,eixo:detectEixo(indicador),
+      meses24:d24?d24.meses:{},meses25:d25?d25.meses:{},meses26:d26?d26.meses:{}
     });
   }
-
-  if(!IND.length){ showErr('Nenhum dado encontrado para Diretoria = "COMLURB". Verifique a planilha.'); return; }
+  if(!IND.length){showErr('Nenhum dado processado. Verifique a planilha.');return;}
+  FILT=[...IND];
+  buildFilters();
   render();
 }
+function avg(arr){ return arr.length?arr.reduce((a,b)=>a+b,0)/arr.length:null; }
 
-// ── RENDER ────────────────────────────────────────────────────────────────────
-function render(){
-  const now=new Date();
-  $('ts').textContent = now.toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'});
-  $('cycle-tag').textContent = 'Jan–Mar '+now.getFullYear();
-  renderHero();
-  renderCards();
-  renderMapa();
-  renderDrill();
-  $('loading').style.display='none'; $('page').style.display='';
+// ── Filtros ───────────────────────────────────────────────────────────────────
+function buildFilters(){
+  const anos=[...new Set(RAW.map(r=>r['Ano']).filter(Boolean))].sort();
+  const dirs=[...new Set(RAW.map(r=>(r['Diretoria']||'').trim()).filter(Boolean))].sort();
+  const eixos=[...new Set(IND.map(d=>d.eixo))].sort();
+  const inds=[...new Set(IND.map(d=>d.indicador))].sort();
+  populateSel('f-ano',['Todos',...anos]);
+  populateSel('f-dir',['Todas',...dirs]);
+  populateSel('f-eixo',['Todos',...eixos]);
+  populateSel('f-ind',['Todos',...inds]);
+  // chart sel
+  populateSel('chart-sel',IND.map(d=>d.indicador).sort());
+  $('chart-sel').value='Índice Padrão de Limpeza - IPL';
+}
+function populateSel(id,opts){
+  const el=$(id); el.innerHTML='';
+  for(const o of opts){const op=document.createElement('option');op.value=o;op.textContent=o;el.appendChild(op);}
+}
+function applyFilters(){
+  const ano=$('f-ano').value, dir=$('f-dir').value, eixo=$('f-eixo').value, ind=$('f-ind').value;
+  FILT=IND.filter(d=>{
+    if(eixo!=='Todos'&&d.eixo!==eixo) return false;
+    if(ind!=='Todos'&&d.indicador!==ind) return false;
+    return true;
+  });
+  render();
+}
+function clearFilters(){
+  $('f-ano').value='Todos';$('f-dir').value='Todas';$('f-eixo').value='Todos';$('f-ind').value='Todos';
+  FILT=[...IND]; render();
 }
 
-// HERO ─────────────────────────────────────────────────────────────────────────
-function renderHero(){
-  const comMeta = IND.filter(d=>d.status!=='sem_meta');
-  const total   = comMeta.length;
-  if(!total){ $('h-pct').textContent='—'; return; }
-
-  const nDentro = comMeta.filter(d=>d.status==='dentro').length;
-  const nCrit   = comMeta.filter(d=>d.status==='abaixo'&&d.tendencia==='desfavoravel').length;
-  const pct     = Math.round((nDentro/total)*100);
-  const cor     = pct>=65?'green':pct>=45?'amber':'red';
-
-  $('h-pct').textContent = pct+'%';
-  $('h-pct').className = 'hero-big '+cor;
-  $('h-sub').textContent = `${nDentro} de ${total} indicadores com meta atingida (base 2025)`;
-
-  // Delta 2026
-  const comVar = IND.filter(d=>d.varYoy!=null);
-  const nMelh  = comVar.filter(d=>d.tendencia==='favoravel').length;
-  if(comVar.length){
-    $('h-delta').textContent = `↑ ${nMelh} de ${comVar.length} indicadores melhorando em 2026`;
-    $('h-delta').className = 'hero-delta '+(nMelh/comVar.length>=.5?'up':'dn');
-  }
-
-  // Críticos
-  const crits = comMeta.filter(d=>d.status==='abaixo'&&d.tendencia==='desfavoravel');
-  $('h-crit-n').textContent = nCrit;
-  $('h-crit-n').className = 'stat-n '+(nCrit===0?'green':nCrit<=2?'amber':'red');
-  $('h-crit-names').innerHTML = crits.slice(0,3).map(d=>d.indicador.split('–')[0].split('-')[0].trim()).join('<br>')||'nenhum';
-
-  // Dentro
-  $('h-ok-n').textContent = nDentro;
-  $('h-ok-n').className = 'stat-n '+(pct>=65?'green':'amber');
-  const okInds = comMeta.filter(d=>d.status==='dentro').map(d=>d.indicador.split('–')[0].split(' - ')[0].trim());
-  $('h-ok-names').innerHTML = okInds.slice(0,3).join('<br>') + (okInds.length>3?`<br>+${okInds.length-3} mais`:'');
+// ── Render ────────────────────────────────────────────────────────────────────
+function render(){
+  const now=new Date();
+  $('ts-val').textContent=now.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'})+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  renderCards();
+  renderExec();
+  renderDonut();
+  renderRankings();
+  updateChart();
+  $('loading').style.display='none'; $('page').style.display='';
 }
 
 // CARDS ────────────────────────────────────────────────────────────────────────
 function renderCards(){
-  // Destaques: indicadores com configuração explícita + tendência favorável
-  const destConf  = ['Índice Padrão de Limpeza - IPL','Performance de Atendimento de Capina em Logradouro','Acidente de Trabalho – Típico','Tempo Médio de Atendimento - Remoção Gratuita'];
-  const atencConf = ['Performance de Atendimento da Remoção Gratuita','Solicitações 1746 - Capina','Absenteísmo - Gerenciável','Índice de Utilização da Frota de Coleta Domiciliar'];
-
-  function buildCard(ind){
-    const d = IND.find(i=>i.indicador===ind);
-    const conf = CARD_CONF[ind];
-    if(!d) return '';
-
-    // Número principal: acum26 se disponível, senão acum25
-    const val    = d.acum26!=null ? d.acum26 : d.acum25;
-    const unit   = d.acum25!=null&&d.acum25<=100 ? '%' : '';
-    const valFmt = val!=null ? fmtN(val, unit) : '—';
-
-    // Delta YoY
-    let deltaHtml = '';
+  const ORDER=['Índice Padrão de Limpeza - IPL','Performance de Atendimento da Remoção Gratuita','Solicitações 1746 - Capina','Performance de Atendimento de Capina em Logradouro','Acidente de Trabalho – Típico','Índice de Utilização da Frota de Coleta Domiciliar'];
+  const html=ORDER.map(ind=>{
+    const d=IND.find(i=>i.indicador===ind);
+    const conf=CARD_CONF[ind];
+    if(!d||!conf) return '';
+    const val=d.acum26!=null?d.acum26:d.acum25;
+    const isSmall = val!=null&&val<200;
+    const numStr = val==null?'—':isSmall?fmtN(val,1):fmtN(val,0);
+    const unit   = d.acum25!=null&&d.acum25<=100?'%':'';
+    let deltaHtml='';
     if(d.varYoy!=null){
-      const sign  = d.varYoy>0?'+':'';
-      const dCor  = d.tendencia==='favoravel'?'up':d.tendencia==='desfavoravel'?'dn':'nt';
-      const arrow = d.varYoy>0?'▲':'▼';
-      deltaHtml = `<span class="card-delta ${dCor}">${arrow} ${sign}${d.varYoy.toFixed(1).replace('.',',')}%</span>`;
+      const sign=d.varYoy>0?'+':'',arrow=d.varYoy>0?'▲':'▼';
+      const dcor=d.tendencia==='favoravel'?'up':d.tendencia==='desfavoravel'?'dn':'nt';
+      deltaHtml=`<span class="card-delta ${dcor}">${arrow} ${sign}${d.varYoy.toFixed(1).replace('.',',')}%</span>`;
     }
-    const ctx = conf ? conf.ctx : 'vs 2025';
-    const txt = conf ? conf.txt : `<strong>${ind}</strong>`;
-    const cor = conf ? conf.cor : (d.tendencia==='favoravel'?'green':d.tendencia==='desfavoravel'?'red':'blue');
-    const eye = conf ? conf.eye : d.eixo;
-    const icon= conf ? conf.icon : '·';
-
-    return `<div class="card ${cor}">
+    return `<div class="card ${conf.cor}">
       <div class="card-top">
-        <div class="card-icon ${cor}">${icon}</div>
-        <div class="card-eye ${cor}">${eye}</div>
+        <div class="card-ico ${conf.cor}">${conf.ico}</div>
+        <div class="card-eye ${conf.cor}">${conf.eye}</div>
       </div>
-      <div class="card-n ${cor}">${valFmt.replace('%','')}<span class="card-n-unit">${unit}</span></div>
-      <div class="card-txt">${txt}</div>
-      <div class="card-foot">
-        ${deltaHtml}
-        <span class="card-delta-ctx">${ctx}</span>
-      </div>
+      <div class="card-n ${conf.cor}">${numStr}<span class="card-unit">${unit}</span></div>
+      <div class="card-txt">${conf.txt}</div>
+      <div class="card-foot">${deltaHtml}<span class="card-ctx">${conf.ctx}</span></div>
     </div>`;
-  }
-
-  $('cards-destaques').innerHTML = destConf.map(buildCard).filter(Boolean).join('');
-  $('cards-atencao').innerHTML   = atencConf.map(buildCard).filter(Boolean).join('');
+  }).filter(Boolean).join('');
+  $('cards-row').innerHTML=html;
 }
 
-// MAPA ─────────────────────────────────────────────────────────────────────────
-function renderMapa(){
-  const EIXOS=['Pessoas','Segurança','Operação','Atendimento','Outros'];
-  const presentes = [...new Set(IND.map(d=>d.eixo))];
-  const todos = EIXOS.filter(e=>presentes.includes(e));
-  for(const e of presentes) if(!todos.includes(e)) todos.push(e);
+// LEITURA EXECUTIVA ────────────────────────────────────────────────────────────
+function renderExec(){
+  const data=FILT.length?FILT:IND;
+  const comMeta=data.filter(d=>d.status!=='sem_meta');
+  const total=comMeta.length;
+  if(!total){$('exec-body').innerHTML='<p>Sem dados com meta definida no filtro atual.</p>';return;}
+  const nDentro=comMeta.filter(d=>d.status==='dentro').length;
+  const nAbaixo=comMeta.filter(d=>d.status==='abaixo').length;
+  const nCrit=comMeta.filter(d=>d.status==='abaixo'&&d.tendencia==='desfavoravel').length;
+  const semMeta=data.filter(d=>d.status==='sem_meta').length;
+  const pct=Math.round((nDentro/total)*100);
+  // eixo com mais desvios
+  const eixoDesvios={};
+  for(const d of comMeta.filter(d=>d.status==='abaixo')) eixoDesvios[d.eixo]=(eixoDesvios[d.eixo]||0)+1;
+  const piorEixo=Object.entries(eixoDesvios).sort((a,b)=>b[1]-a[1])[0];
+  // melhor indicador selecionado no chart
+  const selInd=$('chart-sel')?.value;
+  const selD=IND.find(d=>d.indicador===selInd);
 
-  $('mapa').innerHTML = todos.map(e=>{
-    const g = IND.filter(d=>d.eixo===e&&d.status!=='sem_meta');
-    if(!g.length) return `<div class="eixo"><div class="eixo-dot gray"></div><div class="eixo-nome">${e}</div><div class="eixo-sit gray">Sem dados</div><div class="eixo-det">—</div></div>`;
-    const nD   = g.filter(d=>d.status==='dentro').length;
-    const nC   = g.filter(d=>d.status==='abaixo'&&d.tendencia==='desfavoravel').length;
-    const pct  = Math.round((nD/g.length)*100);
-    const cor  = nC>0?'red':pct>=60?'green':'amber';
-    const sit  = nC>0?'Crítico':pct>=60?'Estável':'Atenção';
-    return `<div class="eixo">
-      <div class="eixo-dot ${cor}"></div>
-      <div class="eixo-nome">${e}</div>
-      <div class="eixo-sit ${cor}">${sit}</div>
-      <div class="eixo-det">${nD}/${g.length} metas</div>
-    </div>`;
-  }).join('');
+  let txt=`<p>No recorte atual, <strong>${nDentro} de ${total}</strong> indicadores com meta estão dentro ou acima da referência. Isso representa <strong>${pct}%</strong> da carteira monitorada.</p>`;
+  if(nAbaixo>0) txt+=`<p>O ponto de atenção está em <strong>${nAbaixo} indicadores abaixo da meta</strong> (${100-pct}%).${piorEixo?` O eixo com maior concentração de atenção é <strong>${piorEixo[0]}</strong>, com ${piorEixo[1]} indicador${piorEixo[1]>1?'es':''} abaixo da referência.`:''}</p>`;
+  if(selD&&selD.varYoy!=null) txt+=`<p>Para o indicador selecionado (<strong>${selInd?.split(' - ')[0]||selInd}</strong>), a variação YoY Q1 é de <strong>${selD.varYoy>0?'+':''}${selD.varYoy.toFixed(1).replace('.',',')}%</strong>, com tendência ${selD.tendencia==='favoravel'?'favorável':'desfavorável'} em 2026.</p>`;
+  $('exec-body').innerHTML=txt;
+
+  $('exec-kpis').innerHTML=`
+    <div class="ekpi"><div class="ekpi-n gray">${total+semMeta}</div><div class="ekpi-lbl">Indicadores</div></div>
+    <div class="ekpi"><div class="ekpi-n green">${nDentro}</div><div class="ekpi-lbl">Dentro da meta</div></div>
+    <div class="ekpi"><div class="ekpi-n red">${nAbaixo}</div><div class="ekpi-lbl">Abaixo da meta</div></div>
+    <div class="ekpi"><div class="ekpi-n gray">${semMeta}</div><div class="ekpi-lbl">Sem meta</div></div>`;
 }
 
-// DRILL ────────────────────────────────────────────────────────────────────────
-function renderDrill(){
-  $('drill-sub').textContent = `${IND.length} indicadores · nível corporativo COMLURB`;
-  const eixos = ['Todos',...new Set(IND.map(d=>d.eixo))];
-  $('drill-filters').innerHTML = `<span class="dflbl">Eixo</span>`;
-  for(const e of eixos){
-    const btn=document.createElement('button');
-    btn.className='fbtn'+(e==='Todos'?' on':'');
-    btn.textContent=e;
-    btn.onclick=()=>{ DRILL_EIXO=e; $('drill-filters').querySelectorAll('.fbtn').forEach(b=>b.classList.remove('on')); btn.classList.add('on'); renderDrillTable(); };
-    $('drill-filters').appendChild(btn);
-  }
-  renderDrillTable();
-}
+// DONUT ────────────────────────────────────────────────────────────────────────
+function renderDonut(){
+  const data=FILT.length?FILT:IND;
+  const byEixo={};
+  for(const d of data){ byEixo[d.eixo]=(byEixo[d.eixo]||0)+1; }
+  const sorted=Object.entries(byEixo).sort((a,b)=>b[1]-a[1]);
+  const total=sorted.reduce((s,[,n])=>s+n,0);
+  const labels=sorted.map(([e])=>e);
+  const vals=sorted.map(([,n])=>n);
+  const colors=DONUT_COLORS.slice(0,labels.length);
 
-function renderDrillTable(){
-  const data = DRILL_EIXO==='Todos'?IND:IND.filter(d=>d.eixo===DRILL_EIXO);
-  const sorted=[...data].sort((a,b)=>{
-    const s=d=>(d.status==='abaixo'&&d.tendencia==='desfavoravel')?0:d.status==='abaixo'?1:d.tendencia==='desfavoravel'?2:3;
-    return s(a)-s(b);
+  if(donutChart) donutChart.destroy();
+  donutChart=new Chart($('donut-chart'),{
+    type:'doughnut',
+    data:{labels,datasets:[{data:vals,backgroundColor:colors,borderColor:Array(colors.length).fill('#0c1b2e'),borderWidth:2,hoverOffset:4}]},
+    options:{responsive:false,cutout:'65%',plugins:{legend:{display:false},tooltip:{
+      backgroundColor:'#0c1b2e',borderColor:'#1e3550',borderWidth:1,
+      titleColor:'#cfe2f5',bodyColor:'#4d6f8f',
+      callbacks:{label:ctx=>`${ctx.label}: ${ctx.parsed} (${Math.round(ctx.parsed/total*100)}%)`}
+    }},
+    animation:{duration:600}}
   });
 
-  $('drill-tbody').innerHTML='';
-  for(const d of sorted){
-    const cor  = d.status==='abaixo'&&d.tendencia==='desfavoravel'?'red':d.status==='abaixo'?'amber':d.status==='dentro'?'green':'gray';
-    const lbl  = d.status==='abaixo'&&d.tendencia==='desfavoravel'?'Crítico':d.status==='abaixo'?'Abaixo':d.status==='dentro'?'Meta atingida':'Sem meta';
-    const tCor = d.tendencia==='favoravel'?'fav':d.tendencia==='desfavoravel'?'desf':'est';
-    const tLbl = d.tendencia==='favoravel'?'▲ Favorável':d.tendencia==='desfavoravel'?'▼ Desfavorável':d.tendencia==='estavel'?'= Estável':'—';
-    const pW   = d.pct_meta!=null?Math.min(Math.round((Math.min(d.pct_meta,130)/130)*100),100):0;
-    const varS = d.varYoy!=null?(d.varYoy>0?'+':'')+d.varYoy.toFixed(1).replace('.',',')+'%':'—';
-    const varC = d.varYoy==null?'':d.tendencia==='favoravel'?'style="color:var(--green)"':d.tendencia==='desfavoravel'?'style="color:var(--red)"':'';
-    const tr=document.createElement('tr');
-    tr.innerHTML=`<td style="max-width:220px;line-height:1.3">${d.indicador}</td>
-      <td style="color:var(--muted)">${d.eixo}</td>
-      <td><span class="brow"><span class="brow-f ${cor}" style="display:block;width:${pW}%;height:100%"></span></span>${fmtN(d.acum25)}</td>
-      <td style="font-family:'DM Mono',monospace;font-size:11px">${fmtN(d.meta25)}</td>
-      <td style="font-family:'DM Mono',monospace;font-size:11px">${fmtN(d.acum26)}</td>
-      <td style="font-family:'DM Mono',monospace;font-size:11px" ${varC}>${varS}</td>
-      <td><span class="tend ${tCor}">${tLbl}</span></td>
-      <td><span class="pill ${cor}">${lbl}</span></td>`;
-    $('drill-tbody').appendChild(tr);
+  $('donut-legend').innerHTML=sorted.map(([e,n],i)=>`
+    <div class="dl-item">
+      <div class="dl-left">
+        <div class="dl-swatch" style="background:${colors[i]}"></div>
+        <div class="dl-name">${e}</div>
+      </div>
+      <div class="dl-right">
+        <div class="dl-n">${n}</div>
+        <div class="dl-pct">(${Math.round(n/total*100)}%)</div>
+      </div>
+    </div>`).join('');
+}
+
+// GRÁFICO DE LINHA ─────────────────────────────────────────────────────────────
+function updateChart(){
+  const ind=$('chart-sel')?.value;
+  if(!ind) return;
+  const d=IND.find(i=>i.indicador===ind);
+  if(!d){if(lineChart){lineChart.destroy();lineChart=null;}return;}
+
+  const data24=MESES.map(m=>d.meses24[m]||null);
+  const data25=MESES.map(m=>d.meses25[m]||null);
+  const data26=MESES.map(m=>d.meses26[m]||null);
+
+  const ds=[];
+  if(data24.some(v=>v!=null)) ds.push({label:'2024',data:data24,borderColor:'#4a8fd4',backgroundColor:'rgba(74,143,212,.08)',pointRadius:3,pointHoverRadius:5,borderWidth:1.5,tension:.35,spanGaps:true});
+  if(data25.some(v=>v!=null)) ds.push({label:'2025',data:data25,borderColor:'#cc8a26',backgroundColor:'rgba(204,138,38,.08)',pointRadius:3,pointHoverRadius:5,borderWidth:1.5,tension:.35,spanGaps:true});
+  if(data26.some(v=>v!=null)) ds.push({label:'2026',data:data26,borderColor:'#29b87a',backgroundColor:'rgba(41,184,122,.1)',pointRadius:3,pointHoverRadius:5,borderWidth:2,tension:.35,spanGaps:true,borderDash:[]});
+
+  if(lineChart) lineChart.destroy();
+  lineChart=new Chart($('line-chart'),{
+    type:'line',
+    data:{labels:MESES,datasets:ds},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{
+        backgroundColor:'#0c1b2e',borderColor:'#1e3550',borderWidth:1,
+        titleColor:'#cfe2f5',bodyColor:'#4d6f8f',mode:'index',intersect:false
+      }},
+      scales:{
+        x:{grid:{color:'#172b42'},ticks:{color:'#4d6f8f',font:{size:10}}},
+        y:{grid:{color:'#172b42'},ticks:{color:'#4d6f8f',font:{size:10}},beginAtZero:false}
+      },
+      interaction:{mode:'nearest',axis:'x',intersect:false},
+      animation:{duration:400}
+    }
+  });
+  // atualiza leitura executiva com novo indicador selecionado
+  renderExec();
+}
+
+// RANKINGS ─────────────────────────────────────────────────────────────────────
+function renderRankings(){
+  const rank1746=[
+    {nome:'Remoção Gratuita',val:10287},
+    {nome:'Remoção de Resíduos',val:4234},
+    {nome:'Capina',val:3268},
+    {nome:'Varrição',val:2540},
+    {nome:'Coleta',val:2079},
+    {nome:'Limpeza de Ralos',val:583},
+  ];
+  const rankOuv=[
+    {nome:'Remoção Gratuita',val:984},
+    {nome:'Remoção de Resíduos',val:592},
+    {nome:'Capina',val:336},
+    {nome:'Varrição',val:282},
+    {nome:'Coleta',val:229},
+    {nome:'Limpeza de Ralos',val:75},
+  ];
+  // Tentar pegar do IND (caso planilha tenha dados mais recentes)
+  const ind1746Prefix='Solicitações 1746 - ';
+  const indOuvPrefix='Solicitações Ouvidoria - ';
+  function buildFromIND(prefix,colorClass){
+    const items=IND.filter(d=>d.indicador.startsWith(prefix)&&d.acum26!=null)
+      .map(d=>({nome:d.indicador.replace(prefix,''),val:d.acum26}))
+      .sort((a,b)=>b.val-a.val);
+    return items.length?items:null;
   }
-  if(!sorted.length) $('drill-tbody').innerHTML=`<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:20px">Nenhum indicador.</td></tr>`;
+  const live1746=buildFromIND(ind1746Prefix,'blue');
+  const liveOuv=buildFromIND(indOuvPrefix,'amber');
+
+  renderRankEl('rank-1746', live1746||rank1746, 'blue');
+  renderRankEl('rank-ouv',  liveOuv||rankOuv,   'amber');
+}
+function renderRankEl(id,items,color){
+  const total=items.reduce((s,i)=>s+i.val,0)||1;
+  $( id).innerHTML=items.map((item,i)=>`
+    <div class="rank-item">
+      <div class="rank-pos">${i+1}</div>
+      <div class="rank-name">${item.nome}</div>
+      <div class="rank-bar-wrap">
+        <div class="rank-bar-track"><div class="rank-bar-fill ${color}" style="width:${Math.round(item.val/items[0].val*100)}%"></div></div>
+      </div>
+      <div class="rank-val">${item.val.toLocaleString('pt-BR')}</div>
+      <div class="rank-pct">${Math.round(item.val/total*100)}%</div>
+    </div>`).join('');
 }
 
-function toggleDrill(){
-  $('drill-body').classList.toggle('open');
-  $('drill-chev').classList.toggle('open');
-}
+function showErr(msg){$('err').innerHTML=msg;$('err').style.display='block';$('loading').style.display='none';$('page').style.display='';}
 
-function showErr(msg){
-  $('err').innerHTML=msg; $('err').style.display='block';
-  $('loading').style.display='none'; $('page').style.display='';
-}
-
+// ── START ──────────────────────────────────────────────────────────────────────
 load();
 </script>
 </body>
