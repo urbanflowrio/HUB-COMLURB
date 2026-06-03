@@ -3,1602 +3,687 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PRE · Sala de Situação · HUB COMLURB</title>
-
+<title>PRE · Resultados Corporativos · HUB COMLURB</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-
 <style>
 :root{
-  --bg:#07111f;
-  --ink:#f2f6ff;
-  --muted:#9fb0c7;
-  --panel:#0d1b2f;
-  --panel2:#0b1a2e;
-  --line:#274260;
-  --blue:#6da5d8;
-  --orange:#e87535;
-  --green:#78aaa3;
-  --red:#ef6a5d;
-  --yellow:#e8c335;
-  --purple:#a78bfa;
-  --shadow:0 18px 45px rgba(0,0,0,.28);
+  --bg:#06101c;--ink:#e8f0fa;--muted:#6a8aa8;--panel:#0b1826;
+  --line:#1e3450;--blue:#5b9bd5;--orange:#e87535;
+  --green:#6ba89a;--red:#d9604e;--yellow:#c9a830;
+  --shadow:0 4px 24px rgba(0,0,0,.32);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{
-  background:
-    radial-gradient(circle at top left,rgba(109,165,216,.10),transparent 32%),
-    radial-gradient(circle at top right,rgba(232,117,53,.08),transparent 26%),
-    var(--bg);
-  color:var(--ink);
-  font-family:Inter,Segoe UI,Arial,sans-serif;
-}
-.app{max-width:1880px;margin:0 auto;padding:18px}
-.header{
-  display:flex;align-items:center;gap:22px;
-  padding:20px 22px;
-  border:1px solid rgba(111,164,216,.25);
-  border-radius:22px;
-  background:rgba(11,26,46,.96);
-  box-shadow:var(--shadow);
-  margin-bottom:14px;
-}
-.logo{
-  width:230px;max-height:58px;object-fit:contain;
-  border-right:1px solid rgba(255,255,255,.35);
-  padding-right:20px;flex-shrink:0;
-}
-.eyebrow{
-  font-size:11px;font-weight:900;letter-spacing:.16em;
-  text-transform:uppercase;color:#b9c9dc
-}
-h1{margin:4px 0;font-size:clamp(22px,2vw,34px);line-height:1.05;color:#fff}
-.sub{color:#c5d5e8;font-size:13px;margin-top:2px}
+html{font-size:14px}
+body{background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans',Inter,Segoe UI,Arial,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+.app{max-width:1440px;margin:0 auto;padding:24px 28px}
 
-/* filtros */
-.controls{
-  display:grid;grid-template-columns:110px 1fr 1fr 1fr 1fr 120px;
-  gap:10px;margin:14px 0;
-}
-.field{
-  border:1px solid var(--line);
-  background:rgba(13,27,47,.96);
-  border-radius:14px;
-  padding:10px 12px;
-}
-.btn-clear{
-  border:1px solid rgba(232,117,53,.75);
-  background:#14243b;border-radius:14px;
-  padding:10px 12px;cursor:pointer;color:#fff;
-  font-weight:950;font-size:13px;transition:.15s;
-}
-.btn-clear:hover{background:#1e3352}
-label{
-  display:block;color:#aebbd0;font-size:10px;
-  letter-spacing:.13em;text-transform:uppercase;
-  font-weight:900;margin-bottom:5px
-}
-select{
-  width:100%;background:transparent;border:0;color:#f2f6ff;
-  font-weight:800;outline:0;cursor:pointer;font-size:13px
-}
-select option{background:#0d1b2f;color:#fff}
+/* ── HEADER ── */
+.header{display:flex;align-items:center;gap:24px;padding:18px 24px;border-bottom:1px solid var(--line);margin-bottom:20px}
+.logo{height:44px;width:auto;object-fit:contain;border-right:1px solid rgba(255,255,255,.15);padding-right:22px;flex-shrink:0}
+.header-text{}
+.eyebrow{font-size:10px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+h1{font-size:20px;font-weight:700;color:#fff;letter-spacing:-.01em;line-height:1.15}
+.header-right{margin-left:auto;text-align:right}
+.updated{font-size:11px;color:var(--muted)}
+.scope-info{font-size:11px;color:#3d6080;margin-top:2px}
 
-/* títulos */
-.section-label{
-  font:800 11px/1 Inter,sans-serif;
-  letter-spacing:.16em;text-transform:uppercase;
-  color:#6f8aaa;margin:20px 0 10px;
-  padding-left:2px;display:flex;align-items:center;gap:10px;
-}
-.section-label:after{
-  content:"";flex:1;height:1px;background:rgba(39,66,96,.68)
-}
+/* ── FILTROS ── */
+.controls{display:flex;gap:10px;align-items:stretch;margin-bottom:24px;flex-wrap:wrap}
+.field{border:1px solid var(--line);background:transparent;border-radius:6px;padding:7px 11px;flex:1;min-width:120px}
+label{display:block;font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+select{width:100%;background:transparent;border:0;color:var(--ink);font-size:13px;font-weight:500;outline:0;cursor:pointer}
+select option{background:#0b1826}
+.btn-clear{border:1px solid var(--line);background:transparent;border-radius:6px;padding:7px 16px;cursor:pointer;color:var(--muted);font-size:12px;font-weight:600;letter-spacing:.04em;transition:color .15s,border-color .15s;white-space:nowrap}
+.btn-clear:hover{color:var(--ink);border-color:#3d6080}
 
-/* diagnóstico */
-.diagnostic{
-  display:none;
-  grid-template-columns:repeat(5,1fr);
-  gap:10px;
-  margin-bottom:12px;
-}
-.diag-card{
-  background:#091728;border:1px dashed rgba(109,165,216,.45);
-  border-radius:14px;padding:12px 14px;
-}
-.diag-card span{
-  display:block;color:#8fa7c3;font-size:9px;font-weight:900;
-  letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px;
-}
-.diag-card b{font-size:21px;color:#fff}
-.diag-list{
-  grid-column:1/-1;
-  background:#091728;border:1px dashed rgba(109,165,216,.35);
-  border-radius:14px;padding:12px 14px;
-  color:#c7d8ef;font-size:11px;line-height:1.55;
-  max-height:150px;overflow:auto;
-}
-.diag-toggle{
-  border:1px solid rgba(109,165,216,.55);
-  background:#0b1a2e;color:#cfe2f8;
-  border-radius:999px;padding:6px 10px;
-  font-size:11px;font-weight:900;cursor:pointer;
-  margin-left:auto;
-}
+/* ── SÍNTESE ── */
+.sintese{font-size:13.5px;color:#a8c4e0;line-height:1.7;margin-bottom:14px;padding:0 2px}
+.sintese b{color:#d8eaff;font-weight:600}
 
-/* KPIs */
-.kpis{
-  display:grid;grid-template-columns:repeat(5,1fr);
-  gap:12px;margin-bottom:6px;
-}
-.kpi{
-  position:relative;overflow:hidden;
-  background:rgba(13,27,47,.98);
-  border:1px solid var(--line);
-  border-radius:18px;padding:16px 18px;
-  box-shadow:var(--shadow);
-}
-.kpi:before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:#4b7eac}
-.kpi.green:before{background:var(--green)}
-.kpi.red:before{background:var(--red)}
-.kpi.orange:before{background:var(--orange)}
-.kpi.yellow:before{background:var(--yellow)}
-.kpi.purple:before{background:var(--purple)}
-.kpi span{
-  display:block;color:#aebbd0;font-size:10px;
-  letter-spacing:.12em;text-transform:uppercase;font-weight:950
-}
-.kpi strong{
-  display:block;font-size:clamp(22px,1.9vw,32px);
-  margin:8px 0 3px;font-weight:950;color:#fff
-}
-.kpi small{color:#a8b8cf;font-size:11px;line-height:1.4}
+/* ── PLACAR ── */
+.placar{display:flex;align-items:center;gap:0;border:1px solid var(--line);border-radius:6px;overflow:hidden;margin-bottom:20px;background:var(--panel)}
+.pl-item{padding:10px 20px;border-right:1px solid var(--line);display:flex;align-items:baseline;gap:7px}
+.pl-item:last-child{border-right:0}
+.pl-label{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.pl-val{font-size:18px;font-weight:700;color:#fff}
+.pl-val.pct{font-size:22px;font-weight:800}
+.pl-val.crit{color:var(--red)}
+.pl-val.alert{color:var(--yellow)}
+.pl-val.sem{color:#3d6080}
+.pl-sep{flex:1}
 
-/* Mapa calor */
-.heatmap-wrap{
-  display:grid;grid-template-columns:repeat(6,1fr);
-  gap:10px;margin-bottom:6px
-}
-.heat-card{
-  border:1px solid var(--line);
-  background:rgba(13,27,47,.98);
-  border-radius:16px;padding:16px 15px;
-  display:flex;align-items:center;gap:12px;
-  cursor:pointer;transition:.15s;position:relative;overflow:hidden;
-}
-.heat-card:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(0,0,0,.3)}
-.heat-card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px}
-.heat-card.verde:before{background:var(--green)}
-.heat-card.amarelo:before{background:var(--yellow)}
-.heat-card.vermelho:before{background:var(--red)}
-.heat-card.cinza:before{background:#70839c}
-.heat-dot{
-  width:38px;height:38px;border-radius:50%;
-  flex-shrink:0;display:flex;align-items:center;justify-content:center;
-  font-size:15px;font-weight:950;
-}
-.heat-card.verde .heat-dot{background:rgba(120,170,163,.18);color:var(--green)}
-.heat-card.amarelo .heat-dot{background:rgba(232,195,53,.14);color:var(--yellow)}
-.heat-card.vermelho .heat-dot{background:rgba(239,106,93,.15);color:var(--red)}
-.heat-card.cinza .heat-dot{background:rgba(159,176,199,.1);color:#9fb0c7}
-.heat-eixo{
-  font-size:10px;font-weight:950;color:#9fb0c7;
-  text-transform:uppercase;letter-spacing:.10em;margin-bottom:4px
-}
-.heat-status{font-size:15px;font-weight:900;color:#fff}
-.heat-detalhe{font-size:11px;color:#a8b8cf;margin-top:3px}
+/* ── SEÇÃO ── */
+.sec{font-size:9px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#2a4860;margin:28px 0 10px;padding-bottom:8px;border-bottom:1px solid var(--line)}
 
-/* Agenda */
-.agenda-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.agenda-card{
-  border:1px solid var(--line);
-  background:rgba(13,27,47,.98);
-  border-radius:16px;padding:16px 18px;
-  position:relative;overflow:hidden;transition:.15s;
-}
-.agenda-card:hover{transform:translateY(-2px);border-color:rgba(239,106,93,.45)}
-.agenda-card:before{content:"";position:absolute;top:0;left:0;right:0;height:3px}
-.agenda-card.p1:before{background:var(--red)}
-.agenda-card.p2:before{background:var(--orange)}
-.agenda-card.p3:before{background:var(--yellow)}
-.ag-num{
-  font:900 10px 'IBM Plex Mono',monospace;
-  color:#8fa7c3;letter-spacing:.1em;text-transform:uppercase;margin-bottom:7px
-}
-.ag-eixo{
-  font-size:10px;font-weight:950;text-transform:uppercase;
-  letter-spacing:.1em;margin-bottom:4px
-}
-.p1 .ag-eixo{color:var(--red)}
-.p2 .ag-eixo{color:var(--orange)}
-.p3 .ag-eixo{color:var(--yellow)}
-.ag-titulo{font-size:14px;font-weight:900;color:#fff;line-height:1.35;margin-bottom:6px}
-.ag-contexto{font-size:12px;color:#a8b8cf;line-height:1.55}
-.ag-indicadores{margin-top:10px;display:flex;flex-direction:column;gap:4px}
-.ag-ind{
-  font-size:11px;color:#c8daf0;padding:4px 8px;
-  background:rgba(255,255,255,.05);border-radius:6px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis
-}
+/* ══════════════════════════════════════
+   MATRIZ EXECUTIVA
+   ══════════════════════════════════════ */
+.matriz{width:100%;border-collapse:collapse;margin-bottom:4px}
+.matriz th{padding:9px 16px;text-align:left;font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#2a4860;border-bottom:2px solid var(--line);background:transparent}
+.matriz th:not(:first-child){text-align:center}
+.matriz td{padding:16px 16px;border-bottom:1px solid rgba(30,52,80,.6);vertical-align:middle}
+.matriz tr:last-child td{border-bottom:0}
+.matriz tr:hover td{background:rgba(91,155,213,.04)}
+.m-eixo{font-size:14px;font-weight:600;color:#c8daf0;display:flex;align-items:center;gap:10px}
+.m-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.m-num{text-align:center}
+.m-num b{display:block;font-size:20px;font-weight:700;line-height:1}
+.m-num small{font-size:10px;color:var(--muted);margin-top:1px;display:block}
+.m-num.verde b{color:var(--green)}
+.m-num.amarelo b{color:var(--yellow)}
+.m-num.crit b{color:var(--red)}
+.m-sit{text-align:center}
+.m-badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.06em;padding:4px 10px;border-radius:4px;text-transform:uppercase}
+.m-badge.verde{background:rgba(107,168,154,.12);color:var(--green)}
+.m-badge.amarelo{background:rgba(201,168,48,.1);color:var(--yellow)}
+.m-badge.crit{background:rgba(217,96,78,.12);color:var(--red)}
+.m-badge.sem{background:rgba(61,96,128,.1);color:#3d6080}
+.m-total{font-size:11px;color:#3d6080;text-align:center}
 
-/* Radar diretorias */
-.radar-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
-.radar-card{
-  border:1px solid var(--line);
-  background:rgba(13,27,47,.98);
-  border-radius:14px;padding:14px 16px
-}
-.radar-dir{
-  font:900 10px 'IBM Plex Mono',monospace;
-  color:#9fb0c7;text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px
-}
-.radar-taxa{font-size:27px;font-weight:950;color:#fff;line-height:1;margin-bottom:7px}
-.radar-bar{height:5px;background:#0e2035;border-radius:10px;overflow:hidden;margin-bottom:7px}
-.radar-bar i{display:block;height:100%;border-radius:10px}
-.radar-stats{font-size:11px;color:#a8b8cf;line-height:1.6}
+/* ══════════════════════════════════════
+   DIRETORIAS
+   ══════════════════════════════════════ */
+.dir-table{width:100%;border-collapse:collapse}
+.dir-table th{padding:8px 14px;text-align:left;font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#2a4860;border-bottom:2px solid var(--line)}
+.dir-table th:not(:first-child){text-align:right}
+.dir-table td{padding:13px 14px;border-bottom:1px solid rgba(30,52,80,.5);font-size:13px;color:#a8c4e0}
+.dir-table tr:last-child td{border-bottom:0}
+.dir-table tr:hover td{background:rgba(91,155,213,.04)}
+.dir-nome{font-size:13px;font-weight:600;color:#d8eaff}
+.dir-taxa{font-size:16px;font-weight:700;text-align:right}
+.dir-taxa.alta{color:var(--green)}.dir-taxa.media{color:var(--yellow)}.dir-taxa.baixa{color:var(--red)}
+.dir-bar-cell{width:140px}
+.dir-bar-wrap{height:3px;background:rgba(30,52,80,.8);border-radius:2px;overflow:hidden}
+.dir-bar-fill{height:100%;border-radius:2px;transition:width .4s}
+.dir-num{text-align:right;font-size:12px}
+.dir-crit{color:var(--red)}.dir-alert{color:var(--yellow)}.dir-ok{color:var(--green)}
+.dir-table td.muted{color:#3d6080}
 
-/* insights */
-.ins-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.ins-card{
-  border:1px solid var(--line);
-  background:rgba(13,27,47,.98);
-  border-radius:16px;padding:15px 17px;
-  cursor:pointer;transition:.15s;position:relative;overflow:hidden;
-}
-.ins-card:before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--blue)}
-.ins-card.good:before{background:var(--green)}
-.ins-card.warn:before{background:var(--yellow)}
-.ins-card.bad:before{background:var(--red)}
-.ins-card.neutral:before{background:var(--purple)}
-.ins-card:hover{transform:translateY(-2px);border-color:rgba(109,165,216,.45);box-shadow:0 12px 30px rgba(0,0,0,.28)}
-.ins-card.open{border-color:rgba(109,165,216,.65);background:#0e2038}
-.ins-tag{
-  font:700 9px 'IBM Plex Mono',monospace;
-  letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px
-}
-.ins-card.good .ins-tag{color:var(--green)}
-.ins-card.warn .ins-tag{color:var(--yellow)}
-.ins-card.bad .ins-tag{color:var(--red)}
-.ins-card.neutral .ins-tag{color:var(--purple)}
-.ins-card .ins-tag{color:var(--blue)}
-.ins-titulo{font-size:13px;font-weight:900;color:#fff;line-height:1.35;margin-bottom:5px}
-.ins-val{font-size:21px;font-weight:950;color:#fff;line-height:1;margin-bottom:4px}
-.ins-sub{font-size:11px;color:#a8b8cf;line-height:1.4}
-.ins-arrow{position:absolute;top:13px;right:14px;font-size:12px;color:#9fb0c7;transition:.2s}
-.ins-card.open .ins-arrow{transform:rotate(180deg);color:var(--blue)}
+/* ══════════════════════════════════════
+   RISCOS E DESTAQUES
+   ══════════════════════════════════════ */
+.rd-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:4px}
+.rd-titulo{font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#2a4860;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.rd-item{padding:12px 0;border-bottom:1px solid rgba(30,52,80,.5);display:grid;grid-template-columns:3px 1fr;gap:12px}
+.rd-item:last-child{border-bottom:0}
+.rd-barra{border-radius:2px}
+.rd-barra.red{background:var(--red)}.rd-barra.green{background:var(--green)}
+.rd-corpo{}
+.rd-nome{font-size:13px;font-weight:600;color:#d8eaff;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.rd-nome:hover{color:#fff;text-decoration:underline;text-decoration-color:rgba(91,155,213,.4)}
+.rd-dados{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--muted)}
+.rd-dados span b{font-weight:600}
+.rd-dados .v-bad{color:var(--red)}.rd-dados .v-good{color:var(--green)}
+.rd-tend{font-size:10px;font-weight:700;letter-spacing:.04em;padding:1px 6px;border-radius:3px}
+.rd-tend.piora{color:var(--red)}.rd-tend.melhora{color:var(--green)}.rd-tend.estavel{color:var(--muted)}
 
-.ins-expand{
-  display:none;border:1px solid rgba(109,165,216,.25);
-  border-radius:16px;background:rgba(9,22,38,.97);
-  margin-top:10px;box-shadow:0 18px 45px rgba(0,0,0,.3)
-}
-.ins-expand.open{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:0;animation:slideDown .22s ease both}
-@keyframes slideDown{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:none}}
-.exp-main{padding:20px 22px;border-right:1px solid var(--line)}
-.exp-main h3{font-size:15px;font-weight:900;color:#fff;margin-bottom:12px;line-height:1.35}
-.exp-narrative{color:#d4e3f5;font-size:13px;line-height:1.75}
-.exp-narrative b{color:#fff}
-.exp-chart{padding:14px 16px}
-.exp-chart canvas{max-height:180px}
-.exp-stats{padding:14px 16px;border-left:1px solid var(--line)}
-.stat-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.06);gap:12px}
-.stat-row:last-child{border:0}
-.stat-label{font-size:11px;color:#9fb0c7;font-weight:700}
-.stat-val{font-size:12px;font-weight:900;color:#fff;text-align:right}
-.stat-val.good{color:var(--green)}
-.stat-val.bad{color:var(--red)}
-.stat-val.warn{color:var(--yellow)}
+/* ══════════════════════════════════════
+   AGENDA
+   ══════════════════════════════════════ */
+.agenda-lista{}
+.ag-item{display:grid;grid-template-columns:28px 1fr;gap:14px;padding:16px 0;border-bottom:1px solid rgba(30,52,80,.5)}
+.ag-item:last-child{border-bottom:0}
+.ag-n{font-size:12px;font-weight:700;color:#2a4860;padding-top:2px}
+.ag-corpo{}
+.ag-tema{font-size:14px;font-weight:600;color:#d8eaff;margin-bottom:4px}
+.ag-tipo{display:inline-block;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:3px;margin-bottom:6px}
+.ag-tipo.crit{background:rgba(217,96,78,.12);color:var(--red)}
+.ag-tipo.alert{background:rgba(201,168,48,.1);color:var(--yellow)}
+.ag-tipo.obs{background:rgba(61,96,128,.1);color:#4a7090}
+.ag-contexto{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:6px}
+.ag-inds{display:flex;flex-wrap:wrap;gap:5px}
+.ag-ind{font-size:10px;color:#3d6080;background:rgba(30,52,80,.6);border-radius:3px;padding:2px 7px}
 
-/* inferiores */
-.layoutBottom{display:grid;grid-template-columns:minmax(0,1fr) 370px;gap:14px}
-.colLeft,.colRight{display:flex;flex-direction:column;gap:14px}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+/* ══════════════════════════════════════
+   MODO INDICADOR — FICHA
+   ══════════════════════════════════════ */
+.ficha{display:none}
+.ficha.active{display:block}
+.corporativo.hidden{display:none}
 
-.indicator-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.indicator-card{
-  background:rgba(13,27,47,.98);
-  border:1px solid var(--line);
-  border-radius:20px;
-  box-shadow:var(--shadow);
-  overflow:hidden;
-}
-.indicator-card .body{padding:16px 18px;color:#d7e4f7;font-size:13px;line-height:1.7}
-.indicator-card .big{
-  display:block;
-  font-size:30px;
-  font-weight:950;
-  color:#fff;
-  margin:8px 0 4px;
-}
-.indicator-card .muted{color:#9fb0c7;font-size:11px}
-.indicator-kv{display:grid;grid-template-columns:1fr auto;gap:8px;border-top:1px solid rgba(255,255,255,.06);padding:8px 0}
-.indicator-kv:first-child{border-top:0}
-.indicator-kv span{color:#9fb0c7;font-size:11px;font-weight:800}
-.indicator-kv b{font-size:12px;color:#fff;text-align:right}
-@media(max-width:900px){.indicator-grid{grid-template-columns:1fr}}
+.btn-voltar{display:inline-flex;align-items:center;gap:6px;border:0;background:transparent;padding:4px 0;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;letter-spacing:.02em;margin-bottom:20px;transition:color .15s}
+.btn-voltar:hover{color:var(--ink)}
+.btn-voltar:before{content:"←";font-size:14px}
 
-.panel{
-  background:rgba(13,27,47,.98);
-  border:1px solid var(--line);
-  border-radius:20px;box-shadow:var(--shadow);overflow:hidden
-}
-.panelHead{
-  display:flex;align-items:flex-start;justify-content:space-between;gap:14px;
-  padding:14px 18px;border-bottom:1px solid var(--line);background:#0b1a2e
-}
-.panel h2{margin:0;font-size:14px;color:#fff;font-weight:900}
-.hint{font-size:11px;color:#a8b8cf;margin-top:3px}
-.badge{
-  font-size:11px;color:#dceaff;border:1px solid var(--line);
-  border-radius:999px;padding:5px 10px;background:#0d2037;
-  white-space:nowrap;flex-shrink:0
-}
-.chartWrap{padding:14px 16px 18px;height:300px}
-.chartWrap.tall{height:360px}
-.chartWrap canvas{max-height:100%}
-.evol-select{padding:10px 16px 0}
-.evol-select select{
-  width:100%;background:#0e2035;border:1px solid var(--line);
-  border-radius:10px;color:#f2f6ff;font-weight:800;
-  padding:8px 10px;outline:0;cursor:pointer;font-size:12px
-}
-.insight-box{padding:16px 18px}
-.insight-box p{color:#d7e4f7;line-height:1.7;font-size:13px;margin-top:8px}
+.ficha-topo{border-bottom:1px solid var(--line);padding-bottom:18px;margin-bottom:24px}
+.ficha-eyebrow{font-size:10px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.ficha-nome{font-size:22px;font-weight:700;color:#fff;line-height:1.2;margin-bottom:12px}
+.ficha-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.chip{display:inline-block;font-size:10px;font-weight:600;letter-spacing:.04em;padding:3px 9px;border-radius:3px}
+.chip.meta{background:rgba(107,168,154,.15);color:var(--green)}
+.chip.abaixo{background:rgba(217,96,78,.14);color:var(--red)}
+.chip.sem{background:rgba(61,96,128,.12);color:#4a7090}
+.chip.piora{background:rgba(217,96,78,.1);color:var(--red)}
+.chip.melhora{background:rgba(107,168,154,.1);color:var(--green)}
+.chip.estavel{background:rgba(61,96,128,.1);color:#4a7090}
+.chip.cons-alta{background:rgba(107,168,154,.1);color:var(--green)}
+.chip.cons-media{background:rgba(201,168,48,.08);color:var(--yellow)}
+.chip.cons-baixa{background:rgba(217,96,78,.08);color:var(--red)}
+.chip.neutro{background:rgba(61,96,128,.1);color:#4a7090}
+.ficha-nums{display:flex;gap:32px;flex-wrap:wrap}
+.f-num-val{font-size:30px;font-weight:700;color:#fff;line-height:1}
+.f-num-val.bad{color:var(--red)}.f-num-val.good{color:var(--green)}
+.f-num-label{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:3px}
+.ficha-sep{width:1px;background:var(--line);align-self:stretch}
 
-.ranking{padding:10px 14px}
-.rank{
-  display:grid;grid-template-columns:20px minmax(0,1fr) 64px;gap:8px;
-  align-items:center;padding:9px 6px;border-bottom:1px solid rgba(255,255,255,.06)
-}
-.rank:last-child{border-bottom:0}
-.rank:hover{background:rgba(109,165,216,.06);border-radius:8px}
-.rank-n{font-size:11px;font-weight:900;color:#9fb0c7;text-align:center}
-.rank-info b{display:block;font-size:12px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.rank-info small{color:#a8b8cf;font-size:10px}
-.rank-bar{height:3px;background:#0e2035;border-radius:10px;overflow:hidden;margin-top:3px}
-.rank-bar i{display:block;height:100%;border-radius:10px;background:linear-gradient(90deg,var(--blue),var(--orange))}
-.rank-bar i.bad{background:linear-gradient(90deg,var(--red),var(--orange))}
-.rank-val{font-size:12px;font-weight:900;text-align:right}
+.ficha-corpo{display:grid;grid-template-columns:1.5fr 1fr;gap:32px}
+.ficha-chart-label{font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#2a4860;margin-bottom:10px}
+.ficha-chart-wrap{height:220px;margin-bottom:24px}
+.ficha-interp-label{font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#2a4860;margin-bottom:10px}
+.ficha-interp{font-size:13px;color:#a8c4e0;line-height:1.8}
+.ficha-interp b{color:#d8eaff;font-weight:600}
+.ficha-decisao{margin-top:16px;padding:12px 14px;border-left:2px solid #1e3450;background:rgba(30,52,80,.3)}
+.ficha-decisao-label{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#2a4860;margin-bottom:5px}
+.ficha-decisao-text{font-size:12.5px;color:#8aaccc;font-style:italic;line-height:1.6}
 
-/* loading */
-.loading{
-  border:1px solid rgba(109,165,216,.35);
-  background:#091728;border-radius:16px;padding:14px 16px;
-  color:#c7d8ef;font-size:13px;margin:10px 0;
-}
-.errorBox{
-  border:1px solid rgba(239,106,93,.55);
-  background:rgba(239,106,93,.08);
-  border-radius:16px;padding:14px 16px;
-  color:#ffd6d2;font-size:13px;margin:10px 0;line-height:1.55;
-}
+/* FOOTER */
+.footer{margin-top:40px;padding-top:14px;border-top:1px solid var(--line);display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px}
+.footer span{font-size:10px;color:#243648}
 
-.footer{
-  margin-top:16px;padding:10px 4px;
-  border-top:1px solid rgba(39,66,96,.45);
-  display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px
-}
-.footer span{font-size:11px;color:#4a6a88}
-
-@media(max-width:1500px){
-  .heatmap-wrap{grid-template-columns:repeat(3,1fr)}
-  .layoutBottom{grid-template-columns:1fr}
-}
+/* RESPONSIVE */
 @media(max-width:1100px){
-  .kpis{grid-template-columns:repeat(3,1fr)}
-  .controls{grid-template-columns:repeat(3,1fr)}
-  .agenda-grid,.ins-grid{grid-template-columns:repeat(2,1fr)}
-  .grid2{grid-template-columns:1fr}
-  .diagnostic{grid-template-columns:repeat(2,1fr)}
-  .diag-list{grid-column:1/-1}
+  .rd-grid{grid-template-columns:1fr}
+  .ficha-corpo{grid-template-columns:1fr}
 }
-@media(max-width:760px){
-  .app{padding:12px}
-  .header{flex-direction:column;align-items:flex-start}
-  .logo{border-right:0;padding-right:0;width:180px}
-  .kpis,.controls,.heatmap-wrap,.agenda-grid,.ins-grid,.radar-grid,.diagnostic{grid-template-columns:1fr}
-  .ins-expand.open{grid-template-columns:1fr}
-  .exp-main{border-right:0;border-bottom:1px solid var(--line)}
-  .exp-stats{border-left:0;border-top:1px solid var(--line)}
+@media(max-width:800px){
+  .app{padding:16px 18px}
+  .controls{gap:8px}
+  .placar{flex-wrap:wrap}
+  .pl-sep{display:none}
+  .matriz th:nth-child(5),.matriz td:nth-child(5){display:none}
+}
+@media(max-width:600px){
+  .header{flex-wrap:wrap}.logo{border-right:0;padding-right:0}
+  .header-right{width:100%;text-align:left}
+  h1{font-size:17px}
+  .ficha-nums{gap:18px}
+  .ficha-corpo{grid-template-columns:1fr}
 }
 </style>
 </head>
-
 <body>
 <div class="app">
 
+<!-- HEADER -->
 <header class="header">
   <img class="logo" src="../assets/logos/RIOPREFEITURA Comlurb horizontal monocromatica branco.png" alt="COMLURB">
-  <div>
-    <div class="eyebrow">Presidência da COMLURB &bull; Sala de Situação Estratégica</div>
-    <h1>Painel PRE &mdash; Centro de Comando</h1>
-    <div class="sub">Leitura executiva consolidada dos indicadores avaliados &mdash; 2025&ndash;2026</div>
+  <div class="header-text">
+    <div class="eyebrow">Presidencia da COMLURB</div>
+    <h1>Resultados Corporativos &mdash; Indicadores Avaliados</h1>
   </div>
-  <button class="diag-toggle" id="btnDiag">Diagnóstico</button>
+  <div class="header-right">
+    <div class="updated" id="updated">—</div>
+    <div class="scope-info" id="scopeInfo">—</div>
+  </div>
 </header>
 
+<!-- FILTROS -->
 <section class="controls">
   <div class="field"><label>Ano</label><select id="fAno"></select></div>
   <div class="field"><label>Diretoria</label><select id="fDir"></select></div>
-  <div class="field"><label>Sup./Coord.</label><select id="fSup"></select></div>
+  <div class="field"><label>Sup. / Coord.</label><select id="fSup"></select></div>
   <div class="field"><label>Indicador</label><select id="fInd"></select></div>
-  <div class="field"><label>Status</label><select id="fStatus"></select></div>
-  <button class="btn-clear" id="btnClear">Limpar filtros</button>
+  <button class="btn-clear" id="btnClear">Limpar</button>
 </section>
 
-<div id="loadBox" class="loading">Carregando dados do CSV publicado...</div>
-<div id="errBox" class="errorBox" style="display:none"></div>
+<!-- ════════ VISÃO CORPORATIVA ════════ -->
+<div class="corporativo" id="viewCorporativo">
 
-<section class="diagnostic" id="diagnostic">
-  <div class="diag-card"><span>Linhas CSV</span><b id="dRows">—</b></div>
-  <div class="diag-card"><span>Registros válidos</span><b id="dValid">—</b></div>
-  <div class="diag-card"><span>Indicadores únicos</span><b id="dInds">—</b></div>
-  <div class="diag-card"><span>Sem eixo</span><b id="dOutros">—</b></div>
-  <div class="diag-card"><span>Diretorias</span><b id="dDirs">—</b></div>
-  <div class="diag-list" id="dText">Aguardando leitura...</div>
-</section>
+  <!-- SÍNTESE -->
+  <p class="sintese" id="sintese">Carregando...</p>
 
-<div class="section-label">Estado Geral da Companhia</div>
-<section class="kpis">
-  <div class="kpi">        <span>Indicadores Avaliados</span><strong id="kTotal">—</strong><small id="kTotalSub">—</small></div>
-  <div class="kpi orange"> <span>Taxa de Atingimento</span><strong id="kTaxa">—</strong><small id="kTaxaSub">—</small></div>
-  <div class="kpi red">    <span>Riscos Institucionais</span><strong id="kRisco">—</strong><small id="kRiscoSub">abaixo da meta + piora</small></div>
-  <div class="kpi yellow"> <span>Alertas Preventivos</span><strong id="kAlerta">—</strong><small id="kAlertaSub">na meta mas deteriorando</small></div>
-  <div class="kpi green">  <span>Resultados Consolidados</span><strong id="kConsol">—</strong><small id="kConsolSub">meta + consistência</small></div>
-</section>
+  <!-- PLACAR -->
+  <div class="placar" id="placar">
+    <div class="pl-item"><span class="pl-label">Consolidado</span><span class="pl-val pct" id="plPct">—</span></div>
+    <div class="pl-item"><span class="pl-label">Criticos</span><span class="pl-val crit" id="plCrit">—</span></div>
+    <div class="pl-item"><span class="pl-label">Atencao</span><span class="pl-val alert" id="plAlert">—</span></div>
+    <div class="pl-item"><span class="pl-label">Sem referencia</span><span class="pl-val sem" id="plSem">—</span></div>
+    <div class="pl-sep"></div>
+    <div class="pl-item"><span class="pl-label">Total</span><span class="pl-val" id="plTotal">—</span></div>
+  </div>
 
-<div class="section-label">Mapa de Calor Estratégico</div>
-<section class="heatmap-wrap" id="heatmapWrap"></section>
+  <!-- MATRIZ -->
+  <div class="sec">Matriz Executiva</div>
+  <table class="matriz">
+    <thead>
+      <tr>
+        <th style="width:180px">Eixo Estrategico</th>
+        <th>Dentro da Meta</th>
+        <th>Atencao</th>
+        <th>Critico</th>
+        <th>Total</th>
+        <th>Situacao</th>
+      </tr>
+    </thead>
+    <tbody id="matrizBody"></tbody>
+  </table>
 
-<div class="section-label">Agenda da Presidência</div>
-<section class="agenda-grid" id="agendaGrid"></section>
+  <!-- DIRETORIAS -->
+  <div class="sec">Resultado por Diretoria</div>
+  <table class="dir-table">
+    <thead>
+      <tr>
+        <th>Diretoria</th>
+        <th style="width:140px">Atingimento</th>
+        <th style="width:140px"></th>
+        <th>Na Meta</th>
+        <th>Criticos</th>
+        <th>Alertas</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody id="dirBody"></tbody>
+  </table>
 
-<div class="section-label">Radar das Diretorias</div>
-<section class="radar-grid" id="radarGrid"></section>
-
-<div class="section-label">Insights Estratégicos</div>
-<section class="ins-grid" id="insGrid"></section>
-<div id="insExpand"></div>
-
-<div class="section-label">Evoluções e Tendências</div>
-<section class="layoutBottom">
-  <div class="colLeft">
-    <section class="panel">
-      <div class="panelHead">
-        <div><h2>Evolução Mensal do Indicador</h2><div class="hint">Comparativo 2025 vs 2026 com linha de meta</div></div>
-        <span class="badge" id="evolBadge">—</span>
-      </div>
-      <div class="evol-select"><select id="selInd"></select></div>
-      <div class="chartWrap tall"><canvas id="lineChart"></canvas></div>
-    </section>
-
-    <div class="grid2" id="generalCharts">
-      <section class="panel">
-        <div class="panelHead"><div><h2>Status vs Meta</h2><div class="hint">Distribuição por situação no recorte filtrado</div></div></div>
-        <div class="chartWrap"><canvas id="donutChart"></canvas></div>
-      </section>
-      <section class="panel">
-        <div class="panelHead"><div><h2>Comparativo 2025 vs 2026</h2><div class="hint">Acumulado por indicador com dados nos dois anos</div></div></div>
-        <div class="chartWrap"><canvas id="barChart"></canvas></div>
-      </section>
+  <!-- RISCOS E DESTAQUES -->
+  <div class="sec">Principais Riscos e Destaques</div>
+  <div class="rd-grid">
+    <div>
+      <div class="rd-titulo">Criticos &mdash; Desvio com trajetoria desfavoravel</div>
+      <div id="listaRiscos"></div>
     </div>
-
-    <div class="indicator-grid" id="indicatorAnalysis" style="display:none">
-      <section class="indicator-card">
-        <div class="panelHead"><div><h2>Leitura do Indicador</h2><div class="hint">Interpretação aplicada ao filtro selecionado</div></div></div>
-        <div class="body" id="indicatorReadBox">—</div>
-      </section>
-      <section class="indicator-card">
-        <div class="panelHead"><div><h2>Comparação Anual</h2><div class="hint">Mesmo indicador em 2025 e 2026</div></div></div>
-        <div class="body" id="indicatorCompareBox">—</div>
-      </section>
+    <div>
+      <div class="rd-titulo">Destaques &mdash; Resultado frente a meta</div>
+      <div id="listaDestaques"></div>
     </div>
   </div>
 
-  <div class="colRight">
-    <section class="panel">
-      <div class="panelHead"><h2>Leitura Executiva</h2><span class="badge" id="scopeBadge">—</span></div>
-      <div class="insight-box"><p id="insightText">Carregando...</p></div>
-    </section>
+  <!-- AGENDA -->
+  <div class="sec">Agenda da Presidencia</div>
+  <div class="agenda-lista" id="agendaLista"></div>
 
-    <section class="panel">
-      <div class="panelHead"><div><h2>Maiores Desvios</h2><div class="hint">Indicadores abaixo da referência cadastrada</div></div></div>
-      <div class="ranking" id="rankDesvio"></div>
-    </section>
+</div><!-- /corporativo -->
 
-    <section class="panel">
-      <div class="panelHead"><div><h2>Resultados Consolidados</h2><div class="hint">Dentro da meta com consistência alta</div></div></div>
-      <div class="ranking" id="rankBom"></div>
-    </section>
-  </div>
-</section>
+<!-- ════════ FICHA DO INDICADOR ════════ -->
+<div class="ficha" id="viewFicha">
+  <button class="btn-voltar" id="btnVoltar">Voltar para visao corporativa</button>
+  <div id="fichaContent"></div>
+</div>
 
+<!-- FOOTER -->
 <footer class="footer">
-  <span>Gabinete da Presidência / HUB COMLURB &bull; Núcleo de Inteligência e Gestão Estratégica Operacional</span>
-  <span>Fonte: SARC &mdash; Aba Geral / Indicadores Avaliados</span>
+  <span>Gabinete da Presidencia / HUB COMLURB &bull; Nucleo de Inteligencia e Gestao Estrategica Operacional</span>
+  <span>Fonte: SARC &mdash; Indicadores Avaliados</span>
 </footer>
+
 </div>
 
 <script>
-/* ══════════════════════════════════════════════════════
-   HUB COMLURB · Painel PRE · Sala de Situação
-   Versão robusta: carrega todos os dados, diagnostica colunas
-   e não descarta indicador sem classificação.
-   ══════════════════════════════════════════════════════ */
+const CSV_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vQphrIIjiY4aWBONgByLezMnFk8YbyYpF-vtgxOLoV8-85_WUVAXH_f_Ahy8ymxmgnGXmQ_KiFSOkIK/pub?gid=1044100274&single=true&output=csv';
+const ANOS=[2025,2026];
+const MESES=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
 
-const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQphrIIjiY4aWBONgByLezMnFk8YbyYpF-vtgxOLoV8-85_WUVAXH_f_Ahy8ymxmgnGXmQ_KiFSOkIK/pub?gid=1044100274&single=true&output=csv';
-const ANOS = [2025, 2026];
-const MESES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-
-const EIXOS = {
-  'Pessoas': [
-    'Absenteísmo - Gerenciável','Empregados Afastados','Hora Extra Realizada',
-    'Adicional Noturno Realizado','Horas Domingos e Feriados Realizadas',
-    'Treinamentos Realizados (NR)'
-  ],
-  'Segurança': [
-    'Acidente de Trabalho – Típico','Acidente de Trabalho – Trajeto',
-    'Taxa de Frequência de Acidentes','Taxa de Gravidade de Acidentes'
-  ],
-  'Operação': [
-    'Índice Padrão de Limpeza - IPL','Índice Padrão de Roçada - IPR',
-    'Desvio Padrão - IPL Setorial','Índice de Utilização da Frota de Coleta Domiciliar',
-    'Índice de Utilização da Frota de Remoção de Lixo Público','Praças',
-    'Produção do Serviço de Manejo Arbóreo'
-  ],
-  'Atendimento': [
-    'Índice de Atendimento das Solicitações 1746','Performance de Atendimento da Remoção Gratuita',
-    'Performance de Atendimento de Capina em Logradouro','Performance de Atendimento de Controle de Roedores e Caramujos',
-    'Performance de Atendimento de Poda de Árvore','Tempo Médio de Atendimento - Remoção Gratuita',
-    'Tempo Médio de Atendimento - Vetores','Solicitações 1746','Solicitações 1746 - Capina',
-    'Solicitações 1746 - Coleta','Solicitações 1746 - Destoca de Toco e Raiz',
-    'Solicitações 1746 - Limpeza','Solicitações 1746 - Limpeza de Ralos',
-    'Solicitações 1746 - Poda de Árvore','Solicitações 1746 - Praças',
-    'Solicitações 1746 - Remoção de Árvore','Solicitações 1746 - Remoção de Resíduos',
-    'Solicitações 1746 - Remoção Gratuita','Solicitações 1746 - Risco de Queda',
-    'Solicitações 1746 - Varrição','Solicitações 1746 - Vetores',
-    'Solicitações Ouvidoria','Solicitações Ouvidoria - Capina',
-    'Solicitações Ouvidoria - Coleta','Solicitações Ouvidoria - Destoca de Toco e Raiz',
-    'Solicitações Ouvidoria - Limpeza de Ralos','Solicitações Ouvidoria - Poda de Árvore',
-    'Solicitações Ouvidoria - Praças','Solicitações Ouvidoria - Remoção de Árvore',
-    'Solicitações Ouvidoria - Remoção de Resíduos','Solicitações Ouvidoria - Remoção Gratuita',
-    'Solicitações Ouvidoria - Risco de Queda','Solicitações Ouvidoria - Varrição',
-    'Solicitações Ouvidoria - Vetores'
-  ],
-  'Sustentabilidade': [
-    'Resíduos Coletados no RJ','Resíduos Desviados do Aterro',
-    'Resíduos Orgânicos (Biometanização)','Resíduos Recebidos nas ETRs',
-    'Resíduos Recebidos no CTR Gericinó','Índice do Coletado em Relação ao Potencial Reciclável',
-    'Cadastro de Grandes Geradores','Cadastro de Grandes Geradores com segregação de resíduos',
-    'Ecopontos'
-  ],
-  'Receita': [
-    'Índice de Eficiência da Arrecadação - Órgãos Públicos',
-    'Índice de Eficiência da Arrecadação - Receitas Diversas',
-    'Índice de Conformidade - PGR'
-  ]
+const EIXOS={
+  'Pessoas':['Absenteísmo - Gerenciável','Empregados Afastados','Hora Extra Realizada','Adicional Noturno Realizado','Horas Domingos e Feriados Realizadas','Treinamentos Realizados (NR)'],
+  'Segurança':['Acidente de Trabalho – Típico','Acidente de Trabalho – Trajeto','Taxa de Frequência de Acidentes','Taxa de Gravidade de Acidentes'],
+  'Operação':['Índice Padrão de Limpeza - IPL','Índice Padrão de Roçada - IPR','Desvio Padrão - IPL Setorial','Índice de Utilização da Frota de Coleta Domiciliar','Índice de Utilização da Frota de Remoção de Lixo Público','Praças','Produção do Serviço de Manejo Arbóreo'],
+  'Atendimento':['Índice de Atendimento das Solicitações 1746','Performance de Atendimento da Remoção Gratuita','Performance de Atendimento de Capina em Logradouro','Performance de Atendimento de Controle de Roedores e Caramujos','Performance de Atendimento de Poda de Árvore','Tempo Médio de Atendimento - Remoção Gratuita','Tempo Médio de Atendimento - Vetores','Solicitações 1746','Solicitações 1746 - Capina','Solicitações 1746 - Coleta','Solicitações 1746 - Destoca de Toco e Raiz','Solicitações 1746 - Limpeza','Solicitações 1746 - Limpeza de Ralos','Solicitações 1746 - Poda de Árvore','Solicitações 1746 - Praças','Solicitações 1746 - Remoção de Árvore','Solicitações 1746 - Remoção de Resíduos','Solicitações 1746 - Remoção Gratuita','Solicitações 1746 - Risco de Queda','Solicitações 1746 - Varrição','Solicitações 1746 - Vetores','Solicitações Ouvidoria','Solicitações Ouvidoria - Capina','Solicitações Ouvidoria - Coleta','Solicitações Ouvidoria - Destoca de Toco e Raiz','Solicitações Ouvidoria - Limpeza de Ralos','Solicitações Ouvidoria - Poda de Árvore','Solicitações Ouvidoria - Praças','Solicitações Ouvidoria - Remoção de Árvore','Solicitações Ouvidoria - Remoção de Resíduos','Solicitações Ouvidoria - Remoção Gratuita','Solicitações Ouvidoria - Risco de Queda','Solicitações Ouvidoria - Varrição','Solicitações Ouvidoria - Vetores'],
+  'Sustentabilidade':['Resíduos Coletados no RJ','Resíduos Desviados do Aterro','Resíduos Orgânicos (Biometanização)','Resíduos Recebidos nas ETRs','Resíduos Recebidos no CTR Gericinó','Índice do Coletado em Relação ao Potencial Reciclável','Cadastro de Grandes Geradores','Cadastro de Grandes Geradores com segregação de resíduos','Ecopontos'],
+  'Receita':['Índice de Eficiência da Arrecadação - Órgãos Públicos','Índice de Eficiência da Arrecadação - Receitas Diversas','Índice de Conformidade - PGR']
+};
+const ORDEM_EIXOS=['Pessoas','Segurança','Operação','Atendimento','Sustentabilidade','Receita'];
+const TEMA_EIXO={
+  'Pessoas':'Gestao de pessoas e condicoes de trabalho',
+  'Segurança':'Saude e segurança ocupacional',
+  'Operação':'Desempenho operacional de limpeza urbana',
+  'Atendimento':'Atendimento ao cidadao e demandas 1746',
+  'Sustentabilidade':'Gestao de residuos e economia circular',
+  'Receita':'Arrecadacao e conformidade financeira'
 };
 
-const EIXO_ICONE = {
-  'Pessoas':'P',
-  'Segurança':'S',
-  'Operação':'O',
-  'Atendimento':'A',
-  'Sustentabilidade':'E',
-  'Receita':'R',
-  'Outros':'?'
-};
+const $=id=>document.getElementById(id);
+const norm=s=>String(s??'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[\u2013\u2014\u2015]/g,'-').replace(/\s+/g,' ').trim();
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+let DATA=[],CHARTS={},modoFicha=false;
 
-const $ = id => document.getElementById(id);
-let DATA = [];
-let RAW_ROWS = [];
-let RAW_COLUMNS = [];
-let CHARTS = {};
-let INSIGHT_CHARTS = {};
-let openIdx = null;
+function num(v){if(v==null)return null;let s=String(v).trim().replace(/[^\d,.\-]/g,'');if(!s||s==='-')return null;if(s.includes(',')&&s.includes('.'))s=s.replace(/\./g,'').replace(',','.');else if(s.includes(','))s=s.replace(',','.');const n=Number(s);return Number.isFinite(n)?n:null;}
+function fmt(v,u=''){if(v==null||Number.isNaN(v))return'—';if(String(u).includes('%'))return v.toLocaleString('pt-BR',{maximumFractionDigits:1})+'%';if(Math.abs(v)>=1e6)return(v/1e6).toLocaleString('pt-BR',{maximumFractionDigits:1})+' mi';if(Math.abs(v)>=1000)return v.toLocaleString('pt-BR',{maximumFractionDigits:0});return v.toLocaleString('pt-BR',{maximumFractionDigits:1});}
+function getF(row,names){const ks=Object.keys(row);for(const n of names){const k=ks.find(x=>norm(x)===norm(n));if(k&&String(row[k]).trim())return row[k];}return'';}
 
-/* Utils */
-function norm(s){
-  return String(s ?? '')
-    .trim()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g,'')
-    .replace(/[–—−]/g,'-')
-    .replace(/\s+/g,' ')
-    .toLowerCase();
-}
-function keyNorm(s){
-  return norm(s).replace(/[^a-z0-9]/g,'');
-}
-function esc(s){
-  return String(s ?? '').replace(/[&<>"']/g, m => ({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-  }[m]));
-}
-function num(v){
-  if(v == null) return null;
-  let s = String(v).trim();
-  if(!s || s === '-' || s === '–' || s === '—') return null;
-  s = s.replace(/[^\d,.\-]/g,'');
-  if(!s) return null;
-  if(s.includes(',') && s.includes('.')) s = s.replace(/\./g,'').replace(',','.');
-  else if(s.includes(',')) s = s.replace(',','.');
-  const n = Number(s);
-  return Number.isFinite(n) ? n : null;
-}
-function fmt(v,u=''){
-  if(v == null || Number.isNaN(v)) return '—';
-  if(String(u).includes('%')) return v.toLocaleString('pt-BR',{maximumFractionDigits:1}) + '%';
-  if(Math.abs(v) >= 1e6) return (v/1e6).toLocaleString('pt-BR',{maximumFractionDigits:1}) + ' mi';
-  if(Math.abs(v) >= 1000) return v.toLocaleString('pt-BR',{maximumFractionDigits:0});
-  return v.toLocaleString('pt-BR',{maximumFractionDigits:1});
-}
-function uniq(arr){
-  return [...new Set(arr.filter(x => x != null && String(x).trim()))]
-    .sort((a,b)=>String(a).localeCompare(String(b),'pt-BR'));
-}
-
-/* Busca campo por variações e também por contains */
-function getF(row, names){
-  const keys = Object.keys(row || {});
-  const desired = names.map(keyNorm);
-  for(const k of keys){
-    if(desired.includes(keyNorm(k)) && String(row[k] ?? '').trim() !== '') return row[k];
-  }
-  for(const name of names){
-    const n = keyNorm(name);
-    const k = keys.find(x => keyNorm(x).includes(n) || n.includes(keyNorm(x)));
-    if(k && String(row[k] ?? '').trim() !== '') return row[k];
-  }
-  return '';
-}
-
-/* Meses: aceita Jan, Janeiro, JAN etc */
-function getMes(row, mes){
-  const aliases = {
-    Jan:['Jan','Janeiro','JAN'],
-    Fev:['Fev','Fevereiro','FEV'],
-    Mar:['Mar','Março','Marco','MAR'],
-    Abr:['Abr','Abril','ABR'],
-    Mai:['Mai','Maio','MAI'],
-    Jun:['Jun','Junho','JUN'],
-    Jul:['Jul','Julho','JUL'],
-    Ago:['Ago','Agosto','AGO'],
-    Set:['Set','Setembro','SET'],
-    Out:['Out','Outubro','OUT'],
-    Nov:['Nov','Novembro','NOV'],
-    Dez:['Dez','Dezembro','DEZ']
-  };
-  return num(getF(row, aliases[mes] || [mes]));
-}
-
-function eixoDe(indicador){
-  const ni = norm(indicador);
-  for(const [eixo, lista] of Object.entries(EIXOS)){
-    for(const item of lista){
-      const nx = norm(item);
-      if(ni === nx || ni.includes(nx) || nx.includes(ni)) return eixo;
-    }
-  }
-
-  /* fallback por palavras-chave */
-  if(/absente|afastad|hora extra|adicional noturno|domingo|feriado|treinamento/.test(ni)) return 'Pessoas';
-  if(/acidente|frequencia de acidentes|gravidade/.test(ni)) return 'Segurança';
-  if(/ipl|ipr|limpeza|rocada|roçada|frota|pracas|praças|manejo arboreo/.test(ni) && !/solicit|1746|ouvidoria|performance|tempo medio/.test(ni)) return 'Operação';
-  if(/1746|ouvidoria|solicit|performance|tempo medio|remocao|remoção|capina|poda|vetores|ralos|roedores|caramujos|risco de queda/.test(ni)) return 'Atendimento';
-  if(/residu|aterro|biometanizacao|etr|gericino|reciclavel|grandes geradores|ecopontos/.test(ni)) return 'Sustentabilidade';
-  if(/arrecadacao|arrecadação|receitas|orgaos publicos|órgãos públicos|pgr/.test(ni)) return 'Receita';
-  return 'Outros';
-}
-
-function govClass(ind){
-  const n = norm(ind);
-  if(/1746|ouvidoria|solicit|poda|capina|risco de queda|vetores|roedores|caramujos|demanda/.test(n)) return 'dependencia externa';
-  return 'governável';
-}
-
-function tipoIndicador(ind){
-  const eixo = eixoDe(ind);
-  if(['Operação','Atendimento','Sustentabilidade'].includes(eixo)) return 'finalístico';
-  return 'suporte';
-}
+// Eixo com normalização robusta
+const EIXOS_NORM=Object.fromEntries(Object.entries(EIXOS).map(([e,l])=>[e,l.map(norm)]));
+function eixoDe(ind){const k=norm(ind);for(const[e,l]of Object.entries(EIXOS_NORM))if(l.includes(k))return e;return'Outros';}
 
 function transform(r){
-  const dir = String(getF(r,['Diretoria','DIRETORIA','Dir']) || '').trim();
-  const supRaw = String(getF(r,['Superintendência','Superintendencia','Sup./Coord.','Superintendencia / Coordenacao','Coordenação','Coordenacao']) || '').trim();
-  const sup = (!supRaw || supRaw === '-' || supRaw === '–' || supRaw === '—') ? dir : supRaw;
-  const indicador = String(getF(r,['Indicador','INDICADOR','Indicadores','Nome do Indicador','Nome Indicador']) || '').trim();
-
-  const d = {
-    Ano: num(getF(r,['Ano','ANO','Ano Referência','Ano Referencia'])),
-    Indicador: indicador,
-    Diretoria: dir || 'Não informado',
-    Superintendencia: sup || dir || 'Não informado',
-    Unidade: String(getF(r,['Unidade','UNIDADE','Medida','Unid']) || '').trim(),
-    Sentido: String(getF(r,['Sentido','SENTIDO','Polaridade','Melhor']) || '').trim(),
-    Acumulado: num(getF(r,['Acumulado','ACUMULADO','Resultado','Valor Acumulado','Realizado','Resultado Acumulado'])),
-    Meta: num(getF(r,['Meta','META','Alvo','Referência','Referencia']))
-  };
-
-  MESES.forEach(m => d[m] = getMes(r,m));
-
-  if(d.Acumulado == null){
-    const vals = MESES.map(m=>d[m]).filter(x=>x != null);
-    if(vals.length) d.Acumulado = vals.at(-1);
-  }
-
-  d.Eixo = eixoDe(d.Indicador);
-  d.Governabilidade = govClass(d.Indicador);
-  d.Tipo = tipoIndicador(d.Indicador);
+  const dir=String(getF(r,['Diretoria','DIRETORIA'])||'').trim();
+  const supRaw=String(getF(r,['Superintendência','Superintendencia','Sup./Coord.'])||'').trim();
+  const sup=(!supRaw||supRaw==='-'||supRaw==='–'||supRaw==='—')?dir:supRaw;
+  const d={Ano:num(getF(r,['Ano','ANO'])),Indicador:String(getF(r,['Indicador','INDICADOR'])||'').trim(),Diretoria:dir,Superintendencia:sup||dir,Unidade:String(getF(r,['Unidade','UNIDADE'])||'').trim(),Sentido:String(getF(r,['Sentido','SENTIDO'])||'').trim(),Acumulado:num(getF(r,['Acumulado','ACUMULADO','Resultado'])),Meta:num(getF(r,['Meta','META','Alvo']))};
+  MESES.forEach(m=>{d[m]=num(getF(r,[m]));});
+  if(d.Acumulado==null){const v=MESES.map(m=>d[m]).filter(x=>x!=null);if(v.length)d.Acumulado=v.at(-1);}
   return d;
 }
 
-/* status e tendências */
-function statusOf(d){
-  if(d.Meta == null || d.Acumulado == null) return 'Sem meta';
-  const sentido = norm(d.Sentido);
-  const menorMelhor = sentido.includes('↓') || sentido.includes('menor') || sentido.includes('redu');
-  return menorMelhor ? (d.Acumulado <= d.Meta ? 'Dentro da meta' : 'Abaixo da meta')
-                     : (d.Acumulado >= d.Meta ? 'Dentro da meta' : 'Abaixo da meta');
-}
-function desvio(d){
-  return (d.Meta == null || d.Acumulado == null) ? null : d.Acumulado - d.Meta;
-}
-function desvioPct(d){
-  if(d.Meta == null || d.Acumulado == null || d.Meta === 0) return null;
-  return (d.Acumulado - d.Meta) / Math.abs(d.Meta) * 100;
-}
-function tendClass(d){
-  const v = MESES.map(m=>d[m]).filter(x=>x != null);
-  if(v.length < 3) return 'flat';
-  const n = Math.min(3, v.length);
-  const ini = v.slice(0,n).reduce((a,b)=>a+b,0) / n;
-  const fim = v.slice(-n).reduce((a,b)=>a+b,0) / n;
-  if(Math.abs(fim - ini) < 0.01 * Math.abs(ini || 1)) return 'flat';
-  const sobe = fim > ini;
-  const sentido = norm(d.Sentido);
-  const menorMelhor = sentido.includes('↓') || sentido.includes('menor') || sentido.includes('redu');
-  return ((!menorMelhor && sobe) || (menorMelhor && !sobe)) ? 'good' : 'bad';
-}
-function tendLabel(d){
-  const t = tendClass(d);
-  return t === 'good' ? 'Melhora' : t === 'bad' ? 'Piora' : 'Estável';
-}
-function consistencia(d){
-  const v = MESES.map(m=>d[m]).filter(x=>x != null);
-  if(v.length < 4) return 'baixa';
-  const media = v.reduce((a,b)=>a+b,0)/v.length;
-  if(media === 0) return 'baixa';
-  const dp = Math.sqrt(v.reduce((s,x)=>s+(x-media)**2,0)/v.length);
-  const cv = dp / Math.abs(media);
-  return cv < 0.08 ? 'alta' : cv < 0.18 ? 'média' : 'baixa';
-}
+function statusOf(d){if(d.Meta==null||d.Acumulado==null)return'Sem meta';const dn=d.Sentido.includes('↓');return(dn?d.Acumulado<=d.Meta:d.Acumulado>=d.Meta)?'Dentro da meta':'Abaixo da meta';}
+function desvio(d){return(d.Meta==null||d.Acumulado==null)?null:d.Acumulado-d.Meta;}
+function tendClass(d){const v=MESES.map(m=>d[m]).filter(x=>x!=null);if(v.length<3)return'flat';const ini=v.slice(0,3).reduce((a,b)=>a+b,0)/3;const fim=v.slice(-3).reduce((a,b)=>a+b,0)/3;if(Math.abs(fim-ini)<0.01*Math.abs(ini||1))return'flat';const up=fim>ini;const dn=d.Sentido.includes('↓');return((!dn&&up)||(dn&&!up))?'good':'bad';}
+function tendLabel(d){const t=tendClass(d);return t==='good'?'melhora':t==='bad'?'piora':'estavel';}
+function consistencia(d){const v=MESES.map(m=>d[m]).filter(x=>x!=null);if(v.length<4)return'baixa';const med=v.reduce((a,b)=>a+b,0)/v.length;if(!med)return'baixa';const cv=Math.sqrt(v.reduce((s,x)=>s+(x-med)**2,0)/v.length)/Math.abs(med);return cv<0.08?'alta':cv<0.18?'media':'baixa';}
+function superacao(d){if(d.Meta==null||d.Acumulado==null||!d.Meta)return 0;const dn=d.Sentido.includes('↓');return dn?(d.Meta-d.Acumulado)/Math.abs(d.Meta):(d.Acumulado-d.Meta)/Math.abs(d.Meta);}
 
 /* filtros */
-const vf = id => $(id)?.value || '';
-function filtered(){
-  const a = vf('fAno'), dir = vf('fDir'), sup = vf('fSup'), ind = vf('fInd'), st = vf('fStatus');
-  return DATA.filter(d=>{
-    if(a && String(d.Ano) !== a) return false;
-    if(dir && d.Diretoria !== dir) return false;
-    if(sup && d.Superintendencia !== sup) return false;
-    if(ind && d.Indicador !== ind) return false;
-    if(st && statusOf(d) !== st) return false;
-    return true;
-  });
-}
-function setOpts(id, vals, lbl){
-  const el = $(id);
-  if(!el) return;
-  const cur = el.value;
-  el.innerHTML = `<option value="">${lbl}</option>` + vals.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');
-  if(vals.map(String).includes(String(cur))) el.value = cur;
-}
-function cascadeFilters(){
-  const a = vf('fAno'), dir = vf('fDir'), sup = vf('fSup');
-  let base = DATA.slice();
+const vf=id=>$(id)?.value||'';
+function filtered(){const a=vf('fAno'),dir=vf('fDir'),sup=vf('fSup'),ind=vf('fInd');return DATA.filter(d=>{if(!ANOS.includes(d.Ano))return false;if(a&&String(d.Ano)!==a)return false;if(dir&&d.Diretoria!==dir)return false;if(sup&&d.Superintendencia!==sup)return false;if(ind&&d.Indicador!==ind)return false;return true;});}
+function uniq(arr){return[...new Set(arr.filter(x=>x!=null&&String(x).trim()))].sort((a,b)=>String(a).localeCompare(String(b),'pt-BR'));}
+function setOpts(id,vals,lbl){const el=$(id);if(!el)return;const cur=el.value;el.innerHTML=`<option value="">${lbl}</option>`+vals.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');if(vals.map(String).includes(String(cur)))el.value=cur;}
+function cascadeFilters(){const a=vf('fAno'),dir=vf('fDir'),sup=vf('fSup');let b=DATA.filter(d=>ANOS.includes(d.Ano));if(a)b=b.filter(d=>String(d.Ano)===a);setOpts('fDir',uniq(b.map(d=>d.Diretoria)),'Todas');if(dir)b=b.filter(d=>d.Diretoria===dir);setOpts('fSup',uniq(b.map(d=>d.Superintendencia)),'Todas');if(sup)b=b.filter(d=>d.Superintendencia===sup);setOpts('fInd',uniq(b.map(d=>d.Indicador)),'Todos');if(dir&&[...$('fDir').options].some(o=>o.value===dir))$('fDir').value=dir;if(sup&&[...$('fSup').options].some(o=>o.value===sup))$('fSup').value=sup;}
+function populateAll(){const b=DATA.filter(d=>ANOS.includes(d.Ano));setOpts('fAno',uniq(b.map(d=>d.Ano)),'Todos os anos');cascadeFilters();}
 
-  if(a) base = base.filter(d=>String(d.Ano) === a);
-  setOpts('fDir', uniq(base.map(d=>d.Diretoria)), 'Todas');
+/* chart */
+function mkChart(id,type,labels,datasets,extra={}){if(CHARTS[id])CHARTS[id].destroy();CHARTS[id]=new Chart($(id),{type,data:{labels,datasets},options:Object.assign({responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#8aaccc',font:{size:11}}}},scales:(type==='doughnut'||type==='pie')?{}:{x:{ticks:{color:'#4a6a88',font:{size:10}},grid:{color:'rgba(30,52,80,.4)'}},y:{ticks:{color:'#4a6a88',font:{size:10}},grid:{color:'rgba(30,52,80,.5)'}}}},extra)});}
 
-  if(dir) base = base.filter(d=>d.Diretoria === dir);
-  setOpts('fSup', uniq(base.map(d=>d.Superintendencia)), 'Todas');
+/* ── render síntese + placar ── */
+function renderSintesePlacar(rows){
+  const cm=rows.filter(d=>d.Meta!=null&&d.Acumulado!=null);
+  const dentro=cm.filter(d=>statusOf(d)==='Dentro da meta');
+  const abaixo=cm.filter(d=>statusOf(d)==='Abaixo da meta');
+  const criticos=abaixo.filter(d=>tendClass(d)==='bad').length;
+  const alertas=dentro.filter(d=>tendClass(d)==='bad').length;
+  const semRef=rows.filter(d=>d.Meta==null||d.Acumulado==null).length;
+  const pct=cm.length?Math.round(dentro.length/cm.length*100):0;
 
-  if(sup) base = base.filter(d=>d.Superintendencia === sup);
-  setOpts('fInd', uniq(base.map(d=>d.Indicador)), 'Todos');
-  setOpts('fStatus', uniq(base.map(d=>statusOf(d))), 'Todos');
+  // Eixos com mais critcos
+  const pressao={};
+  abaixo.filter(d=>tendClass(d)==='bad').forEach(d=>{const e=eixoDe(d.Indicador);pressao[e]=(pressao[e]||0)+1;});
+  const topPressao=Object.entries(pressao).sort((a,b)=>b[1]-a[1]).map(([e])=>e);
 
-  if(dir && [...$('fDir').options].some(o=>o.value===dir)) $('fDir').value = dir;
-  if(sup && [...$('fSup').options].some(o=>o.value===sup)) $('fSup').value = sup;
-}
-function populateAll(){
-  setOpts('fAno', uniq(DATA.map(d=>d.Ano)), 'Todos os anos');
-  cascadeFilters();
-}
+  // Síntese
+  let s=`No recorte selecionado, a companhia apresenta <b>${pct}%</b> dos indicadores dentro da meta`;
+  if(topPressao.length>=2) s+=`, com maior pressao concentrada em <b>${esc(topPressao[0])}</b> e <b>${esc(topPressao[1])}</b>`;
+  else if(topPressao.length===1) s+=`, com pressao concentrada em <b>${esc(topPressao[0])}</b>`;
+  else if(criticos===0&&alertas===0) s+=`. Nenhum eixo apresenta sinal critico ou de atencao no momento`;
+  s+='.';
+  $('sintese').innerHTML=s;
 
-/* diagnóstico */
-function renderDiagnostic(){
-  const inds = uniq(DATA.map(d=>d.Indicador));
-  const outros = uniq(DATA.filter(d=>d.Eixo === 'Outros').map(d=>d.Indicador));
-  const dirs = uniq(DATA.map(d=>d.Diretoria));
-  const porEixo = {};
-  for(const e of [...Object.keys(EIXOS),'Outros']){
-    porEixo[e] = uniq(DATA.filter(d=>d.Eixo === e).map(d=>d.Indicador)).length;
-  }
-
-  $('dRows').textContent = RAW_ROWS.length;
-  $('dValid').textContent = DATA.length;
-  $('dInds').textContent = inds.length;
-  $('dOutros').textContent = outros.length;
-  $('dDirs').textContent = dirs.length;
-
-  $('dText').innerHTML =
-    `<b>Colunas encontradas:</b> ${esc(RAW_COLUMNS.join(' | ') || '—')}<br>` +
-    `<b>Classificação por eixo:</b> ${Object.entries(porEixo).map(([k,v])=>`${esc(k)}: ${v}`).join(' · ')}<br>` +
-    `<b>Diretorias:</b> ${esc(dirs.join(' | ') || '—')}<br>` +
-    `<b>Indicadores sem eixo:</b> ${outros.length ? esc(outros.join(' | ')) : 'nenhum'}`;
-
-  console.log('Linhas lidas:', RAW_ROWS.length);
-  console.log('Colunas encontradas:', RAW_COLUMNS);
-  console.log('Registros válidos:', DATA.length);
-  console.log('Indicadores únicos:', inds);
-  console.log('Indicadores sem eixo:', outros);
-  console.log('Diretorias:', dirs);
+  // Placar
+  $('plPct').textContent=pct+'%';
+  $('plCrit').textContent=criticos;
+  $('plAlert').textContent=alertas;
+  $('plSem').textContent=semRef;
+  $('plTotal').textContent=rows.length;
+  $('scopeInfo').textContent=`${rows.length} registros &bull; ${uniq(rows.map(d=>d.Indicador)).length} indicadores`;
 }
 
-/* gráficos */
-function mkChart(id,type,labels,datasets,extra={}){
-  if(CHARTS[id]) CHARTS[id].destroy();
-  const el = $(id);
-  if(!el) return;
-  CHARTS[id] = new Chart(el, {
-    type,
-    data:{labels,datasets},
-    options:Object.assign({
-      responsive:true,
-      maintainAspectRatio:false,
-      plugins:{
-        legend:{labels:{color:'#c7d8ef',font:{size:11}}},
-        tooltip:{mode:'index',intersect:false}
-      },
-      scales:(type==='doughnut'||type==='pie') ? {} : {
-        x:{ticks:{color:'#8a9db8',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}},
-        y:{ticks:{color:'#8a9db8',font:{size:10}},grid:{color:'rgba(255,255,255,.07)'}}
-      }
-    }, extra)
-  });
+/* ── matriz ── */
+function renderMatriz(rows){
+  $('matrizBody').innerHTML=ORDEM_EIXOS.map(eixo=>{
+    const inds=rows.filter(d=>eixoDe(d.Indicador)===eixo);
+    if(!inds.length)return'';
+    const cm=inds.filter(d=>d.Meta!=null&&d.Acumulado!=null);
+    const dentro=cm.filter(d=>statusOf(d)==='Dentro da meta');
+    const abaixo=cm.filter(d=>statusOf(d)==='Abaixo da meta');
+    const crit=abaixo.filter(d=>tendClass(d)==='bad').length;
+    const alert=dentro.filter(d=>tendClass(d)==='bad').length;
+    const pct=cm.length?Math.round(dentro.length/cm.length*100):null;
+    let sit='sem',sitTxt='Sem ref.';
+    if(cm.length){sit=crit>0?'crit':alert>0||abaixo.length>0?'amarelo':'verde';sitTxt=crit>0?'Critico':alert>0||abaixo.length>0?'Atencao':'Estavel';}
+    const dotCor=sit==='verde'?'var(--green)':sit==='amarelo'?'var(--yellow)':sit==='crit'?'var(--red)':'#2a4860';
+    return`<tr>
+      <td><div class="m-eixo"><span class="m-dot" style="background:${dotCor}"></span>${esc(eixo)}</div></td>
+      <td class="m-num verde"><b>${dentro.length}</b><small>${pct!=null?pct+'%':'—'}</small></td>
+      <td class="m-num amarelo"><b>${alert||'—'}</b><small>${alert?'preventivo':''}</small></td>
+      <td class="m-num crit"><b>${crit||'—'}</b><small>${crit?'critico':''}</small></td>
+      <td class="m-total">${inds.length}</td>
+      <td class="m-sit"><span class="m-badge ${sit}">${sitTxt}</span></td>
+    </tr>`;
+  }).join('');
 }
 
-/* BLOCO 1 */
-function renderKPIs(rows){
-  const cm = rows.filter(d=>d.Meta != null && d.Acumulado != null);
-  const dentro = cm.filter(d=>statusOf(d)==='Dentro da meta');
-  const abaixo = cm.filter(d=>statusOf(d)==='Abaixo da meta');
-  const pct = cm.length ? Math.round(dentro.length/cm.length*100) : 0;
-  const criticos = abaixo.filter(d=>tendClass(d)==='bad').length;
-  const alertas = dentro.filter(d=>tendClass(d)==='bad').length;
-  const consol = dentro.filter(d=>consistencia(d)==='alta').length;
+/* ── diretorias ── */
+function renderDiretorias(rows){
+  const dirs=uniq(rows.map(d=>d.Diretoria)).filter(Boolean);
+  if(!dirs.length){$('dirBody').innerHTML='<tr><td colspan="7" style="color:var(--muted);padding:14px">Sem dados por diretoria no recorte.</td></tr>';return;}
+  const info=dirs.map(dir=>{
+    const sub=rows.filter(d=>d.Diretoria===dir);
+    const cm=sub.filter(d=>d.Meta!=null&&d.Acumulado!=null);
+    const dentro=cm.filter(d=>statusOf(d)==='Dentro da meta');
+    const abaixo=cm.filter(d=>statusOf(d)==='Abaixo da meta');
+    const crit=abaixo.filter(d=>tendClass(d)==='bad').length;
+    const alert=dentro.filter(d=>tendClass(d)==='bad').length;
+    const pct=cm.length?Math.round(dentro.length/cm.length*100):null;
+    return{dir,pct,total:sub.length,cm:cm.length,dentro:dentro.length,abaixo:abaixo.length,crit,alert};
+  }).sort((a,b)=>(b.pct??-1)-(a.pct??-1));
 
-  $('kTotal').textContent = rows.length;
-  $('kTotalSub').textContent = `${uniq(rows.map(d=>d.Indicador)).length} indicadores distintos`;
-  $('kTaxa').textContent = pct + '%';
-  $('kTaxaSub').textContent = `${dentro.length} de ${cm.length} com meta`;
-  $('kRisco').textContent = criticos;
-  $('kRiscoSub').textContent = criticos ? 'abaixo da meta + piora' : 'nenhum risco crítico';
-  $('kAlerta').textContent = alertas;
-  $('kAlertaSub').textContent = alertas ? 'na meta mas deteriorando' : 'sem alertas preventivos';
-  $('kConsol').textContent = consol;
-  $('kConsolSub').textContent = 'meta + consistência alta';
-  $('scopeBadge').textContent = rows.length + ' registros';
+  $('dirBody').innerHTML=info.map(x=>{
+    const cls=x.pct==null?'':x.pct>=80?'alta':x.pct>=60?'media':'baixa';
+    const cor=x.pct==null?'#2a4860':x.pct>=80?'var(--green)':x.pct>=60?'var(--yellow)':'var(--red)';
+    return`<tr>
+      <td class="dir-nome">${esc(x.dir)}</td>
+      <td class="dir-taxa ${cls}">${x.pct!=null?x.pct+'%':'—'}</td>
+      <td class="dir-bar-cell"><div class="dir-bar-wrap"><div class="dir-bar-fill" style="width:${x.pct??0}%;background:${cor}"></div></div></td>
+      <td class="dir-num dir-ok">${x.dentro}</td>
+      <td class="dir-num dir-crit">${x.crit||'—'}</td>
+      <td class="dir-num dir-alert">${x.alert||'—'}</td>
+      <td class="dir-num muted">${x.total}</td>
+    </tr>`;
+  }).join('');
 }
 
-/* BLOCO 2 */
-function renderHeatmap(rows){
-  const ordem = ['Pessoas','Segurança','Operação','Atendimento','Sustentabilidade','Receita'];
-  const html = ordem.map(eixo=>{
-    const inds = rows.filter(d=>d.Eixo === eixo);
-    if(!inds.length) {
-      return `<div class="heat-card cinza">
-        <div class="heat-dot">${EIXO_ICONE[eixo]}</div>
-        <div><div class="heat-eixo">${eixo}</div><div class="heat-status">Sem dados</div><div class="heat-detalhe">0 ind. no recorte</div></div>
-      </div>`;
-    }
-
-    const cm = inds.filter(d=>d.Meta != null && d.Acumulado != null);
-    const dentro = cm.filter(d=>statusOf(d)==='Dentro da meta');
-    const abaixo = cm.filter(d=>statusOf(d)==='Abaixo da meta');
-    const criticos = abaixo.filter(d=>tendClass(d)==='bad').length;
-    const alertas = dentro.filter(d=>tendClass(d)==='bad').length;
-    const pct = cm.length ? Math.round(dentro.length/cm.length*100) : null;
-
-    let cls = 'cinza', statusTxt = 'Sem referência';
-    if(cm.length){
-      if(criticos > 0) { cls='vermelho'; statusTxt='Crítico'; }
-      else if(alertas > 0 || abaixo.length > 0) { cls='amarelo'; statusTxt='Atenção'; }
-      else { cls='verde'; statusTxt='Estável'; }
-    }
-    const detalhe = cm.length ? `${pct}% na meta · ${inds.length} ind.` : `${inds.length} ind. sem meta`;
-    return `<div class="heat-card ${cls}" title="${esc(eixo)}">
-      <div class="heat-dot">${EIXO_ICONE[eixo]}</div>
-      <div>
-        <div class="heat-eixo">${esc(eixo)}</div>
-        <div class="heat-status">${statusTxt}</div>
-        <div class="heat-detalhe">${detalhe}</div>
+/* ── riscos ── */
+function renderRiscos(rows){
+  const cm=rows.filter(d=>d.Meta!=null&&d.Acumulado!=null&&statusOf(d)==='Abaixo da meta');
+  const sorted=[...cm].sort((a,b)=>{const pa=tendClass(a)==='bad'?1:0,pb=tendClass(b)==='bad'?1:0;if(pb!==pa)return pb-pa;return Math.abs(desvio(b)||0)-Math.abs(desvio(a)||0);}).slice(0,5);
+  $('listaRiscos').innerHTML=sorted.length?sorted.map(d=>{
+    const dv=desvio(d);const pct=d.Meta?(dv/Math.abs(d.Meta)*100):0;const tc=tendLabel(d);
+    return`<div class="rd-item">
+      <div class="rd-barra red"></div>
+      <div class="rd-corpo">
+        <div class="rd-nome" onclick="abrirFicha('${esc(d.Indicador).replace(/'/g,"\\'")}')">${esc(d.Indicador)}</div>
+        <div class="rd-dados">
+          <span>Real: <b class="v-bad">${fmt(d.Acumulado,d.Unidade)}</b></span>
+          <span>Meta: <b>${fmt(d.Meta,d.Unidade)}</b></span>
+          <span>Desvio: <b class="v-bad">${fmt(dv,d.Unidade)} (${Math.abs(pct).toFixed(1)}%)</b></span>
+          <span>${esc(d.Diretoria)}</span>
+          <span class="rd-tend ${tc}">${tc}</span>
+        </div>
       </div>
     </div>`;
-  }).join('');
-
-  $('heatmapWrap').innerHTML = html;
+  }).join(''):'<div style="padding:14px 0;color:var(--muted);font-size:12px">Nenhum indicador critico no recorte.</div>';
 }
 
-/* BLOCO 3 */
+/* ── destaques ── */
+function renderDestaques(rows){
+  const cm=rows.filter(d=>d.Meta!=null&&d.Acumulado!=null&&statusOf(d)==='Dentro da meta');
+  const sorted=[...cm].sort((a,b)=>{const ca=consistencia(a)==='alta'?1:0,cb=consistencia(b)==='alta'?1:0;if(cb!==ca)return cb-ca;return superacao(b)-superacao(a);}).slice(0,5);
+  $('listaDestaques').innerHTML=sorted.length?sorted.map(d=>{
+    const dv=desvio(d);const pct=d.Meta?(dv/Math.abs(d.Meta)*100):0;const tc=tendLabel(d);const cons=consistencia(d);
+    return`<div class="rd-item">
+      <div class="rd-barra green"></div>
+      <div class="rd-corpo">
+        <div class="rd-nome" onclick="abrirFicha('${esc(d.Indicador).replace(/'/g,"\\'")}')">${esc(d.Indicador)}</div>
+        <div class="rd-dados">
+          <span>Real: <b class="v-good">${fmt(d.Acumulado,d.Unidade)}</b></span>
+          <span>Meta: <b>${fmt(d.Meta,d.Unidade)}</b></span>
+          <span>Superacao: <b class="v-good">+${Math.abs(pct).toFixed(1)}%</b></span>
+          <span>${esc(d.Diretoria)}</span>
+          <span class="rd-tend ${tc}">${tc}</span>
+          ${cons==='alta'?'<span style="color:#4a7090;font-size:10px">consistencia alta</span>':''}
+        </div>
+      </div>
+    </div>`;
+  }).join(''):'<div style="padding:14px 0;color:var(--muted);font-size:12px">Sem destaques no recorte.</div>';
+}
+
+/* ── agenda ── */
 function renderAgenda(rows){
-  const cm = rows.filter(d=>d.Meta != null && d.Acumulado != null);
-  const criticos = cm.filter(d=>statusOf(d)==='Abaixo da meta' && tendClass(d)==='bad');
-  const abaixo = cm.filter(d=>statusOf(d)==='Abaixo da meta' && tendClass(d)!=='bad');
-  const alertas = cm.filter(d=>statusOf(d)==='Dentro da meta' && tendClass(d)==='bad');
+  const cm=rows.filter(d=>d.Meta!=null&&d.Acumulado!=null);
+  const crit=[...cm.filter(d=>statusOf(d)==='Abaixo da meta'&&tendClass(d)==='bad')].sort((a,b)=>Math.abs(desvio(b)||0)-Math.abs(desvio(a)||0));
+  const alert=[...cm.filter(d=>statusOf(d)==='Dentro da meta'&&tendClass(d)==='bad')];
+  const press=[...cm.filter(d=>statusOf(d)==='Abaixo da meta'&&tendClass(d)!=='bad')].sort((a,b)=>Math.abs(desvio(b)||0)-Math.abs(desvio(a)||0));
 
-  const todos = [
-    ...criticos.map(d=>({d, peso:3, tipo:'Risco crítico'})),
-    ...abaixo.map(d=>({d, peso:2, tipo:'Pressão sobre a meta'})),
-    ...alertas.map(d=>({d, peso:1, tipo:'Atenção preventiva'}))
-  ];
-
-  const grupos = {};
-  todos.forEach(x=>{
-    const e = x.d.Eixo || 'Outros';
-    if(!grupos[e]) grupos[e] = {eixo:e, peso:0, itens:[]};
-    grupos[e].peso += x.peso;
-    grupos[e].itens.push(x);
+  const agenda={};
+  [...crit,...alert,...press].forEach(d=>{
+    const e=eixoDe(d.Indicador);
+    if(!agenda[e]) agenda[e]={tipo:crit.includes(d)?'crit':alert.includes(d)?'alert':'obs',inds:[],scores:0};
+    agenda[e].inds.push(d);
+    agenda[e].scores+=Math.abs(desvio(d)||0);
   });
+  const ord={crit:0,alert:1,obs:2};
+  const itens=Object.entries(agenda).sort((a,b)=>ord[a[1].tipo]-ord[b[1].tipo]||b[1].scores-a[1].scores).slice(0,3);
 
-  const agenda = Object.values(grupos)
-    .sort((a,b)=>b.peso-a.peso)
-    .slice(0,3);
-
-  if(!agenda.length){
-    $('agendaGrid').innerHTML = `<div style="grid-column:1/-1;color:var(--muted);font-size:13px;padding:8px">Nenhum tema crítico ou de alerta no recorte atual.</div>`;
-    return;
-  }
-
-  $('agendaGrid').innerHTML = agenda.map((g,i)=>{
-    const cls = i===0 ? 'p1' : i===1 ? 'p2' : 'p3';
-    const top = g.itens.sort((a,b)=>b.peso-a.peso || Math.abs(desvio(b.d)||0)-Math.abs(desvio(a.d)||0)).slice(0,3);
-    const principal = top[0];
-    const label = i===0 ? 'Prioridade máxima' : i===1 ? 'Atenção executiva' : 'Monitoramento';
-    return `<div class="agenda-card ${cls}">
-      <div class="ag-num">${String(i+1).padStart(2,'0')} · ${label}</div>
-      <div class="ag-eixo">${esc(g.eixo)}</div>
-      <div class="ag-titulo">${esc(g.eixo)} · ${top.length} sinal${top.length>1?'ais':' '} relevante${top.length>1?'s':''}</div>
-      <div class="ag-contexto">${principal.tipo}: ${esc(principal.d.Indicador)}. ${principal.d.Meta!=null ? `Acumulado ${fmt(principal.d.Acumulado,principal.d.Unidade)} contra meta ${fmt(principal.d.Meta,principal.d.Unidade)}.` : ''}</div>
-      <div class="ag-indicadores">${top.map(x=>`<div class="ag-ind">${esc(x.d.Indicador)}</div>`).join('')}</div>
-    </div>`;
-  }).join('');
-}
-
-/* BLOCO 4 */
-function renderRadar(rows){
-  const dirs = uniq(rows.map(d=>d.Diretoria)).filter(Boolean);
-  if(!dirs.length){
-    $('radarGrid').innerHTML = `<div style="color:var(--muted);font-size:13px">Sem diretorias identificadas no recorte.</div>`;
-    return;
-  }
-
-  const info = dirs.map(dir=>{
-    const sub = rows.filter(d=>d.Diretoria === dir);
-    const cm = sub.filter(d=>d.Meta != null && d.Acumulado != null);
-    const dentro = cm.filter(d=>statusOf(d)==='Dentro da meta');
-    const pct = cm.length ? Math.round(dentro.length/cm.length*100) : null;
-    const riscos = cm.filter(d=>statusOf(d)==='Abaixo da meta' && tendClass(d)==='bad').length;
-    const alertas = cm.filter(d=>statusOf(d)==='Dentro da meta' && tendClass(d)==='bad').length;
-    return {dir, sub, cm, dentro, pct, riscos, alertas};
-  }).sort((a,b)=>(b.pct ?? -1)-(a.pct ?? -1));
-
-  $('radarGrid').innerHTML = info.map(x=>{
-    const cor = x.pct == null ? '#9fb0c7' : x.pct >= 80 ? '#78aaa3' : x.pct >= 60 ? '#e8c335' : '#ef6a5d';
-    const w = x.pct == null ? 0 : Math.max(4,x.pct);
-    return `<div class="radar-card">
-      <div class="radar-dir">${esc(x.dir)}</div>
-      <div class="radar-taxa" style="color:${cor}">${x.pct == null ? '—' : x.pct + '%'}</div>
-      <div class="radar-bar"><i style="width:${w}%;background:${cor}"></i></div>
-      <div class="radar-stats">
-        ${x.dentro.length} de ${x.cm.length} na meta<br>
-        ${x.riscos ? `<span style="color:var(--red)">${x.riscos} risco${x.riscos>1?'s':''}</span>` : 'sem risco crítico'}
-        ${x.alertas ? ` · <span style="color:var(--yellow)">${x.alertas} alerta${x.alertas>1?'s':''}</span>` : ''}
+  if(!itens.length){$('agendaLista').innerHTML='<div style="color:var(--muted);font-size:12px;padding:12px 0">Nenhum tema critico ou de atencao no recorte.</div>';return;}
+  const tipoLabel={crit:'Risco Institucional',alert:'Sinal de Atencao',obs:'Ponto de Observacao'};
+  $('agendaLista').innerHTML=itens.map(([eixo,dados],i)=>{
+    const uniqInds=[...new Map(dados.inds.map(d=>[d.Indicador,d])).values()].slice(0,4);
+    const principalDev=dados.inds[0]?Math.abs(desvio(dados.inds[0])||0):0;
+    const ctx=dados.inds.length===1
+      ?`${esc(dados.inds[0].Indicador)} registra desvio de ${fmt(desvio(dados.inds[0]),dados.inds[0].Unidade)}.`
+      :`${dados.inds.length} indicadores com sinal desfavoravel neste eixo.`;
+    return`<div class="ag-item">
+      <div class="ag-n">0${i+1}</div>
+      <div class="ag-corpo">
+        <div><span class="ag-tipo ${dados.tipo}">${tipoLabel[dados.tipo]}</span></div>
+        <div class="ag-tema">${TEMA_EIXO[eixo]||esc(eixo)}</div>
+        <div class="ag-contexto">${ctx}</div>
+        <div class="ag-inds">${uniqInds.map(d=>`<span class="ag-ind">${esc(d.Indicador)}</span>`).join('')}</div>
       </div>
     </div>`;
   }).join('');
 }
 
-/* BLOCO 5 */
-function buildInsights(rows){
-  const cm = rows.filter(d=>d.Meta != null && d.Acumulado != null);
-  const dentro = cm.filter(d=>statusOf(d)==='Dentro da meta');
-  const abaixo = cm.filter(d=>statusOf(d)==='Abaixo da meta');
-  const ins = [];
+/* ── ficha do indicador ── */
+function abrirFicha(nomeInd){
+  modoFicha=true;
+  $('viewCorporativo').classList.add('hidden');
+  $('viewFicha').classList.add('active');
 
-  const criticos = abaixo.filter(d=>tendClass(d)==='bad').sort((a,b)=>Math.abs(desvio(b)||0)-Math.abs(desvio(a)||0));
-  if(criticos.length){
-    const rep = criticos[0];
-    ins.push({
-      cls:'bad', tag:'Risco Institucional',
-      titulo:`${criticos.length} indicador${criticos.length>1?'es':''} em zona crítica`,
-      val:criticos.length, sub:'desvio negativo + trajetória desfavorável',
-      d:rep,
-      narrativa:`<b>${criticos.length}</b> indicador${criticos.length>1?'es combinam':' combina'} resultado abaixo da meta e tendência de piora. Esse é o principal sinal para a Presidência, porque une distância da meta com trajetória desfavorável. O caso mais relevante é <b>${esc(rep.Indicador)}</b>, no eixo <b>${esc(rep.Eixo)}</b>, com acumulado de <b>${fmt(rep.Acumulado,rep.Unidade)}</b> frente à meta de <b>${fmt(rep.Meta,rep.Unidade)}</b>.`
-    });
+  const rows=DATA.filter(d=>d.Indicador===nomeInd&&ANOS.includes(d.Ano));
+  if(!rows.length){$('fichaContent').innerHTML='<p style="color:var(--muted)">Sem dados para este indicador.</p>';return;}
+
+  const d=rows.sort((a,b)=>b.Ano-a.Ano)[0];
+  const outro=rows.find(r=>r.Ano!==d.Ano);
+  const st=statusOf(d),dv=desvio(d),tc=tendClass(d),cons=consistencia(d);
+  const pct=d.Meta&&dv!=null?Math.abs(dv/d.Meta*100):null;
+  const yoy=outro&&d.Acumulado!=null&&outro.Acumulado?(d.Acumulado-outro.Acumulado)/Math.abs(outro.Acumulado)*100:null;
+  const stC=st==='Dentro da meta'?'meta':st==='Abaixo da meta'?'abaixo':'sem';
+  const tcC=tc==='good'?'melhora':tc==='bad'?'piora':'estavel';
+
+  // Interpretação
+  let interp=`<b>${esc(nomeInd)}</b> integra o eixo estrategico <b>${esc(eixoDe(nomeInd))}</b>`;
+  if(d.Meta!=null&&d.Acumulado!=null){
+    interp+=` e registra acumulado de <b>${fmt(d.Acumulado,d.Unidade)}</b> frente a meta de <b>${fmt(d.Meta,d.Unidade)}</b>.`;
+    if(st==='Dentro da meta') interp+=pct!=null?` O resultado supera a referencia em <b>${pct.toFixed(1)}%</b>.`:' O resultado esta dentro da referencia.';
+    else interp+=` Ha um desvio de <b>${fmt(dv,d.Unidade)}</b>${pct!=null?` (${pct.toFixed(1)}%)`:''}.`;
+    if(tc==='bad') interp+=` A serie mensal aponta deterioracao de desempenho nos ultimos meses.`;
+    else if(tc==='good') interp+=` A trajetoria mensal e positiva, com melhora recente.`;
+    else interp+=` A trajetoria mensal e estavel.`;
+    if(cons==='alta') interp+=` O resultado apresenta consistencia alta ao longo do periodo &mdash; nao e um pico isolado.`;
+    else if(cons==='baixa') interp+=` A variacao mensal e elevada, o que pode indicar sazonalidade ou instabilidade operacional.`;
+    if(yoy!=null) interp+=`<br><br>Em relacao ao ano anterior, o acumulado ${yoy>=0?'cresceu':'recuou'} <b>${Math.abs(yoy).toFixed(1)}%</b> &mdash; ${d.Ano-1}: ${outro?fmt(outro.Acumulado,d.Unidade):'—'} &rarr; ${d.Ano}: ${fmt(d.Acumulado,d.Unidade)}.`;
+  } else {
+    interp+='. Nao ha meta ou acumulado registrado no periodo, o que impede a avaliacao objetiva do desempenho.';
   }
 
-  const alertas = dentro.filter(d=>tendClass(d)==='bad').sort((a,b)=>Math.abs(desvio(a)||0)-Math.abs(desvio(b)||0));
-  if(alertas.length){
-    const rep = alertas[0];
-    ins.push({
-      cls:'warn', tag:'Atenção Preventiva',
-      titulo:`${alertas.length} indicador${alertas.length>1?'es':''} ainda na meta, mas piorando`,
-      val:alertas.length, sub:'sinal antes do desvio formal',
-      d:rep,
-      narrativa:`Há <b>${alertas.length}</b> indicador${alertas.length>1?'es':' '} ainda dentro da referência, mas com perda recente de desempenho. Esse grupo deve ser observado antes do fechamento do período. O principal caso é <b>${esc(rep.Indicador)}</b>, no eixo <b>${esc(rep.Eixo)}</b>.`
-    });
-  }
+  // Leitura de situação
+  let situacao='';
+  if(st==='Abaixo da meta'&&tc==='bad') situacao='Desvio combinado a trajetoria desfavoravel. O sinal merece acompanhamento proximo neste ciclo.';
+  else if(st==='Abaixo da meta') situacao='Resultado abaixo da referencia, sem agravamento de trajetoria no momento. Vale verificar a origem do desvio.';
+  else if(st==='Dentro da meta'&&tc==='bad') situacao='Ainda dentro da referencia, mas com perda de desempenho recente. Ponto de atencao preventiva.';
+  else if(st==='Dentro da meta'&&cons==='alta') situacao='Resultado consolidado com consistencia ao longo do periodo.';
+  else if(st==='Dentro da meta') situacao='Resultado dentro da referencia.';
+  else situacao='Sem meta cadastrada. A leitura de desempenho fica limitada sem referencia de comparacao.';
 
-  const replicaveis = dentro.filter(d=>tendClass(d)==='good' && consistencia(d)==='alta')
-    .sort((a,b)=>Math.abs(desvioPct(b)||0)-Math.abs(desvioPct(a)||0));
-  if(replicaveis.length){
-    const rep = replicaveis[0];
-    ins.push({
-      cls:'good', tag:'Boa Prática Replicável',
-      titulo:`${replicaveis.length} resultado${replicaveis.length>1?'s':''} consolidado${replicaveis.length>1?'s':''}`,
-      val:replicaveis.length, sub:'meta + tendência positiva + consistência alta',
-      d:rep,
-      narrativa:`<b>${replicaveis.length}</b> indicador${replicaveis.length>1?'es apresentam':' apresenta'} resultado acima da meta com consistência alta. Isso diferencia desempenho estrutural de pico isolado. O destaque é <b>${esc(rep.Indicador)}</b>, no eixo <b>${esc(rep.Eixo)}</b>.`
-    });
-  }
-
-  const governaveis = rows.filter(d=>d.Governabilidade === 'governável');
-  const govAbaixo = governaveis.filter(d=>statusOf(d)==='Abaixo da meta');
-  if(governaveis.length){
-    const rep = govAbaixo[0] || governaveis[0];
-    const pct = Math.round(govAbaixo.length / governaveis.length * 100);
-    ins.push({
-      cls:'neutral', tag:'Governabilidade',
-      titulo:`${governaveis.length} indicadores sob controle direto`,
-      val:`${govAbaixo.length} abaixo`,
-      sub:`${pct}% dos governáveis com desvio`,
-      d:rep,
-      narrativa:`O painel separa indicadores governáveis daqueles dependentes de demanda cidadã, clima, terceiros ou outros órgãos. Dos <b>${governaveis.length}</b> indicadores governáveis no recorte, <b>${govAbaixo.length}</b> estão abaixo da meta. Essa leitura evita comparar naturezas diferentes na mesma régua.`
-    });
-  }
-
-  const alta = rows.filter(d=>consistencia(d)==='alta').length;
-  const media = rows.filter(d=>consistencia(d)==='média').length;
-  const baixa = rows.filter(d=>consistencia(d)==='baixa').length;
-  if(rows.length){
-    const rep = rows.find(d=>consistencia(d)==='baixa' && statusOf(d)==='Dentro da meta') || rows[0];
-    ins.push({
-      cls:'neutral', tag:'Consistência Operacional',
-      titulo:`${alta} indicador${alta!==1?'es':''} com padrão estável`,
-      val:`${alta} alta / ${media} média`,
-      sub:`${baixa} com variação elevada`,
-      d:rep,
-      narrativa:`Consistência operacional diferencia resultado confiável de resultado circunstancial. No recorte, <b>${alta}</b> indicador${alta!==1?'es têm':' tem'} consistência alta, <b>${media}</b> consistência média e <b>${baixa}</b> variação elevada.`
-    });
-  }
-
-  const semMeta = rows.filter(d=>d.Meta == null || d.Acumulado == null);
-  if(semMeta.length){
-    const rep = semMeta.find(d=>d.Acumulado != null) || semMeta[0];
-    ins.push({
-      cls:'neutral', tag:'Meta sem Referência',
-      titulo:`${semMeta.length} indicador${semMeta.length>1?'es':''} sem leitura possível`,
-      val:semMeta.length,
-      sub:'sem meta ou acumulado',
-      d:rep,
-      narrativa:`<b>${semMeta.length}</b> indicador${semMeta.length>1?'es não possuem':' não possui'} meta ou acumulado no recorte. O painel pode exibir o volume, mas não consegue afirmar se o desempenho é bom, ruim ou aceitável sem uma referência.`
-    });
-  }
-
-  return ins.slice(0,6);
-}
-function buildIndicatorMode(rows){
-  const inds = uniq(rows.map(d=>d.Indicador));
-  if(inds.length !== 1) return null;
-
-  const ind = inds[0];
-  const recs = rows.filter(d=>d.Indicador === ind).sort((a,b)=>(b.Ano||0)-(a.Ano||0));
-  const atual = recs[0];
-  const anterior = recs.find(d=>d.Ano !== atual.Ano);
-  if(!atual) return null;
-
-  const st = statusOf(atual);
-  const tc = tendClass(atual);
-  const cons = consistencia(atual);
-  const vals = MESES.map(m=>atual[m]).filter(x=>x != null);
-  const primeiro = vals.length ? vals[0] : null;
-  const ultimo = vals.length ? vals.at(-1) : null;
-  const deltaSerie = (primeiro != null && ultimo != null && primeiro !== 0) ? ((ultimo - primeiro) / Math.abs(primeiro) * 100) : null;
-  const yoy = (anterior && anterior.Acumulado != null && atual.Acumulado != null && anterior.Acumulado !== 0)
-    ? ((atual.Acumulado - anterior.Acumulado) / Math.abs(anterior.Acumulado) * 100)
-    : null;
-
-  const semMeta = atual.Meta == null || atual.Acumulado == null;
-  const eixo = atual.Eixo || eixoDe(atual.Indicador);
-  const gov = atual.Governabilidade || govClass(atual.Indicador);
-  const tipo = atual.Tipo || tipoIndicador(atual.Indicador);
-
-  const leituraStatus = semMeta
-    ? `O indicador possui valor realizado, mas não tem meta cadastrada no recorte. Ele pode ser monitorado, porém não deve ser tratado como bom ou ruim sem referência formal.`
-    : st === 'Dentro da meta'
-      ? `O indicador está dentro da referência cadastrada. A leitura executiva deve observar se esse resultado é consistente ou se depende de variação pontual.`
-      : `O indicador está abaixo da referência cadastrada. A leitura executiva deve verificar se o desvio é pontual, estrutural ou associado a fatores fora da governabilidade direta.`;
-
-  const leituraTend = tc === 'good'
-    ? `A trajetória recente é favorável em relação ao sentido esperado do indicador.`
-    : tc === 'bad'
-      ? `A trajetória recente é desfavorável em relação ao sentido esperado do indicador. Mesmo sem meta, isso indica perda de desempenho ou aumento de pressão.`
-      : `A série recente está estável, sem variação relevante no padrão mensal.`;
-
-  const leituraCons = cons === 'alta'
-    ? `A série tem baixa oscilação mensal, sugerindo comportamento operacional mais previsível.`
-    : cons === 'média'
-      ? `A série apresenta oscilação moderada. O resultado deve ser lido com cautela, especialmente se houver poucos meses preenchidos.`
-      : `A série apresenta variação elevada ou poucos dados mensais. O resultado pode refletir pico, sazonalidade ou preenchimento incompleto.`;
-
-  const pergunta = semMeta
-    ? `Definir meta ou referência de acompanhamento para permitir avaliação executiva.`
-    : st === 'Abaixo da meta'
-      ? `Identificar causa do desvio, responsável pelo plano de recuperação e prazo de correção.`
-      : tc === 'bad'
-        ? `Acompanhar preventivamente para evitar que a deterioração vire desvio formal no fechamento.`
-        : `Preservar o padrão atual e verificar se a prática pode ser replicada em áreas semelhantes.`;
-
-  return [
-    {
-      cls: semMeta ? 'neutral' : st === 'Dentro da meta' ? 'good' : 'bad',
-      tag:'Ficha do Indicador',
-      titulo:atual.Indicador,
-      val:fmt(atual.Acumulado,atual.Unidade),
-      sub: semMeta ? 'sem meta cadastrada' : `${st} · meta ${fmt(atual.Meta,atual.Unidade)}`,
-      d:atual,
-      narrativa:`<b>${esc(atual.Indicador)}</b> é um indicador do eixo <b>${esc(eixo)}</b>, classificado como <b>${esc(tipo)}</b> e com leitura de governabilidade <b>${esc(gov)}</b>.<br><br>${leituraStatus}`
-    },
-    {
-      cls: tc === 'good' ? 'good' : tc === 'bad' ? 'warn' : 'neutral',
-      tag:'Comportamento Recente',
-      titulo: tc === 'good' ? 'Trajetória favorável' : tc === 'bad' ? 'Trajetória desfavorável' : 'Trajetória estável',
-      val: deltaSerie == null ? '—' : `${deltaSerie >= 0 ? '+' : ''}${deltaSerie.toFixed(1)}%`,
-      sub: primeiro != null && ultimo != null ? `${fmt(primeiro,atual.Unidade)} → ${fmt(ultimo,atual.Unidade)}` : 'sem série mensal suficiente',
-      d:atual,
-      narrativa:`${leituraTend}<br><br>No período carregado, a série saiu de <b>${fmt(primeiro,atual.Unidade)}</b> para <b>${fmt(ultimo,atual.Unidade)}</b>. ${deltaSerie == null ? 'Não há dados mensais suficientes para calcular a variação.' : `A variação estimada foi de <b>${deltaSerie >= 0 ? '+' : ''}${deltaSerie.toFixed(1)}%</b>.`}`
-    },
-    {
-      cls: cons === 'alta' ? 'good' : cons === 'média' ? 'neutral' : 'warn',
-      tag:'Confiabilidade da Leitura',
-      titulo: cons === 'alta' ? 'Resultado mais estável' : cons === 'média' ? 'Oscilação moderada' : 'Leitura instável',
-      val:cons,
-      sub: yoy == null ? 'sem comparação anual' : `variação anual ${yoy >= 0 ? '+' : ''}${yoy.toFixed(1)}%`,
-      d:atual,
-      narrativa:`${leituraCons}${yoy == null ? '' : `<br><br>Na comparação com ${anterior.Ano}, o acumulado variou <b>${yoy >= 0 ? '+' : ''}${yoy.toFixed(1)}%</b>, saindo de <b>${fmt(anterior.Acumulado,atual.Unidade)}</b> para <b>${fmt(atual.Acumulado,atual.Unidade)}</b>.`}`
-    },
-    {
-      cls: semMeta || tc === 'bad' || st === 'Abaixo da meta' ? 'warn' : 'good',
-      tag:'Decisão Executiva',
-      titulo:'O que esse indicador pede',
-      val: semMeta ? 'definir meta' : st === 'Abaixo da meta' ? 'plano de ação' : tc === 'bad' ? 'monitorar' : 'manter padrão',
-      sub:'leitura para despacho',
-      d:atual,
-      narrativa:`A leitura executiva recomendada é: <b>${esc(pergunta)}</b><br><br>Esse card evita que o painel apenas mostre o número. Ele transforma o indicador selecionado em uma pauta objetiva para gestão.`
-    }
-  ];
-}
-
-function renderInsights(rows){
-  const indicatorMode = buildIndicatorMode(rows);
-  const items = indicatorMode || buildInsights(rows);
-
-  if(!items.length){
-    $('insGrid').innerHTML = `<div style="color:var(--muted);font-size:13px;padding:8px">Sem dados suficientes para gerar insights.</div>`;
-    $('insExpand').innerHTML = '';
-    return;
-  }
-
-  const label = document.querySelectorAll('.section-label')[4];
-  if(label){
-    label.childNodes[0].nodeValue = indicatorMode ? 'Ficha Executiva do Indicador ' : 'Insights Estratégicos ';
-  }
-
-  window._insItems = items;
-  $('insGrid').innerHTML = items.map((ins,i)=>`
-    <div class="ins-card ${ins.cls}" data-idx="${i}" onclick="toggleIns(${i})">
-      <div class="ins-tag">${esc(ins.tag)}</div>
-      <div class="ins-titulo">${esc(ins.titulo)}</div>
-      <div class="ins-val">${esc(ins.val)}</div>
-      <div class="ins-sub">${esc(ins.sub)}</div>
-      <span class="ins-arrow">&#9660;</span>
+  $('fichaContent').innerHTML=`
+    <div class="ficha-topo">
+      <div class="ficha-eyebrow">${esc(eixoDe(nomeInd))} &bull; ${esc(d.Diretoria)} &bull; ${d.Ano}</div>
+      <div class="ficha-nome">${esc(nomeInd)}</div>
+      <div class="ficha-chips">
+        <span class="chip ${stC}">${st}</span>
+        <span class="chip ${tcC}">Tendencia: ${tendLabel(d)}</span>
+        <span class="chip cons-${cons}">Consistencia ${cons}</span>
+      </div>
+      <div class="ficha-nums">
+        <div>
+          <div class="f-num-val ${stC==='abaixo'?'bad':stC==='meta'?'good':''}">${fmt(d.Acumulado,d.Unidade)}</div>
+          <div class="f-num-label">Realizado</div>
+        </div>
+        <div class="ficha-sep"></div>
+        <div>
+          <div class="f-num-val">${fmt(d.Meta,d.Unidade)}</div>
+          <div class="f-num-label">Meta</div>
+        </div>
+        ${dv!=null?`<div class="ficha-sep"></div><div>
+          <div class="f-num-val ${dv<0?'bad':'good'}">${dv>=0?'+':''}${fmt(dv,d.Unidade)}</div>
+          <div class="f-num-label">Desvio</div>
+        </div>`:''}
+        ${yoy!=null?`<div class="ficha-sep"></div><div>
+          <div class="f-num-val ${yoy<0?'bad':'good'}">${yoy>=0?'+':''}${yoy.toFixed(1)}%</div>
+          <div class="f-num-label">Var. anual</div>
+        </div>`:''}
+      </div>
     </div>
-  `).join('');
-  $('insExpand').innerHTML = '';
-  openIdx = null;
-}
-function toggleIns(idx){
-  const items = window._insItems || [];
-  if(!items[idx]) return;
 
-  if(openIdx === idx){
-    openIdx = null;
-    document.querySelectorAll('.ins-card').forEach(c=>c.classList.remove('open'));
-    $('insExpand').innerHTML = '';
-    return;
-  }
-
-  openIdx = idx;
-  document.querySelectorAll('.ins-card').forEach(c=>c.classList.remove('open'));
-  const card = document.querySelector(`.ins-card[data-idx="${idx}"]`);
-  if(card) card.classList.add('open');
-
-  const ins = items[idx];
-  const d = ins.d || {};
-  const st = statusOf(d);
-  const dv = desvio(d);
-  const tc = tendClass(d);
-  const cons = consistencia(d);
-  const vals = MESES.map(m=>d[m]).filter(x=>x != null);
-  const maxV = vals.length ? Math.max(...vals) : null;
-  const minV = vals.length ? Math.min(...vals) : null;
-  const mediaV = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : null;
-
-  $('insExpand').innerHTML = `
-    <div class="ins-expand open">
-      <div class="exp-main">
-        <h3>${esc(ins.tag)}</h3>
-        <div class="exp-narrative">${ins.narrativa}</div>
+    <div class="ficha-corpo">
+      <div>
+        <div class="ficha-chart-label">Evolucao mensal 2025 &mdash; 2026</div>
+        <div class="ficha-chart-wrap"><canvas id="fichaChart"></canvas></div>
       </div>
-      <div class="exp-chart"><canvas id="expC_${idx}" style="max-height:180px"></canvas></div>
-      <div class="exp-stats">
-        <div class="stat-row"><span class="stat-label">Indicador</span><span class="stat-val" style="font-size:10px;white-space:normal;max-width:140px">${esc(d.Indicador || '—')}</span></div>
-        <div class="stat-row"><span class="stat-label">Eixo</span><span class="stat-val">${esc(d.Eixo || '—')}</span></div>
-        <div class="stat-row"><span class="stat-label">Status</span><span class="stat-val ${st==='Dentro da meta'?'good':st==='Abaixo da meta'?'bad':''}">${st}</span></div>
-        <div class="stat-row"><span class="stat-label">Acumulado</span><span class="stat-val">${fmt(d.Acumulado,d.Unidade)}</span></div>
-        <div class="stat-row"><span class="stat-label">Meta</span><span class="stat-val">${fmt(d.Meta,d.Unidade)}</span></div>
-        <div class="stat-row"><span class="stat-label">Desvio</span><span class="stat-val ${dv!=null && dv<0?'bad':dv!=null && dv>0?'good':''}">${dv!=null?fmt(dv,d.Unidade):'—'}</span></div>
-        <div class="stat-row"><span class="stat-label">Tendência</span><span class="stat-val ${tc==='good'?'good':tc==='bad'?'bad':''}">${tendLabel(d)}</span></div>
-        <div class="stat-row"><span class="stat-label">Consistência</span><span class="stat-val ${cons==='alta'?'good':cons==='baixa'?'warn':''}">${cons}</span></div>
-        <div class="stat-row"><span class="stat-label">Máx. mensal</span><span class="stat-val">${fmt(maxV,d.Unidade)}</span></div>
-        <div class="stat-row"><span class="stat-label">Mín. mensal</span><span class="stat-val">${fmt(minV,d.Unidade)}</span></div>
-        <div class="stat-row"><span class="stat-label">Média mensal</span><span class="stat-val">${fmt(mediaV,d.Unidade)}</span></div>
+      <div>
+        <div class="ficha-interp-label">Interpretacao executiva</div>
+        <div class="ficha-interp">${interp}</div>
+        <div class="ficha-decisao">
+          <div class="ficha-decisao-label">Leitura de situacao</div>
+          <div class="ficha-decisao-text">${situacao}</div>
+        </div>
       </div>
     </div>`;
 
   setTimeout(()=>{
-    const ctx = document.getElementById(`expC_${idx}`);
-    if(!ctx || !d.Indicador) return;
-    if(INSIGHT_CHARTS[idx]) INSIGHT_CHARTS[idx].destroy();
-
-    const datasets = [];
-    ANOS.forEach((a,i)=>{
-      const row = DATA.find(r=>r.Ano===a && norm(r.Indicador)===norm(d.Indicador));
-      if(!row) return;
-      datasets.push({
-        label:String(a),
-        data:MESES.map(m=>row[m]),
-        borderColor:i===0?'#6da5d8':'#e87535',
-        backgroundColor:(i===0?'#6da5d8':'#e87535')+'15',
-        tension:.35,borderWidth:2,pointRadius:3,fill:i===0
-      });
-    });
-    if(d.Meta != null){
-      datasets.push({label:'Meta',data:MESES.map(()=>d.Meta),borderColor:'#e8c335',borderDash:[5,3],borderWidth:1.5,pointRadius:0,fill:false});
-    }
-
-    INSIGHT_CHARTS[idx] = new Chart(ctx,{
-      type:'line',
-      data:{labels:MESES,datasets},
-      options:{
-        responsive:true,maintainAspectRatio:false,
-        plugins:{legend:{labels:{color:'#c7d8ef',font:{size:10}}}},
-        scales:{
-          x:{ticks:{color:'#8a9db8',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}},
-          y:{ticks:{color:'#8a9db8',font:{size:9}},grid:{color:'rgba(255,255,255,.06)'}}
-        }
-      }
-    });
+    const ds=[];
+    ANOS.forEach((a,i)=>{const row=DATA.find(r=>r.Ano===a&&r.Indicador===nomeInd);if(!row)return;ds.push({label:String(a),data:MESES.map(m=>row[m]),borderColor:i===0?'#5b9bd5':'#e87535',backgroundColor:(i===0?'#5b9bd5':'#e87535')+'14',tension:.35,borderWidth:2,pointRadius:3,fill:i===0});});
+    const rm=[...ANOS].reverse().map(a=>DATA.find(r=>r.Ano===a&&r.Indicador===nomeInd&&r.Meta!=null)).find(Boolean);
+    if(rm)ds.push({label:'Meta',data:MESES.map(()=>rm.Meta),borderColor:'#c9a830',borderDash:[5,3],borderWidth:1.5,pointRadius:0,fill:false});
+    mkChart('fichaChart','line',MESES,ds,{plugins:{legend:{labels:{color:'#8aaccc'}}}});
+    $('viewFicha').scrollIntoView({behavior:'smooth',block:'start'});
   },60);
 }
 
-/* leitura */
-function renderInsightText(rows){
-  const inds = uniq(rows.map(d=>d.Indicador));
-  if(inds.length === 1 && rows.length){
-    const recs = rows.slice().sort((a,b)=>(b.Ano||0)-(a.Ano||0));
-    const d = recs[0];
-    const st = statusOf(d);
-    const tc = tendClass(d);
-    const cons = consistencia(d);
-    const semMeta = d.Meta == null || d.Acumulado == null;
-
-    let t = `<b>${esc(d.Indicador)}</b> pertence ao eixo <b>${esc(d.Eixo)}</b>. `;
-    t += semMeta
-      ? `O indicador possui acumulado de <b>${fmt(d.Acumulado,d.Unidade)}</b>, mas está <b>sem meta cadastrada</b>. Portanto, o painel monitora o comportamento, mas não classifica o desempenho como bom ou ruim. `
-      : `O acumulado é <b>${fmt(d.Acumulado,d.Unidade)}</b> frente à meta de <b>${fmt(d.Meta,d.Unidade)}</b>, com status <b>${st}</b>. `;
-    t += tc === 'bad'
-      ? `A trajetória recente é desfavorável, então vale acompanhamento preventivo. `
-      : tc === 'good'
-        ? `A trajetória recente é favorável. `
-        : `A trajetória recente está estável. `;
-    t += `A consistência da série é <b>${cons}</b>. `;
-    t += semMeta
-      ? `A principal decisão é cadastrar uma referência de meta para permitir avaliação executiva.`
-      : st === 'Abaixo da meta'
-        ? `A principal decisão é identificar causa, responsável e prazo para recuperação.`
-        : tc === 'bad'
-          ? `A principal decisão é evitar deterioração antes do fechamento do período.`
-          : `A principal decisão é preservar o padrão atual.`;
-
-    $('insightText').innerHTML = t;
-    return;
-  }
-
-  const cm = rows.filter(d=>d.Meta != null && d.Acumulado != null);
-  const dentro = cm.filter(d=>statusOf(d)==='Dentro da meta');
-  const abaixo = cm.filter(d=>statusOf(d)==='Abaixo da meta');
-  const pct = cm.length ? Math.round(dentro.length/cm.length*100) : 0;
-  const criticos = abaixo.filter(d=>tendClass(d)==='bad');
-  const alertas = dentro.filter(d=>tendClass(d)==='bad');
-  const consol = dentro.filter(d=>consistencia(d)==='alta');
-  const semMeta = rows.filter(d=>d.Meta == null || d.Acumulado == null);
-  const pior = criticos.length ? [...criticos].sort((a,b)=>Math.abs(desvio(b)||0)-Math.abs(desvio(a)||0))[0] : null;
-
-  let t = `No recorte selecionado, o painel mostra não apenas o percentual de indicadores dentro da meta, mas a qualidade do resultado: entregas consolidadas, sinais de deterioração e pontos que exigem observação executiva.`;
-  t += ` De <b>${cm.length}</b> indicadores com meta, <b>${dentro.length}</b> estão dentro da referência, resultando em <b>${pct}%</b> de atingimento.`;
-  if(criticos.length){
-    t += ` <b>${criticos.length}</b> indicador${criticos.length>1?'es concentram':' concentra'} o sinal mais crítico: desvio negativo com trajetória desfavorável`;
-    if(pior) t += `, com destaque para <b>${esc(pior.Indicador)}</b>`;
-    t += `.`;
-  }
-  if(alertas.length) t += ` Outros <b>${alertas.length}</b> ainda estão na meta, mas já mostram perda de desempenho.`;
-  if(consol.length) t += ` <b>${consol.length}</b> indicador${consol.length>1?'es apresentam':' apresenta'} consistência alta, sinalizando resultado estrutural.`;
-  if(semMeta.length) t += ` <b>${semMeta.length}</b> indicador${semMeta.length>1?'es estão':' está'} sem meta ou acumulado, limitando a leitura executiva.`;
-
-  $('insightText').innerHTML = t;
+function voltarCorporativo(){
+  modoFicha=false;
+  $('fInd').value='';
+  $('viewCorporativo').classList.remove('hidden');
+  $('viewFicha').classList.remove('active');
+  cascadeFilters();
+  renderCorporativo(filtered());
 }
 
-/* gráficos inferiores */
-function populateSelInd(rows){
-  const inds = uniq(rows.map(d=>d.Indicador));
-  const sel = $('selInd');
-  const cur = sel.value;
-  sel.innerHTML = inds.map(i=>`<option value="${esc(i)}">${esc(i)}</option>`).join('');
-  if(inds.includes(cur)) sel.value = cur;
-}
-function renderEvol(){
-  const ind = $('selInd').value;
-  if(!ind) return;
-  $('evolBadge').textContent = ind.length > 45 ? ind.slice(0,44)+'…' : ind;
-
-  const datasets = [];
-  ANOS.forEach((a,i)=>{
-    const row = DATA.find(d=>d.Ano === a && d.Indicador === ind);
-    if(!row) return;
-    datasets.push({
-      label:String(a),
-      data:MESES.map(m=>row[m]),
-      borderColor:i===0?'#6da5d8':'#e87535',
-      backgroundColor:(i===0?'#6da5d8':'#e87535')+'1a',
-      tension:.35,borderWidth:2.5,pointRadius:4,fill:i===0
-    });
-  });
-  const rm = [...ANOS].reverse().map(a=>DATA.find(d=>d.Ano===a && d.Indicador===ind && d.Meta!=null)).find(Boolean);
-  if(rm) datasets.push({label:'Meta',data:MESES.map(()=>rm.Meta),borderColor:'#e8c335',borderDash:[6,4],borderWidth:1.5,pointRadius:0,fill:false});
-
-  if(datasets.length) mkChart('lineChart','line',MESES,datasets);
-}
-function renderDonut(rows){
-  const s = {'Dentro da meta':0,'Abaixo da meta':0,'Sem meta':0};
-  rows.forEach(d=>s[statusOf(d)] = (s[statusOf(d)] || 0) + 1);
-  mkChart('donutChart','doughnut',Object.keys(s),[{
-    data:Object.values(s),
-    backgroundColor:['#78aaa3','#ef6a5d','#274260'],
-    borderWidth:0,hoverOffset:8
-  }],{plugins:{legend:{position:'right',labels:{color:'#c7d8ef',font:{size:11}}}}});
-}
-function renderBar(rows){
-  const rec = new Set(rows.map(d=>d.Indicador));
-  const i25 = new Set(DATA.filter(d=>d.Ano===2025).map(d=>d.Indicador));
-  const i26 = new Set(DATA.filter(d=>d.Ano===2026).map(d=>d.Indicador));
-  const top = [...i25].filter(i=>i26.has(i) && rec.has(i)).slice(0,10);
-
-  const d25 = top.map(i=>(DATA.find(d=>d.Ano===2025 && d.Indicador===i)||{}).Acumulado ?? null);
-  const d26 = top.map(i=>(DATA.find(d=>d.Ano===2026 && d.Indicador===i)||{}).Acumulado ?? null);
-
-  mkChart('barChart','bar',top.map(l=>l.length>18?l.slice(0,17)+'…':l),[
-    {label:'2025',data:d25,backgroundColor:'#6da5d8cc',borderRadius:4,borderWidth:0},
-    {label:'2026',data:d26,backgroundColor:'#e87535cc',borderRadius:4,borderWidth:0}
-  ]);
-}
-
-function isSingleIndicator(rows){
-  return uniq(rows.map(d=>d.Indicador)).length === 1;
-}
-
-function renderIndicatorAnalysis(rows){
-  const inds = uniq(rows.map(d=>d.Indicador));
-  if(inds.length !== 1){
-    $('indicatorAnalysis').style.display = 'none';
-    $('generalCharts').style.display = 'grid';
-    return;
-  }
-
-  $('indicatorAnalysis').style.display = 'grid';
-  $('generalCharts').style.display = 'none';
-
-  const ind = inds[0];
-  const recs = rows.filter(d=>d.Indicador === ind).sort((a,b)=>(b.Ano||0)-(a.Ano||0));
-  const atual = recs[0];
-  const r2025 = DATA.find(d=>d.Indicador === ind && d.Ano === 2025);
-  const r2026 = DATA.find(d=>d.Indicador === ind && d.Ano === 2026);
-
-  if(!atual){
-    $('indicatorReadBox').innerHTML = 'Sem dados para o indicador selecionado.';
-    $('indicatorCompareBox').innerHTML = 'Sem comparação disponível.';
-    return;
-  }
-
-  const st = statusOf(atual);
-  const tc = tendClass(atual);
-  const cons = consistencia(atual);
-  const semMeta = atual.Meta == null || atual.Acumulado == null;
-  const vals = MESES.map(m=>atual[m]).filter(x=>x != null);
-  const primeiro = vals.length ? vals[0] : null;
-  const ultimo = vals.length ? vals.at(-1) : null;
-  const deltaSerie = (primeiro != null && ultimo != null && primeiro !== 0) ? ((ultimo-primeiro)/Math.abs(primeiro)*100) : null;
-
-  let decisao = '';
-  if(semMeta) decisao = 'Cadastrar meta ou referência para permitir avaliação executiva.';
-  else if(st === 'Abaixo da meta') decisao = 'Apurar causa do desvio, responsável e prazo de recuperação.';
-  else if(tc === 'bad') decisao = 'Monitorar preventivamente para evitar perda de resultado no fechamento.';
-  else decisao = 'Manter padrão atual e avaliar replicação da prática.';
-
-  $('indicatorReadBox').innerHTML = `
-    <span class="big">${fmt(atual.Acumulado,atual.Unidade)}</span>
-    <div class="muted">${esc(atual.Indicador)} · ${esc(atual.Eixo)} · ${esc(atual.Tipo)} · ${esc(atual.Governabilidade)}</div>
-    <br>
-    ${semMeta
-      ? `O indicador possui valor realizado, mas está <b>sem meta cadastrada</b>. Ele não deve ser interpretado como bom ou ruim sem referência formal.`
-      : `O indicador está <b>${st}</b>, com acumulado de <b>${fmt(atual.Acumulado,atual.Unidade)}</b> frente à meta de <b>${fmt(atual.Meta,atual.Unidade)}</b>.`
-    }
-    <br><br>
-    A trajetória recente é <b>${tendLabel(atual)}</b> e a consistência da série é <b>${cons}</b>.
-    ${deltaSerie == null ? '' : ` A variação entre o primeiro e o último mês disponível foi de <b>${deltaSerie>=0?'+':''}${deltaSerie.toFixed(1)}%</b>.`}
-    <br><br>
-    <b>Decisão sugerida:</b> ${decisao}
-  `;
-
-  const yoy = (r2025 && r2026 && r2025.Acumulado != null && r2026.Acumulado != null && r2025.Acumulado !== 0)
-    ? ((r2026.Acumulado-r2025.Acumulado)/Math.abs(r2025.Acumulado)*100)
-    : null;
-
-  $('indicatorCompareBox').innerHTML = `
-    <div class="indicator-kv"><span>2025</span><b>${r2025 ? fmt(r2025.Acumulado,r2025.Unidade) : '—'}</b></div>
-    <div class="indicator-kv"><span>2026</span><b>${r2026 ? fmt(r2026.Acumulado,r2026.Unidade) : '—'}</b></div>
-    <div class="indicator-kv"><span>Variação anual</span><b style="color:${yoy==null?'#fff':yoy>=0?'var(--green)':'var(--red)'}">${yoy==null?'—':(yoy>=0?'+':'')+yoy.toFixed(1)+'%'}</b></div>
-    <div class="indicator-kv"><span>Status atual</span><b>${st}</b></div>
-    <div class="indicator-kv"><span>Meta atual</span><b>${fmt(atual.Meta,atual.Unidade)}</b></div>
-    <div class="indicator-kv"><span>Desvio atual</span><b>${desvio(atual)==null?'—':fmt(desvio(atual),atual.Unidade)}</b></div>
-    <br>
-    <span class="muted">Esta comparação usa apenas o indicador filtrado. O gráfico geral de barras fica oculto para evitar leitura misturada.</span>
-  `;
-}
-
-function renderBottomMode(rows){
-  if(isSingleIndicator(rows)){
-    renderIndicatorAnalysis(rows);
-    renderEvol();
-  }else{
-    $('indicatorAnalysis').style.display = 'none';
-    $('generalCharts').style.display = 'grid';
-    renderDonut(rows);
-    renderBar(rows);
-  }
-}
-
-/* rankings */
-function renderRankings(rows){
-  const abaixo = rows.filter(d=>statusOf(d)==='Abaixo da meta' && d.Acumulado != null && d.Meta != null)
-    .sort((a,b)=>Math.abs(desvio(b)||0)-Math.abs(desvio(a)||0)).slice(0,7);
-  const maxDv = Math.max(...abaixo.map(d=>Math.abs(desvio(d)||0)),1);
-
-  $('rankDesvio').innerHTML = abaixo.length ? abaixo.map((d,i)=>{
-    const dv = desvio(d);
-    return `<div class="rank">
-      <span class="rank-n">${i+1}</span>
-      <div class="rank-info">
-        <b title="${esc(d.Indicador)}">${esc(d.Indicador.length>34?d.Indicador.slice(0,33)+'…':d.Indicador)}</b>
-        <small>${d.Ano} · ${esc(d.Eixo)} · meta ${fmt(d.Meta,d.Unidade)}</small>
-        <div class="rank-bar"><i class="bad" style="width:${Math.max(4,Math.abs(dv||0)/maxDv*100)}%"></i></div>
-      </div>
-      <span class="rank-val" style="color:var(--red)">${fmt(dv,d.Unidade)}</span>
-    </div>`;
-  }).join('') : `<div style="padding:14px 8px;color:var(--muted);font-size:12px">Nenhum abaixo da meta.</div>`;
-
-  const bons = rows.filter(d=>statusOf(d)==='Dentro da meta' && d.Acumulado != null && consistencia(d)==='alta')
-    .sort((a,b)=>Math.abs(desvioPct(b)||0)-Math.abs(desvioPct(a)||0)).slice(0,7);
-  const maxAc = Math.max(...bons.map(d=>d.Acumulado || 0),1);
-
-  $('rankBom').innerHTML = bons.length ? bons.map((d,i)=>`
-    <div class="rank">
-      <span class="rank-n">${i+1}</span>
-      <div class="rank-info">
-        <b title="${esc(d.Indicador)}">${esc(d.Indicador.length>34?d.Indicador.slice(0,33)+'…':d.Indicador)}</b>
-        <small>${d.Ano} · ${esc(d.Eixo)} · consistência alta</small>
-        <div class="rank-bar"><i style="width:${Math.max(4,(d.Acumulado||0)/maxAc*100)}%"></i></div>
-      </div>
-      <span class="rank-val" style="color:var(--green)">${fmt(d.Acumulado,d.Unidade)}</span>
-    </div>
-  `).join('') : `<div style="padding:14px 8px;color:var(--muted);font-size:12px">Sem resultados consolidados no filtro.</div>`;
+function renderCorporativo(rows){
+  renderSintesePlacar(rows);
+  renderMatriz(rows);
+  renderDiretorias(rows);
+  renderRiscos(rows);
+  renderDestaques(rows);
+  renderAgenda(rows);
+  const now=new Date();
+  $('updated').textContent=`${now.toLocaleDateString('pt-BR')} ${now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}`;
 }
 
 function render(){
-  const rows = filtered();
-  renderKPIs(rows);
-  renderHeatmap(rows);
-  renderAgenda(rows);
-  renderRadar(rows);
-  renderInsights(rows);
-  renderInsightText(rows);
-  populateSelInd(rows);
-  renderBottomMode(rows);
-  renderRankings(rows);
+  const ind=vf('fInd');
+  if(ind){abrirFicha(ind);return;}
+  modoFicha=false;
+  $('viewCorporativo').classList.remove('hidden');
+  $('viewFicha').classList.remove('active');
+  renderCorporativo(filtered());
 }
 
-/* eventos */
-document.addEventListener('change', e=>{
-  const id = e.target?.id;
-  if(['fAno','fDir','fSup'].includes(id)){ cascadeFilters(); render(); }
-  else if(['fInd','fStatus'].includes(id)){ render(); }
-  else if(id === 'selInd'){ renderEvol(); }
+document.addEventListener('change',e=>{
+  const id=e.target?.id;
+  if(['fAno','fDir','fSup'].includes(id)){cascadeFilters();render();}
+  else if(id==='fInd') render();
 });
-document.addEventListener('click', e=>{
-  if(e.target?.id === 'btnClear' || e.target?.closest?.('#btnClear')){
-    ['fAno','fDir','fSup','fInd','fStatus'].forEach(id=>$(id).value='');
-    cascadeFilters();
-    render();
-  }
-  if(e.target?.id === 'btnDiag'){
-    const el = $('diagnostic');
-    el.style.display = el.style.display === 'grid' ? 'none' : 'grid';
-  }
+document.addEventListener('click',e=>{
+  if(e.target?.closest?.('#btnClear')){['fAno','fDir','fSup','fInd'].forEach(id=>$(id).value='');modoFicha=false;cascadeFilters();render();}
+  if(e.target?.closest?.('#btnVoltar')) voltarCorporativo();
 });
 
-/* boot */
-Papa.parse(CSV_URL,{
-  download:true,
-  header:true,
-  skipEmptyLines:true,
-  complete: res=>{
-    RAW_ROWS = res.data || [];
-    RAW_COLUMNS = Object.keys(RAW_ROWS[0] || {});
-
-    DATA = RAW_ROWS
-      .map(transform)
-      .filter(d=>d.Ano && d.Indicador);
-
-    $('loadBox').style.display = 'none';
-
-    if(!DATA.length){
-      $('errBox').style.display = 'block';
-      $('errBox').innerHTML = `O CSV foi lido, mas nenhum registro válido foi encontrado. Verifique se existem colunas de Ano e Indicador. Use o botão Diagnóstico para ver as colunas encontradas.`;
-      $('diagnostic').style.display = 'grid';
-    }
-
-    renderDiagnostic();
-    populateAll();
-    render();
+Papa.parse(CSV_URL,{download:true,header:true,skipEmptyLines:true,
+  complete:r=>{
+    DATA=r.data.map(transform).filter(d=>d.Ano&&d.Indicador);
+    populateAll();render();
   },
-  error: err=>{
-    $('loadBox').style.display = 'none';
-    $('errBox').style.display = 'block';
-    $('errBox').innerHTML = `Erro ao carregar o CSV publicado. Verifique se a planilha está publicada na web e se o link CSV está acessível.<br><br>${esc(err?.message || err)}`;
-    console.error(err);
-  }
+  error:e=>{console.error(e);$('scopeInfo').textContent='Erro ao carregar dados';}
 });
 </script>
 </body>
