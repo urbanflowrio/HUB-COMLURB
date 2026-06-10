@@ -1,7 +1,7 @@
 /**
  * HUB COMLURB - CSS Premium
  * Tema Navy + Glow
- * Versão 2.0
+ * Versão 2.1 - Fix overflow textos
  */
 
 /* ============================================
@@ -9,18 +9,18 @@
    ============================================ */
 :root {
   --bg: #06111f;
-  --panel: #0d1f36;
-  --panel2: #0a1b31;
-  --line: #294866;
-  --text: #f7f9ff;
-  --muted: #b8c9de;
-  --blue: #4b86bd;
-  --blue2: #5b9bd5;
-  --orange: #e87535;
-  --green: #78aaa3;
-  --red: #ef6a5d;
-  --yellow: #ffa02b;
-  --purple: #a78bfa;
+  --painel: #0d1f36;
+  --painel2: #0a1b31;
+  --linha: #294866;
+  --texto: #f7f9ff;
+  --silenciado: #b8c9de;
+  --azul: #4b86bd;
+  --azul2: #5b9bd5;
+  --laranja: #e87535;
+  --verde: #78aaa3;
+  --vermelho: #ef6a5d;
+  --amarelo: #ffa02b;
+  --roxo: #a78bfa;
 }
 
 /* ============================================
@@ -33,7 +33,7 @@
 body {
   margin: 0;
   background: var(--bg);
-  color: var(--text);
+  color: var(--texto);
   font-family: "Segoe UI", Arial, sans-serif;
   line-height: 1.5;
 }
@@ -62,9 +62,9 @@ textarea {
   align-items: center;
   gap: 28px;
   padding: 26px;
-  border: 1px solid var(--line);
+  border: 1px solid var(--linha);
   border-radius: 22px;
-  background: var(--panel2);
+  background: var(--painel2);
   margin-bottom: 20px;
 }
 
@@ -142,7 +142,7 @@ h1 {
 }
 
 .tabBtn {
-  border: 1px solid var(--line);
+  border: 1px solid var(--linha);
   background: #0a1b31;
   color: #dcecff;
   border-radius: 999px;
@@ -153,7 +153,7 @@ h1 {
 }
 
 .tabBtn:hover {
-  border-color: var(--blue);
+  border-color: var(--azul);
   transform: translateY(-1px);
 }
 
@@ -186,10 +186,11 @@ h1 {
 }
 
 .field {
-  background: var(--panel);
-  border: 1px solid var(--line);
+  background: var(--painel);
+  border: 1px solid var(--linha);
   border-radius: 16px;
   padding: 12px;
+  min-width: 0; /* FIX: evita overflow no grid */
 }
 
 label {
@@ -200,6 +201,10 @@ label {
   color: #b8d4f2;
   margin-bottom: 8px;
   text-transform: uppercase;
+  /* FIX: label não corta palavras */
+  white-space: normal;
+  word-break: keep-all;
+  line-height: 1.3;
 }
 
 select,
@@ -212,6 +217,9 @@ input[type="search"] {
   font-weight: 800;
   font-size: 15px;
   outline: none;
+  /* FIX: select não estoura */
+  min-width: 0;
+  max-width: 100%;
 }
 
 option {
@@ -219,7 +227,7 @@ option {
 }
 
 .actionBtn {
-  border: 1px solid var(--line);
+  border: 1px solid var(--linha);
   background: #0a1b31;
   color: #dcecff;
   border-radius: 16px;
@@ -228,10 +236,11 @@ option {
   cursor: pointer;
   align-self: stretch;
   transition: 0.2s;
+  white-space: nowrap;
 }
 
 .actionBtn:hover {
-  border-color: var(--blue);
+  border-color: var(--azul);
   transform: translateY(-1px);
 }
 
@@ -246,6 +255,7 @@ option {
    ============================================ */
 .multiBox {
   position: relative;
+  min-width: 0; /* FIX */
 }
 
 .multiBtn {
@@ -261,12 +271,24 @@ option {
   justify-content: space-between;
   gap: 10px;
   align-items: center;
+  min-width: 0; /* FIX */
+  overflow: hidden; /* FIX */
+}
+
+/* FIX: texto do botão não estoura */
+.multiBtn span,
+.multiBtn > *:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
 }
 
 .multiBtn:after {
   content: "⌄";
   font-size: 18px;
   color: #dcecff;
+  flex-shrink: 0; /* FIX: seta não encolhe */
 }
 
 .multiPanel {
@@ -277,7 +299,7 @@ option {
   top: calc(100% + 8px);
   z-index: 999;
   background: #0a1b31;
-  border: 1px solid var(--line);
+  border: 1px solid var(--linha);
   border-radius: 16px;
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.32);
   padding: 12px;
@@ -322,6 +344,7 @@ option {
 
 .multiItem input {
   width: auto;
+  flex-shrink: 0;
   accent-color: #5b9bd5;
 }
 
@@ -333,7 +356,7 @@ option {
 
 .multiActions button {
   flex: 1;
-  border: 1px solid var(--line);
+  border: 1px solid var(--linha);
   background: #132840;
   color: #dcecff;
   border-radius: 10px;
@@ -343,7 +366,7 @@ option {
 }
 
 /* ============================================
-   KPIs
+   KPIs  ← PRINCIPAL FIX
    ============================================ */
 .kpis {
   display: grid !important;
@@ -354,21 +377,23 @@ option {
 }
 
 .kpi {
-  background: var(--panel);
-  border: 1px solid var(--line);
+  background: var(--painel);
+  border: 1px solid var(--linha);
   border-radius: 18px;
   padding: 18px;
-  min-height: 120px;
+  min-height: 130px;
   cursor: pointer;
   transition: 0.2s;
   grid-column: span 1 !important;
+  /* FIX: impede overflow */
   width: 100% !important;
   min-width: 0 !important;
+  overflow: hidden;
 }
 
 .kpi:hover {
   transform: translateY(-2px);
-  border-color: var(--blue);
+  border-color: var(--azul);
 }
 
 .kpi.feature {
@@ -377,45 +402,58 @@ option {
   grid-column: span 1 !important;
 }
 
-.kpi.red {
-  border-color: rgba(239, 106, 93, 0.46);
-}
+.kpi.red   { border-color: rgba(239, 106,  93, 0.46); }
+.kpi.orange{ border-color: rgba(232, 117,  53, 0.46); }
+.kpi.green { border-color: rgba(120, 170, 163, 0.52); }
+.kpi.purple{ border-color: rgba(167, 139, 250, 0.44); }
 
-.kpi.orange {
-  border-color: rgba(232, 117, 53, 0.46);
-}
-
-.kpi.green {
-  border-color: rgba(120, 170, 163, 0.52);
-}
-
-.kpi.purple {
-  border-color: rgba(167, 139, 250, 0.44);
-}
-
+/* FIX LABEL: nunca corta palavra no meio */
 .kpi .label {
   font-size: 11px;
   letter-spacing: 0.16em;
   color: #b8d4f2;
   font-weight: 900;
   text-transform: uppercase;
-  min-height: auto !important;
+  line-height: 1.35;
+  /* garante quebra SÓ entre palavras completas */
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  white-space: normal;
+  hyphens: none;
+  /* limita a 2 linhas com reticências */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
+/* FIX VALUE: número grande não estoura */
 .kpi .value {
-  font-size: 34px !important;
+  font-size: clamp(26px, 2.4vw, 34px) !important;
   font-weight: 950;
-  margin: 14px 0 4px;
+  margin: 10px 0 4px;
   line-height: 1.05 !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .kpi.feature .value {
-  font-size: 46px;
+  font-size: clamp(32px, 3vw, 46px) !important;
 }
 
+/* FIX NOTE */
 .kpi .note {
   color: #c7d8ee;
   font-size: 13px;
+  line-height: 1.35;
+  white-space: normal;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 /* ============================================
@@ -437,8 +475,8 @@ option {
    PANELS
    ============================================ */
 .panel {
-  background: var(--panel);
-  border: 1px solid var(--line);
+  background: var(--painel);
+  border: 1px solid var(--linha);
   border-radius: 20px;
   min-height: 320px;
   overflow: hidden;
@@ -446,10 +484,11 @@ option {
 
 .panelHead {
   padding: 18px;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--linha);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
 }
 
 h2 {
@@ -468,21 +507,31 @@ h2 {
 }
 
 /* ============================================
-   BAR CHARTS (HTML)
+   BAR CHARTS ← FIX nomes cortados
    ============================================ */
 .barRow {
   display: grid;
-  grid-template-columns: 140px 1fr 70px 55px;
+  grid-template-columns: minmax(0, 130px) 1fr 70px 55px;
   gap: 10px;
   align-items: center;
   margin-bottom: 12px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 10px;
+  transition: 0.15s;
 }
 
+.barRow:hover {
+  background: rgba(91, 155, 213, 0.07);
+}
+
+/* FIX: nome trunca com "..." — sem cortar palavra */
 .barName {
   font-weight: 800;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  min-width: 0;
 }
 
 .track {
@@ -498,26 +547,16 @@ h2 {
   transition: width 0.3s;
 }
 
-.fill.orange {
-  background: linear-gradient(90deg, #b95023, #e87535);
-}
-
-.fill.green {
-  background: linear-gradient(90deg, #437b76, #78aaa3);
-}
-
-.fill.red {
-  background: linear-gradient(90deg, #a83e36, #ef6a5d);
-}
-
-.fill.purple {
-  background: linear-gradient(90deg, #7c5fd8, #a78bfa);
-}
+.fill.orange { background: linear-gradient(90deg, #b95023, #e87535); }
+.fill.green  { background: linear-gradient(90deg, #437b76,  #78aaa3); }
+.fill.red    { background: linear-gradient(90deg, #a83e36,  #ef6a5d); }
+.fill.purple { background: linear-gradient(90deg, #7c5fd8,  #a78bfa); }
 
 .num,
 .pct {
   text-align: right;
   font-weight: 800;
+  white-space: nowrap;
 }
 
 /* ============================================
@@ -535,8 +574,8 @@ h2 {
   height: 180px;
   border-radius: 50%;
   background: conic-gradient(
-    var(--blue) 0 var(--opPct),
-    var(--orange) var(--opPct) 100%
+    var(--azul) 0 var(--opPct),
+    var(--laranja) var(--opPct) 100%
   );
   position: relative;
 }
@@ -546,7 +585,7 @@ h2 {
   position: absolute;
   inset: 52px;
   border-radius: 50%;
-  background: var(--panel);
+  background: var(--painel);
 }
 
 .donutCenter {
@@ -574,24 +613,10 @@ h2 {
   transform: translateX(4px);
 }
 
-.dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: var(--blue);
-}
-
-.dot.orange {
-  background: var(--orange);
-}
-
-.dot.green {
-  background: var(--green);
-}
-
-.dot.purple {
-  background: var(--purple);
-}
+.dot { width: 12px; height: 12px; border-radius: 50%; background: var(--azul); }
+.dot.orange { background: var(--laranja); }
+.dot.green  { background: var(--verde);  }
+.dot.purple { background: var(--roxo); }
 
 /* ============================================
    COLUMN CHARTS
@@ -613,6 +638,7 @@ h2 {
   gap: 8px;
   cursor: pointer;
   transition: 0.2s;
+  min-width: 0; /* FIX */
 }
 
 .colWrap:hover {
@@ -635,12 +661,14 @@ h2 {
   color: #ffa02b;
 }
 
+/* FIX: label da coluna trunca sem quebrar */
 .colLbl {
   font-size: 12px;
   color: #d9e6f8;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  min-width: 0;
 }
 
 /* ============================================
@@ -650,7 +678,7 @@ h2 {
   display: none;
   margin: 0 0 14px;
   background: #0d1f36;
-  border: 1px solid var(--line);
+  border: 1px solid var(--linha);
   border-radius: 18px;
   padding: 14px 16px;
   align-items: center;
@@ -698,6 +726,7 @@ h2 {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   z-index: 1;
+  white-space: nowrap; /* FIX: cabeçalho não quebra */
 }
 
 .dataTable td,
@@ -708,6 +737,11 @@ h2 {
 
 .dataTable td {
   color: #eaf3ff;
+  /* FIX: célula longa trunca */
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .tag {
@@ -717,27 +751,13 @@ h2 {
   padding: 5px 9px;
   font-weight: 900;
   font-size: 12px;
+  white-space: nowrap; /* FIX */
 }
 
-.tag.ok {
-  border-color: #3f7d55;
-  color: #83d99d;
-}
-
-.tag.att {
-  border-color: #8d6a23;
-  color: #ffa02b;
-}
-
-.tag.crit {
-  border-color: #8b3f38;
-  color: #ff7d72;
-}
-
-.tag.purple {
-  border-color: #6d5ba0;
-  color: #a78bfa;
-}
+.tag.ok    { border-color: #3f7d55; color: #83d99d; }
+.tag.att   { border-color: #8d6a23; color: #ffa02b; }
+.tag.crit  { border-color: #8b3f38; color: #ff7d72; }
+.tag.purple{ border-color: #6d5ba0; color: #a78bfa; }
 
 /* ============================================
    TERRITORIAL
@@ -759,6 +779,8 @@ h2 {
   border-radius: 16px;
   padding: 16px;
   min-height: 92px;
+  min-width: 0; /* FIX */
+  overflow: hidden;
 }
 
 .territorialCard small {
@@ -801,7 +823,7 @@ h2 {
 
 .territorialRow {
   display: grid;
-  grid-template-columns: 180px 1fr 82px 70px;
+  grid-template-columns: minmax(0, 180px) 1fr 82px 70px;
   gap: 10px;
   align-items: center;
   background: rgba(19, 40, 64, 0.72);
@@ -824,6 +846,7 @@ h2 {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  min-width: 0; /* FIX */
 }
 
 .territorialTrack {
@@ -844,6 +867,7 @@ h2 {
   text-align: right;
   font-weight: 900;
   color: #fff;
+  white-space: nowrap; /* FIX */
 }
 
 /* ============================================
@@ -865,7 +889,7 @@ h2 {
   color: #aebfd5;
   font-size: 12px;
   text-align: left;
-  border-top: 1px solid var(--line);
+  border-top: 1px solid var(--linha);
   opacity: 0.7;
 }
 
