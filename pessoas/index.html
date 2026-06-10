@@ -10,54 +10,6 @@
 </head>
 
 <body>
-  </head>
-
-<body>
-
-<script>
-(function () {
-
-  const SENHA = "RH_COMLURB_2026#847";
-
-  if(sessionStorage.getItem("hub_pessoas_auth") === "ok"){
-    return;
-  }
-
-  const senhaInformada = prompt("Painel restrito. Informe a senha:");
-
-  if(senhaInformada === SENHA){
-    sessionStorage.setItem("hub_pessoas_auth","ok");
-    return;
-  }
-
-  document.body.innerHTML = `
-    <div style="
-      height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background:#07111f;
-      color:#fff;
-      font-family:Arial,sans-serif;
-    ">
-      <div style="
-        background:#0d1b2f;
-        padding:40px;
-        border-radius:20px;
-        text-align:center;
-      ">
-        <h1>Acesso Restrito</h1>
-        <p>Este painel contém informações internas.</p>
-      </div>
-    </div>
-  `;
-
-  throw new Error("Acesso negado");
-
-})();
-</script>
-
-<div class="app">
 <div class="app">
   
   <!-- ============================================
