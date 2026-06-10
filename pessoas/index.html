@@ -99,17 +99,18 @@
     /* ── barras ── */
     .barRow {
       display: grid;
-      grid-template-columns: minmax(0, 130px) 1fr 70px 55px;
+      grid-template-columns: 160px 1fr 70px 55px;
       gap: 10px;
       align-items: center;
       margin-bottom: 12px;
     }
     .barName {
       min-width: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
       font-weight: 800;
+      font-size: 13px;
+      line-height: 1.35;
+      word-break: break-word;
+      overflow-wrap: break-word;
     }
     .num, .pct {
       white-space: nowrap;
