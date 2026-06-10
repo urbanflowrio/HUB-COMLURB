@@ -410,21 +410,20 @@ option {
 /* FIX LABEL: nunca corta palavra no meio */
 .kpi .label {
   font-size: 11px;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.06em;
   color: #b8d4f2;
-  font-weight: 900;
+  font-weight: 700;
   text-transform: uppercase;
-  line-height: 1.35;
-  /* garante quebra SÓ entre palavras completas */
-  word-break: keep-all;
+  line-height: 1.4;
+  word-break: break-word;
   overflow-wrap: break-word;
   white-space: normal;
   hyphens: none;
-  /* limita a 3 linhas com reticências */
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  min-height: 46px;
 }
 
 /* FIX VALUE: número grande não estoura */
