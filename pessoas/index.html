@@ -46,7 +46,7 @@
     }
     .multiList, .multiList * { overflow-wrap: anywhere; }
 
-    /* ── KPI cards ── FIX PRINCIPAL ── */
+    /* ── KPI cards — FIX TRUNCAÇÃO ── */
     .kpis {
       display: grid !important;
       grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
@@ -57,36 +57,36 @@
       min-width: 0 !important;
       overflow: hidden;
     }
-    /* LABEL: nunca corta palavra no meio */
+    /* LABEL: permite 3 linhas para acomodar texto uppercase com letter-spacing */
     .kpi .label {
-      font-size: 11px !important;
-      letter-spacing: 0.14em !important;
-      line-height: 1.35 !important;
+      font-size: 10.5px !important;
+      letter-spacing: 0.12em !important;
+      line-height: 1.4 !important;
       white-space: normal !important;
-      word-break: keep-all !important;
+      word-break: break-word !important;
       overflow-wrap: break-word !important;
       hyphens: none !important;
       display: -webkit-box !important;
-      -webkit-line-clamp: 2 !important;
+      -webkit-line-clamp: 3 !important;
       -webkit-box-orient: vertical !important;
       overflow: hidden !important;
-      min-height: 30px;
+      min-height: 42px !important;
     }
     /* VALUE: número não estoura */
     .kpi .value {
-      font-size: clamp(24px, 2.2vw, 34px) !important;
+      font-size: clamp(22px, 2.1vw, 32px) !important;
       white-space: nowrap !important;
       overflow: hidden !important;
       text-overflow: ellipsis !important;
       line-height: 1.1 !important;
-      margin: 10px 0 4px !important;
+      margin: 8px 0 4px !important;
     }
     .kpi.feature .value {
-      font-size: clamp(30px, 3vw, 46px) !important;
+      font-size: clamp(28px, 2.8vw, 42px) !important;
     }
     /* NOTE: texto auxiliar não estoura */
     .kpi .note {
-      font-size: 13px !important;
+      font-size: 12px !important;
       line-height: 1.35 !important;
       white-space: normal !important;
       word-break: keep-all !important;
@@ -227,7 +227,7 @@
       </div>
 
       <div class="field">
-        <label>Tipo Cargo</label>
+        <label>Tipo de cargo</label>
         <select id="fTipoCargo">
           <option value="">Todos</option>
         </select>
@@ -246,7 +246,7 @@
       </div>
 
       <div class="field">
-        <label>Função Cargo</label>
+        <label>Função / cargo</label>
         <div class="multiBox" id="funcaoMulti">
           <button class="multiBtn" id="fFuncaoBtn" type="button">Todas</button>
 
@@ -263,7 +263,7 @@
         </div>
       </div>
 
-      <button class="actionBtn" onclick="clearAll()">Limpar</button>
+      <button class="actionBtn" onclick="clearAll()">Limpar filtros</button>
     </section>
 
     <div id="drillBanner"></div>
@@ -274,7 +274,7 @@
       <div class="grid">
         <div class="panel">
           <div class="panelHead">
-            <h2>Distribuição por Diretoria</h2>
+            <h2>Distribuição por diretoria</h2>
             <div class="hint">Clique para filtrar</div>
           </div>
           <div class="body" id="chartDiretorias"></div>
@@ -282,7 +282,7 @@
 
         <div class="panel">
           <div class="panelHead">
-            <h2>Capacidade x Pressão</h2>
+            <h2>Capacidade x pressão</h2>
             <div class="hint">Distribuição do efetivo</div>
           </div>
           <div class="body" id="chartAtvAfast"></div>
@@ -290,7 +290,7 @@
 
         <div class="panel">
           <div class="panelHead">
-            <h2 id="tituloCardCascata">Distribuição por Superintendência</h2>
+            <h2 id="tituloCardCascata">Distribuição por superintendência</h2>
             <div class="hint" id="hintCardCascata">De acordo com o filtro aplicado</div>
           </div>
           <div class="body" id="chartLaudosGerencia"></div>
@@ -304,7 +304,7 @@
       <div class="grid">
         <div class="panel">
           <div class="panelHead">
-            <h2>Pressão por Gerência</h2>
+            <h2>Pressão por gerência</h2>
             <div class="hint">Laudos, afastamentos e idade crítica</div>
           </div>
           <div class="body" id="chartPressaoGerencia"></div>
@@ -312,7 +312,7 @@
 
         <div class="panel">
           <div class="panelHead">
-            <h2>Tipos de Laudo</h2>
+            <h2>Tipos de laudo</h2>
             <div class="hint">Classificação pela conclusão</div>
           </div>
           <div class="body" id="chartTiposLaudo"></div>
@@ -334,7 +334,7 @@
       <div class="grid">
         <div class="panel">
           <div class="panelHead">
-            <h2>Tipos de Afastamento</h2>
+            <h2>Tipos de afastamento</h2>
             <div class="hint">Clique para filtrar</div>
           </div>
           <div class="body" id="chartTipoAfast"></div>
@@ -342,7 +342,7 @@
 
         <div class="panel">
           <div class="panelHead">
-            <h2>Afastados por Gerência</h2>
+            <h2>Afastados por gerência</h2>
             <div class="hint">Ranking gerencial</div>
           </div>
           <div class="body" id="chartAfastGerencia"></div>
@@ -350,7 +350,7 @@
 
         <div class="panel">
           <div class="panelHead">
-            <h2>Tempo de Casa - Afastados</h2>
+            <h2>Tempo de casa — afastados</h2>
             <div class="hint">Anos de serviço</div>
           </div>
           <div class="body" id="chartTempoAfast"></div>
@@ -391,14 +391,14 @@
         <div class="panel">
           <div class="panelHead">
             <h2>Mapa territorial de residência</h2>
-            <div class="hint">Concentração dos principais municípios/bairros</div>
+            <div class="hint">Concentração dos principais municípios / bairros</div>
           </div>
           <div class="body" id="rankCidades"></div>
         </div>
 
         <div class="panel">
           <div class="panelHead">
-            <h2>Jornada</h2>
+            <h2>Jornada de trabalho</h2>
             <div class="hint">Tipos de jornada</div>
           </div>
           <div class="body" id="chartJornada"></div>
@@ -409,7 +409,7 @@
     <main class="screen" id="screenAnalitico">
       <div class="panel">
         <div class="panelHead">
-          <h2>Base analítica enriquecida</h2>
+          <h2>Base analítica</h2>
           <button class="actionBtn primary" onclick="exportExcel()">Exportar Excel</button>
         </div>
 
