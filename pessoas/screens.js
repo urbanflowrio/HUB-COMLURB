@@ -19,7 +19,7 @@ const PessoasScreens = {
     // KPIs
     HUB.cards.render("kpis", [
       {
-        label: "Total de colaboradores",
+        label: "Total de servidores",
         value: total,
         note: "No recorte atual",
         feature: true,
@@ -32,7 +32,7 @@ const PessoasScreens = {
         note: HUB.format.pct(HUB.format.calcPct(ativos, total)),
         color: "green",
         onclick: "PessoasApp.setDrill('situacao','ativo','Servidores ativos')",
-        tooltip: "Colaboradores em atividade regular"
+        tooltip: "Servidores em atividade regular"
       },
       {
         label: "Afastados",
@@ -40,23 +40,23 @@ const PessoasScreens = {
         note: HUB.format.pct(HUB.format.calcPct(afastados, total)),
         color: "orange",
         onclick: "PessoasApp.setDrill('situacao','afastado','Servidores afastados')",
-        tooltip: "Colaboradores temporariamente afastados"
+        tooltip: "Servidores temporariamente afastados"
       },
       {
-        label: "Laudos",
+        label: "Com laudo",
         value: laudos,
         note: HUB.format.pct(HUB.format.calcPct(laudos, total)),
         color: "purple",
         onclick: "PessoasApp.setDrill('situacao','laudo','Servidores com laudo')",
-        tooltip: "Colaboradores com laudo médico"
+        tooltip: "Servidores com laudo médico"
       },
       {
-        label: "Risco 65+",
+        label: "Risco etário 65+",
         value: risco65,
         note: HUB.format.pct(HUB.format.calcPct(risco65, total)),
         color: "red",
         onclick: "PessoasApp.setDrill('situacao','risco65','Risco etário 65+')",
-        tooltip: "Colaboradores com 65 anos ou mais"
+        tooltip: "Servidores com 65 anos ou mais"
       }
     ]);
     
@@ -108,20 +108,20 @@ const PessoasScreens = {
     const filtros = PessoasApp.filters;
     
     let campo = "diretoria";
-    let titulo = "Distribuição por Diretoria";
-    let hint = "Selecione uma Diretoria para abrir por Superintendência";
+    let titulo = "Distribuição por diretoria";
+    let hint = "Selecione uma diretoria para abrir por superintendência";
     
     if (filtros.dir && !filtros.sup) {
       campo = "superintendencia";
-      titulo = "Distribuição por Superintendência / Coordenação";
-      hint = "Selecione para abrir por Gerência";
+      titulo = "Distribuição por superintendência / coordenação";
+      hint = "Selecione para abrir por gerência";
     } else if (filtros.sup && !filtros.ger) {
       campo = "gerencia";
-      titulo = "Distribuição por Gerência";
-      hint = "Selecione para abrir por Setor";
+      titulo = "Distribuição por gerência";
+      hint = "Selecione para abrir por setor";
     } else if (filtros.ger) {
       campo = "setor";
-      titulo = "Distribuição por Setor";
+      titulo = "Distribuição por setor";
       hint = "Leitura por setor operacional";
     }
     
@@ -151,7 +151,7 @@ const PessoasScreens = {
     // KPIs
     HUB.cards.render("kpisSaude", [
       {
-        label: "Total com laudo",
+        label: "Com laudo",
         value: laudos.length,
         note: HUB.format.pct(HUB.format.calcPct(laudos.length, total)),
         feature: true,
@@ -172,7 +172,7 @@ const PessoasScreens = {
         color: "red"
       },
       {
-        label: "Laudo + afastamento",
+        label: "Laudo + afastado",
         value: laudoAfast.length,
         note: "Maior criticidade",
         color: "red"
@@ -233,7 +233,7 @@ const PessoasScreens = {
       {
         label: "Total afastados",
         value: total,
-        note: "Colaboradores afastados no recorte",
+        note: "No recorte atual",
         feature: true,
         color: "orange",
         onclick: "PessoasApp.setDrill('situacao','afastado','Servidores afastados')"
@@ -264,11 +264,11 @@ const PessoasScreens = {
     });
     
     const faixas = HUB.array.faixaCount(subset, "tempoCasa", [
-      ["0-10", 0, 10],
-      ["11-20", 11, 20],
-      ["21-30", 21, 30],
-      ["31-40", 31, 40],
-      ["41-50", 41, 50],
+      ["0–10", 0, 10],
+      ["11–20", 11, 20],
+      ["21–30", 21, 30],
+      ["31–40", 31, 40],
+      ["41–50", 41, 50],
       ["51+", 51, 999]
     ]);
     this._renderCols("chartTempoAfast", faixas, "tempoFaixa");
@@ -321,7 +321,7 @@ const PessoasScreens = {
         customFormatter: v => `<span style="font-size:18px">${v}</span>`
       },
       {
-        label: "Cidade predominante",
+        label: "Município predominante",
         value: cidPred[0],
         note: "Residência",
         format: "custom",
@@ -331,11 +331,11 @@ const PessoasScreens = {
     
     // Gráficos
     const faixasIdade = HUB.array.faixaCount(data, "idade", [
-      ["<30", 0, 30],
-      ["31-40", 31, 40],
-      ["41-50", 41, 50],
-      ["51-60", 51, 60],
-      ["61-70", 61, 70],
+      ["< 30", 0, 30],
+      ["31–40", 31, 40],
+      ["41–50", 41, 50],
+      ["51–60", 51, 60],
+      ["61–70", 61, 70],
       ["71+", 71, 999]
     ]);
     this._renderCols("chartIdade", faixasIdade, "idadeFaixa");
@@ -347,11 +347,11 @@ const PessoasScreens = {
     });
     
     const faixasTempo = HUB.array.faixaCount(data, "tempoCasa", [
-      ["0-10", 0, 10],
-      ["11-20", 11, 20],
-      ["21-30", 21, 30],
-      ["31-40", 31, 40],
-      ["41-50", 41, 50],
+      ["0–10", 0, 10],
+      ["11–20", 11, 20],
+      ["21–30", 21, 30],
+      ["31–40", 31, 40],
+      ["41–50", 41, 50],
       ["51+", 51, 999]
     ]);
     this._renderCols("chartTempoCasa", faixasTempo, "tempoFaixa");
@@ -441,9 +441,9 @@ const PessoasScreens = {
       <table class="dataTable">
         <thead><tr>
           <th>Registro</th><th>Nome</th><th>Diretoria</th><th>Superintendência</th>
-          <th>Gerência</th><th>Setor</th><th>Tipo Cargo</th><th>Função Cargo</th>
+          <th>Gerência</th><th>Setor</th><th>Tipo de cargo</th><th>Função / cargo</th>
           <th>Função EC</th><th>Atuação</th><th>Situação</th><th>Afastamento</th>
-          <th>Tipo Afast.</th><th>Idade</th><th>Tempo Casa</th><th>Laudo</th>
+          <th>Tipo afast.</th><th>Idade</th><th>Tempo de casa</th><th>Laudo</th>
         </tr></thead>
         <tbody>
         ${rows.map(r => `
@@ -456,11 +456,11 @@ const PessoasScreens = {
             <td>${HUB.format.esc(r.setor)}</td>
             <td>${HUB.format.esc(r.tipoCargo)}</td>
             <td>${HUB.format.esc(r.funcaoCargo)}</td>
-            <td>${HUB.format.esc(r.funcaoEC || "-")}</td>
+            <td>${HUB.format.esc(r.funcaoEC || "—")}</td>
             <td>${HUB.format.esc(r.funcaoAtuacao)}</td>
             <td><span class="tag ${r.afastado ? 'att' : 'ok'}">${r.afastado ? 'Afastado' : 'Ativo'}</span></td>
-            <td>${HUB.format.esc(r.afastamento || "-")}</td>
-            <td>${HUB.format.esc(r.tipoAfastamento || "-")}</td>
+            <td>${HUB.format.esc(r.afastamento || "—")}</td>
+            <td>${HUB.format.esc(r.tipoAfastamento || "—")}</td>
             <td>${r.idade || ""}</td>
             <td>${r.tempoCasa || ""}</td>
             <td><span class="tag ${r.possuiLaudo ? 'purple' : 'ok'}">${r.possuiLaudo ? 'Sim' : 'Não'}</span></td>
